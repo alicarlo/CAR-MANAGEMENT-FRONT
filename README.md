@@ -18,11 +18,11 @@ Proyecto base con **Angular** y **Tailwind CSS**.
 
 ## Inatalacion
 
-  npm install
+  npm install (correr en la raiz del proyecto)
 
 ## Correr
 
-  ng serve -o
+  ng serve -o (Correr en la raiz del proyecto)
 
   La aplicación se abrirá en:
   👉 http://localhost:4200/
