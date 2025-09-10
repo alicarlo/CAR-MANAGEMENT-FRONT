@@ -59,22 +59,21 @@ export class SignUpComponent implements OnInit {
 
     this.loading = true;
     const body: RegisterUser = this.saveForm.getRawValue();
-    console.log(body)
     this._AuthService.registerUser(body).subscribe({
-        next: async (response: any) => {
-          if(response) {
-            this._ToastrService.success('Registro exitoso', 'Exito');
-            this.loading = false;
-            this._Location.back();  
-            return;
-          }
+      next: async (response: any) => {
+        if(response) {
+          this._ToastrService.success('Registro exitoso', 'Exito');
           this.loading = false;
-        },
-        error: (err) => {
-          let error = err[0].msg ? err[0].msg : err;
-          this._ToastrService.error(error, 'Error');
-          this.loading = false;
-        },
-      })
+          this._Location.back();  
+          return;
+        }
+        this.loading = false;
+      },
+      error: (err) => {
+        let error = err[0].msg ? err[0].msg : err;
+        this._ToastrService.error(error, 'Error');
+        this.loading = false;
+      },
+    })
   }
 }
