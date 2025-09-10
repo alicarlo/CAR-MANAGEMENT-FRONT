@@ -1,0 +1,10 @@
+<ng-container>
+  <th class="w-[50px]">
+    <input (change)="toggle($event)" class="checkbox checkbox-sm" data-datatable-check="true" type="checkbox" />
+  </th>
+
+  <ng-container *ngFor="let col of columns">
+    <th class="min-w-[200px]">{{ col }}</th>
+  </ng-container>
+  <th class="w-[60px]"></th> 
+</ng-container>

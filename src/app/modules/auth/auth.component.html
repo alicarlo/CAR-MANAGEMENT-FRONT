@@ -1,0 +1,25 @@
+<div class="flex h-screen w-screen">
+  <div class="bg-primary hidden flex-1 items-center justify-center bg-cover lg:flex">
+    <div class="max-w-2xl space-y-4 p-8 text-center text-white">
+      <div class="flex items-center justify-center">
+        <img class="h-[300px]" src="./assets/imgs/machucas.png" alt="dashboard widget" />
+      </div>
+
+    </div>
+  </div>
+  <div class="bg-background flex flex-1 items-center justify-center">
+    <div class="max-w-md overflow-y-auto px-4 sm:w-[500px]">
+      <!-- logo -->
+      <div class="flex items-center justify-center gap-3">
+        <!--
+        <a class="bg-primary rounded-sm p-2">
+          <img src="assets/imgs/login2.png" class="h-10 rounded-2" alt="logo" />
+        </a>
+        -->
+        <b class="text-md text-foreground font-bold">Machucas Automotriz</b>
+      </div>
+      <!-- Route -->
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+<form [formGroup]="saveForm" class="my-10 space-y-6">
+  <div class="text-center">
+    <h2 class="text-foreground mb-1 text-3xl font-semibold">Registro<span class="text-primary">!</span></h2>
+  </div>
+
+  <div class="space-y-3 text-left">
+    <div class="flex flex-col gap-2">
+      <p class="text-foreground text-[11px] font-medium">Nombre completo:</p>
+      <input
+        class="py-2 pl-8 pr-2"
+        placeholder="Nombre completo"
+        type="text"
+        formControlName="full_name" 
+      />
+      <div class="error-messages">
+        <ng-container *ngFor="let error of error_messages.full_name">
+          <div class="error-message" *ngIf="saveForm.get('full_name')?.hasError(error.type) && (saveForm.get('full_name')?.dirty || saveForm.get('full_name')?.touched)">
+            {{error.message}}
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="text-foreground text-[11px] font-medium">Correo:</p>
+      <input
+        class="py-2 pl-8 pr-2"
+        placeholder="Correo"
+        type="text"
+        formControlName="email" 
+      />
+      <div class="error-messages">
+        <ng-container *ngFor="let error of error_messages.email">
+          <div class="error-message" *ngIf="saveForm.get('email')?.hasError(error.type) && (saveForm.get('email')?.dirty || saveForm.get('email')?.touched)">
+            {{error.message}}
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="text-foreground text-[11px] font-medium">Direccion #1 (Opcional):</p>
+      <input
+        class="py-2 pl-8 pr-2"
+        placeholder="Direccion #1"
+        type="text"
+        formControlName="address_street_1" 
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="text-foreground text-[11px] font-medium">Direccion #2 (Opcional):</p>
+      <input
+        class="py-2 pl-8 pr-2"
+        placeholder="Direccion #2"
+        type="text"
+        formControlName="address_street_2" 
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="text-foreground text-[11px] font-medium">Estado (Opcional):</p>
+      <input
+        class="py-2 pl-8 pr-2"
+        placeholder="Estado"
+        type="text"
+        formControlName="address_state" 
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="text-foreground text-[11px] font-medium">Ciudad (Opcional):</p>
+      <input
+        class="py-2 pl-8 pr-2"
+        placeholder="Ciudad"
+        type="text"
+        formControlName="address_city" 
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="text-foreground text-[11px] font-medium">Codigo postal (Opcional):</p>
+      <input
+        class="py-2 pl-8 pr-2"
+        placeholder="Codigo postal"
+        type="text"
+        formControlName="address_zip" 
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <p class="text-foreground text-[11px] font-medium">Pais (Opcional):</p>
+      <input
+        class="py-2 pl-8 pr-2"
+        placeholder="Pais"
+        type="text"
+        formControlName="address_country" 
+      />
+    </div>
+      
+    <div class="flex flex-col gap-2">
+      <p class="text-foreground text-[11px] font-medium">Contraseña:</p>
+      <input
+        class="py-2 pl-8 pr-2"
+        placeholder="Contraseña"
+        type="password"
+        formControlName="password" 
+      />
+      <div class="error-messages">
+        <ng-container *ngFor="let error of error_messages.password">
+          <div class="error-message" *ngIf="saveForm.get('password')?.hasError(error.type) && (saveForm.get('password')?.dirty || saveForm.get('password')?.touched)">
+            {{error.message}}
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <app-button 
+      [loading]="loading" 
+      full 
+      impact="bold" 
+      tone="primary" 
+      shape="rounded" 
+      size="medium"
+      (click)="createUser()"
+      >
+      Registrar
+    </app-button>
+  </div>
+
+  <div class="text-muted-foreground flex items-center text-sm">
+    <app-button [disabled]="loading" routerLink="/auth/sign-in" impact="none" tone="primary" shape="rounded" size="small">
+      Regresar
+    </app-button>
+  </div>
+</form>

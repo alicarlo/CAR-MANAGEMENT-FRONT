@@ -1,0 +1,21 @@
+<ng-container>
+ <td class="text-center">
+    <input
+      [(ngModel)]="selected"
+      [ngModelOptions]="{ standalone: true }"
+      class="checkbox checkbox-sm"
+      type="checkbox" />
+  </td>
+
+  <!-- celdas dinámicas: imprime TODOS los valores del objeto -->
+  <ng-container *ngFor="let val of  dataValues">
+    <td>{{ val }}</td>
+  </ng-container>
+
+  <!-- acciones -->
+  <td class="text-center">
+    <button class="text-muted-foreground hover:bg-card hover:text-foreground flex h-7 w-7 items-center justify-center rounded-md">
+      <svg-icon src="./assets/icons/heroicons/outline/ellipsis-vertical.svg" [svgClass]="'h-4 w-4'"></svg-icon>
+    </button>
+  </td>
+</ng-container>
