@@ -3,6 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
 import { ClientsComponent } from './pages/clients/clients.component';
 import { CarsComponent } from './pages/cars/cars.component';
+import { RolesComponent } from './pages/roles/roles.component';
+import { ScopesComponent } from './pages/scopes/scopes.component';
 
 
 const routes: Routes = [
@@ -12,6 +14,8 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: 'clients', pathMatch: 'full' },
       { path: 'clients', component: ClientsComponent },
+      { path: 'roles', component: RolesComponent },
+      { path: 'scopes', component: ScopesComponent },
       { path: 'cars', component: CarsComponent },
       { path: '**', redirectTo: 'errors/404' },
     ],

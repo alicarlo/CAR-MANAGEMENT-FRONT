@@ -11,12 +11,9 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
 export class TableHeaderComponent {
   @Output() onCheck = new EventEmitter<boolean>();
   @Input() columns!: any[];
-
-  constructor() {
-    setTimeout(() => {
-      console.log(this.columns);
-    }, 2000);
-  }
+  @Input() stickyActions: boolean = true;
+  constructor() {}
+  
   public toggle(event: Event) {
     const value = (event.target as HTMLInputElement).checked;
     this.onCheck.emit(value);

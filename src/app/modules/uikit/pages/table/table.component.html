@@ -19,8 +19,9 @@
 </div>
 
 <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
-  <app-table-action></app-table-action>
+  <app-table-action ></app-table-action>
   <div
+    *ngIf="loading === true && error === false"
     class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted grow overflow-x-auto px-5">
     <table
       class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
@@ -29,14 +30,44 @@
       </thead>
       <tbody>
         @for (item of filteredData(); track $index) {
-          <tr app-table-row class="hover:bg-card/50" [data]="item"></tr>
+          <tr 
+            app-table-row 
+            class="hover:bg-card/50" 
+            [data]="item"  
+            [dataFilterColumns]="dataFilterColumns"
+            [actions]="actions"
+            (action)="onRowAction($event)">
+            >
+          </tr>
         } @empty {
           <tr>
-            <td class="py-4 text-center text-sm" colspan="7">No users found</td>
+            <td class="py-4 text-center text-sm" colspan="7">No hay datos</td>
           </tr>
         }
       </tbody>
     </table>
   </div>
-  <app-table-footer></app-table-footer>
+
+  <div *ngIf="loading === false" class="w-full h-[315px] flex items-center justify-center">
+
+    <app-loading></app-loading>
+     
+  </div>
+
+  <div *ngIf="error === true" class="w-full h-[315px] flex items-center justify-center">
+    <p class="text-foreground">Problemas al cargar los datos</p>
+  </div>
+  <app-table-footer 
+    (pageSizeSelectChild)=pageSizeSelect($event) 
+    (changePageNextPrevChild)="changePageNextPrev($event)"
+    (currentPageChild)="currentPageTable($event)"
+    [hasNext]="hasNext"
+    [hasPrev]="hasPrev"
+    [total]="total"
+    [pages]="pages"
+    [totalPages]="totalPages"
+    [anchorsNext]="anchorsNextArray"
+    [currentPage]="currentPageSelect"
+    [activateSearch]="activateSearch" 
+    ></app-table-footer>
 </div>

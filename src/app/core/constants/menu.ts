@@ -12,6 +12,8 @@ export class Menu {
           route: '/dashboard',
           children: [
             { label: 'Clientes', route: '/layout/dashboard/clients' },
+            { label: 'Roles', route: '/layout/dashboard/roles' },
+            { label: 'Scopes', route: '/layout/dashboard/scopes' },
             { label: 'Vehiculos', route: '/layout/dashboard/cars' }
           ],
         },

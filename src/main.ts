@@ -10,7 +10,8 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 
 import { provideToastr, ToastrModule } from 'ngx-toastr';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { apiInterceptor } from './app/core/interceptor/api.interceptor';
+import { apiInterceptor } from './app/core/interceptor/api/api.interceptor';
+import { errorInterceptor } from './app/core/interceptor/error/error.interceptor';
 
 
 if (environment.production) {
@@ -32,7 +33,7 @@ bootstrapApplication(AppComponent, {
     })
   ), provideAnimations(),
   provideToastr(),
-  provideHttpClient(withInterceptors([apiInterceptor])),
+  provideHttpClient(withInterceptors([apiInterceptor, errorInterceptor])),
   ],
 }).catch((err) => console.error(err));
 

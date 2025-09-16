@@ -12,7 +12,12 @@
           placeholder="Busqueda"
           type="text"
           value=""
+          [(ngModel)]="search"
           (input)="onSearchChange($event)" />
+
+          <div *ngIf="search" class="absolute right-2.5 top-2.5 cursor-pointer" (click)="clearSearch()">
+            <svg-icon src="./assets/icons/heroicons/outline/close.svg" [svgClass]="'h-4 w-4'"> </svg-icon>
+          </div>
       </label>
     </div>
   </div>

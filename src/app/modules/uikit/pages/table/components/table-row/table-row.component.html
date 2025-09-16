@@ -8,14 +8,36 @@
   </td>
 
   <!-- celdas dinámicas: imprime TODOS los valores del objeto -->
-  <ng-container *ngFor="let val of  dataValues">
-    <td>{{ val }}</td>
+  <ng-container *ngFor="let val of  dataFilterColumns; trackBy: trackByCol">
+    <td [ngClass]="val.class" [ngSwitch]="val.type">
+       <ng-container *ngSwitchCase="'text'">
+        {{ getValue(val.key)  }}
+       </ng-container>
+
+        <ng-container *ngSwitchCase="'split'">
+        {{ getValue(val.key).length  }} / 2 
+       </ng-container>
+    </td>
   </ng-container>
 
   <!-- acciones -->
-  <td class="text-center">
-    <button class="text-muted-foreground hover:bg-card hover:text-foreground flex h-7 w-7 items-center justify-center rounded-md">
-      <svg-icon src="./assets/icons/heroicons/outline/ellipsis-vertical.svg" [svgClass]="'h-4 w-4'"></svg-icon>
-    </button>
+  <td 
+    class="text-center"
+     [ngClass]="stickyActions
+          ? 'sticky right-0 z-2  bg-background ]'
+          : ''"
+    >
+    <ng-container >
+      <div class="flex gap-2">
+        <button 
+          *ngFor="let val of  actions; trackBy: trackByAction"
+          class="text-muted-foreground hover:bg-card hover:text-foreground flex h-7 w-7 items-center justify-center rounded-md"
+          (click)="emitAction(val)"
+          [attr.aria-label]="val.label || val.id" 
+        >
+          <mat-icon>{{val.icon}}</mat-icon>
+        </button>
+      </div>
+    </ng-container>
   </td>
 </ng-container>

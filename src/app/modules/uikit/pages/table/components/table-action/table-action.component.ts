@@ -1,21 +1,28 @@
 import { Component } from '@angular/core';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { TableFilterService } from '../../services/table-filter.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-table-action',
-  imports: [AngularSvgIconModule],
+  imports: [AngularSvgIconModule, CommonModule, FormsModule],
   templateUrl: './table-action.component.html',
   styleUrl: './table-action.component.css',
 })
 export class TableActionComponent {
+  search: string = '';
   constructor(public filterService: TableFilterService) {}
 
+  clearSearch() {
+    this.search = '';
+    this.filterService.searchField.set('');  
+  }
+  
   onSearchChange(value: Event) {
-    console.log(value);
     const input = value.target as HTMLInputElement;
+    this.search = input.value;
     this.filterService.searchField.set(input.value);
-    console.log(input.value)
   }
 
   onStatusChange(value: Event) {

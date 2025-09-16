@@ -6,6 +6,8 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { ToastrService } from 'ngx-toastr';
 import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
+import { LoginUser, UserResponse, UserSet } from 'src/app/core/models/auth.model';
+import { AuthService } from 'src/app/core/services/auth/auth.service';
 
 @Component({  
   selector: 'app-sign-in',
@@ -22,12 +24,9 @@ export class SignInComponent implements OnInit {
   constructor(
     private readonly _formBuilder: FormBuilder, 
     private readonly _router: Router,
-    private _ToastrService: ToastrService
+    private _ToastrService: ToastrService,
+    private _AuthService: AuthService,
   ) {}
-
-  onClick() {
-    console.log('Button clicked');
-  }
 
   ngOnInit(): void {
     this.form = this._formBuilder.group({
@@ -48,12 +47,29 @@ export class SignInComponent implements OnInit {
     this.submitted = true;
     const { email, password } = this.form.value;
 
-    console.log(email, password);
     if (this.form.invalid) {
+
       return;
     }
 
-    this._router.navigate(['/layout']);
-
+    this.loading = true;
+    const body: LoginUser = this.form.getRawValue();
+    this._AuthService.loginUser(body).subscribe({
+      next: async (response: UserResponse) => {
+        if(response) {
+          type UserPayload = Pick<UserSet, 'full_name' | 'role' | 'scope_list' | 'user_id'>;
+          const { full_name, role, scope_list, user_id } = response;
+          const payload: UserPayload = { full_name, role, scope_list, user_id };
+          this._AuthService.setSession(response.access_token, payload);
+          this._router.navigate(['/layout']);
+          this._ToastrService.success('Bienvenido', 'Exito');
+        }
+        this.loading = false;
+      },
+      error: (err) => {
+        this._ToastrService.error(err.error, 'Error');
+        this.loading = false;
+      },
+    })
   }
 }

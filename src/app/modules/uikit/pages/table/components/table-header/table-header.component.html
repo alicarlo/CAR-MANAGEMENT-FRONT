@@ -6,5 +6,10 @@
   <ng-container *ngFor="let col of columns">
     <th class="min-w-[200px]">{{ col }}</th>
   </ng-container>
-  <th class="w-[60px]"></th> 
+  <th 
+    class="w-[60px]"
+    [ngClass]="stickyActions
+          ? 'sticky right-0 z-10 bg-card ]'
+          : ''"
+    ></th> 
 </ng-container>

@@ -1,41 +1,48 @@
-<div class="text-muted-foreground flex flex-wrap items-center justify-between gap-2 py-3 px-5 text-xs">
+<div [hidden]="!_activateSearch" class="text-muted-foreground flex flex-wrap items-center justify-between gap-2 py-3 px-5 text-xs">
   <div class="order-2 flex items-center gap-2 md:order-1">
     Ver
-    <select class="w-16 p-2">
-      <option value="5">5</option>
-      <option value="10" selected>10</option>
-      <option value="20">20</option>
-      <option value="30">30</option>
-      <option value="50">50</option>
+    <select class="w-16 p-2"
+      [(ngModel)]="pageSize"
+      [ngModelOptions]="{ standalone: true }"
+      (ngModelChange)="onPageSizeChange($any($event))"
+    >
+      <option [ngValue]="5">5</option>
+      <option [ngValue]="10">10</option>
+      <option [ngValue]="20">20</option>
+      <option [ngValue]="30">30</option>
+      <option [ngValue]="50">50</option>
     </select>
     por pagina
   </div>
   <div class="order-1 flex items-center gap-4 md:order-2">
-    <span>1-10 of 100</span>
+    <span>1-{{showItems}} of {{total}}</span>
     <div class="inline-flex items-center gap-1">
       <button
+        (click)="changePageNextPrev('prev')"
         class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm disabled:opacity-50"
-        disabled>
+        [disabled]="!hasPrev"   
+        [ngClass]="!hasPrev
+          ? '!cursor-not-allowed'
+          : '!cursor-pointer'">
         <svg-icon src="./assets/icons/heroicons/outline/arrow-long-left.svg" [svgClass]="'h-4 w-4'"> </svg-icon>
       </button>
+      
       <button
-        class="bg-muted-foreground/10 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm">
-        1
+        *ngFor="let p of pages"
+        class="hover:bg-muted-foreground/10 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm cursor-pointer"
+        (click)="goToPage(p)"
+        [ngClass]="p === currentPageSelect ? 'bg-muted-foreground/10' : 'hover:bg-muted-foreground/50'">
+        {{ p }}
       </button>
+      
       <button
-        class="hover:bg-muted-foreground/10 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm">
-        2
-      </button>
-      <button
-        class="hover:bg-muted-foreground/10 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm">
-        3
-      </button>
-      <button
-        class="hover:bg-muted-foreground/10 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm">
-        ...
-      </button>
-      <button
-        class="hover:bg-muted-foreground/10 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm">
+        (click)="changePageNextPrev('next')"
+        class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm disabled:opacity-50"
+        [disabled]="!hasNext"   
+        [ngClass]="!hasNext
+          ? '!cursor-not-allowed'
+          : '!cursor-pointer'"
+        >
         <svg-icon src="./assets/icons/heroicons/outline/arrow-long-right.svg" [svgClass]="'h-4 w-4'"> </svg-icon>
       </button>
     </div>

@@ -292,26 +292,36 @@ select {
   @apply h-4 w-4 rounded-sm border-border bg-background checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary focus:ring-2 focus:ring-primary;
 }
 
+/* Colores (recuerda cerrar @apply con ; ) */
+.custom-dialog-container { @apply bg-background text-foreground; }
+.custom-dialog-container .mat-mdc-dialog-title    { @apply bg-background text-foreground; }
+.custom-dialog-container .mat-mdc-dialog-content  { @apply bg-background text-foreground; }
+.custom-dialog-container .mat-mdc-dialog-actions  { @apply bg-background text-foreground; }
 
-
-.custom-dialog-container {
-  @apply bg-background text-foreground
+/* Tamaño del overlay pane */
+.cdk-overlay-pane.dialog-90 {
+  width: 90vw !important;
+  max-width: 90vw !important;
+  height: 90vh !important;
+  max-height: 90vh !important;
 }
 
-/* Estilo del título */
-.custom-dialog-container .mat-mdc-dialog-title {
-  @apply bg-background text-foreground
+/* Que todo llene 100% y use flex (título arriba, acciones abajo, contenido flexible) */
+.cdk-overlay-pane.dialog-90 .mat-mdc-dialog-container { @apply w-full h-full flex flex-col p-0; }
+
+/* En MDC, estas capas también deben medir 100% para evitar márgenes fantasma */
+.cdk-overlay-pane.dialog-90 .mdc-dialog__container,
+.cdk-overlay-pane.dialog-90 .mdc-dialog__surface { height: 100%; }
+
+/* Quita límites y paddings del contenido y hazlo scrollable */
+.cdk-overlay-pane.dialog-90 .mat-mdc-dialog-content {
+  max-height: unset;             /* quita el 65vh por defecto */
+  @apply flex-1 overflow-auto p-0;
 }
 
-/* Estilo del contenido */
-.custom-dialog-container .mat-mdc-dialog-content {
-  @apply bg-background text-foreground
-}
-
-/* Estilo de las acciones */
-.custom-dialog-container .mat-mdc-dialog-actions {
-  @apply bg-background text-foreground
-}
+/* Ajusta título/acciones para que no agreguen espacio extra */
+.cdk-overlay-pane.dialog-90 .mat-mdc-dialog-title   { @apply m-0 p-4; }
+.cdk-overlay-pane.dialog-90 .mat-mdc-dialog-actions { @apply m-0 p-3; }
 
 button {
   cursor: pointer;

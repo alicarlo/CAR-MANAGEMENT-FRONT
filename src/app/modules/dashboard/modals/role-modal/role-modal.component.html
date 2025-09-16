@@ -1,0 +1,96 @@
+<mat-dialog-content>
+  <div class="p-[20px]">
+    <!-- New Action-->
+    <div  class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Roles</p>
+
+      <div>
+        <form  [formGroup]="saveForm" class="flex flex-col gap-6">
+          <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Nombre:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Nombre"
+                type="text"
+                formControlName="name" 
+              />
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.name">
+                  <div class="error-message" *ngIf="saveForm.get('name').hasError(error.type) && (saveForm.get('name').dirty || saveForm.get('name').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Descripcion:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Descripcion"
+                type="text"
+                formControlName="descriptions" 
+              />
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.descriptions">
+                  <div class="error-message" *ngIf="saveForm.get('descriptions').hasError(error.type) && (saveForm.get('descriptions').dirty || saveForm.get('descriptions').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-foreground text-[11px] font-medium">Scopes:</label>
+
+              <div class="relative" (click)="$event.stopPropagation()">
+                <button type="button"
+                  (click)="open = !open"
+                  class="w-full py-1 pl-8 pr-2 rounded-md
+                    bg-background text-foreground
+                    border border-border
+                    focus:outline-none focus:ring-2 focus:ring-primary/50
+                    appearance-none [color-scheme:dark] relative text-left"
+                >
+                  <span class="truncate">{{ selectedLabel() }}</span>
+                  <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">▾</span>
+                </button>
+
+                <div *ngIf="open" class="fixed inset-0 z-40" (click)="open = false"></div>
+
+                <div *ngIf="open"
+                    class="absolute z-50 mt-1 w-full max-h-60 overflow-auto
+                            rounded-md bg-background border border-border shadow">
+                  <ul class="py-1">
+                    <li *ngFor="let s of scopes; trackBy: trackById" class="px-2 py-1 hover:bg-muted/30">
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox"
+                              class="accent-primary"
+                              [checked]="isChecked(s.id)"
+                              (change)="toggleScope(s.id)">
+                        <span class="text-foreground">{{ s.name }}</span>
+                      </label>
+                    </li>
+                  </ul>
+                  <div class="p-2 border-t border-border flex justify-end">
+                    <app-button (click)="open = false" impact="bold" tone="primary" shape="rounded" size="small">Aceptar</app-button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <div class="flex gap-2 p-[20px]">
+    <app-button [loading]="loading" (click)="save()" full impact="bold" tone="primary" shape="rounded" size="medium">Guardar</app-button>
+    <app-button [disabled]="loading"  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
+
+  </div>
+</mat-dialog-actions>
