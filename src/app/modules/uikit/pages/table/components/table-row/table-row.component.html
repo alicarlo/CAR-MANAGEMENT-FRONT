@@ -17,6 +17,11 @@
         <ng-container *ngSwitchCase="'split'">
         {{ getValue(val.key).length  }} / 2 
        </ng-container>
+
+       <ng-container *ngSwitchCase="'dob'">
+        {{ getValue(val.key) | date:'dd/MM/yyyy'  }} 
+       </ng-container>
+
     </td>
   </ng-container>
 

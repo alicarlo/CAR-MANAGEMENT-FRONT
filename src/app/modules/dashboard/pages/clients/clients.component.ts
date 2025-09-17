@@ -25,7 +25,7 @@ export class ClientsComponent {
     { key: 'email', type: 'text' },
     { key: 'phone', type: 'text' },
     { key: 'address_street_1', type: 'text' },
-    { key: 'birthday', type: 'text' },
+    { key: 'birthday', type: 'dob' },
     { key: 'gender', type: 'text' },
     { key: 'rfc', type: 'text' },
     { key: 'status', type: 'text' },
