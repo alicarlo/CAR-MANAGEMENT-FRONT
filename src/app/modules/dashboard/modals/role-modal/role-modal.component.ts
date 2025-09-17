@@ -20,12 +20,14 @@ export class RoleModalComponent {
   loading: boolean = false;
   scopes: Scopes[] = [];
   open: boolean = false;
-  error_messages={
+  error_messages = {
     'name':[
 			{type: 'required', message: 'Nombre es requerido'},
+      {type: 'minlength', message: 'Minimo 3 caracteres'},
 		],
 		'descriptions':[
-				{type: 'required', message: 'Descripcion es requerido'},
+      {type: 'required', message: 'Descripcion es requerido'},
+      {type: 'minlength', message: 'Minimo 3 caracteres'},
 		]
 	}
   constructor(
@@ -141,10 +143,12 @@ export class RoleModalComponent {
   }
 
   toggleScope(id: number) {
+    console.log(id)
     const curr = (this.saveForm.value.scope_id ?? []).map(Number);
     const nid = Number(id);
     const next = curr.includes(nid) ? curr.filter((x: any) => x !== nid) : [...curr, nid];
     this.saveForm.patchValue({ scope_id: next }, { emitEvent: true });
+      console.log(this,this.saveForm.value)
   }
 
   selectedLabel() {

@@ -1,67 +1,76 @@
-export type Estatus = 'EN VENTA' | 'APARTADO' | 'EN PAGOS' | 'LIQUIDADO';
-export type TipoAdquisicion = 'COMPRAS' | 'CONSIGNA';
-
-// Grupo de checks (bool)
-export interface CarsChecks {
-  unidadLuces: boolean;
-  cuartosLuces: boolean;
-  antena: boolean;
-  espejosLaterales: boolean;
-  cristales: boolean;
-  emblemas: boolean;
-  llantas: boolean;
-  taponesRines: boolean;
-  moldurasCompletas: boolean;
-  taponGasolina: boolean;
-  carroceriaSinGoles: boolean;
-  claxon: boolean;
-  instrumentosTablero: boolean;
-  aireAcondicionado: boolean;
-  limpiadores: boolean;
-  radioEstereo: boolean;
-  encendedor: boolean;
-  espejoRetrovisor: boolean;
-  ceniceros: boolean;
-  botonesInteriores: boolean;
-  manijasInteriores: boolean;
-  tapetes: boolean;
-  vestiduras: boolean;
-  gato: boolean;
-  maneralGato: boolean;
-  llaveRuedas: boolean;
-  estHerramientas: boolean;
-  trianguloSeguridad: boolean; // "Traing. de Seguridad"
-  llantaRefaccion: boolean;
-  extinguidor: boolean;
-  taponAceite: boolean;
-  taponRadiador: boolean;
-  filtroAceite: boolean;
-  bateria: boolean;
-  filtroAire: boolean;
-}
-
 
 export interface Cars {
-  id?: string;
-  tipoAutoId: string; 
-  sucursalId: string;
-  marca: string;
-  linea: string;
-  modelo: string;
+  id: number;
+  key: string;
+  car_type_id: number;
+  store_id: number;
+  user_id: number;
+  client_id: number;
+  make: string;
+  model: string;
+  version: string;
   color: string;
-  serie: string;      
-  numeroMotor: string;    
-  kilometraje: number;
-  cilindros: number;
-  fechaLlegada: string; 
-  precioVenta: number;
-  enganche: number;
-  estatus: Estatus;
-  tipoAdquisicion: TipoAdquisicion;
-  checks: CarsChecks;
-  comentarios?: string;
-  comentariosCarroceria?: string;
-  comentariosLlantas?: string;
-  comentariosPintura?: string;
-  comentariosOtros?: string;
+  vin: string;
+  km: number;
+  cylinders: number;
+  engine_number: string;
+  sale_price: number;
+  down_payment: number;
+  car_acquisition: AcquisitionDto;
+  checks: Checks | null;
+  comments: Comments | null;
+  arrived_at: Date
+  status: string
+}
+
+export interface Checks {
+  unidad_luces: Boolean;
+  cuarto_luces: Boolean;
+  antena: Boolean;
+  espejos_laterales: Boolean;
+  cristales: Boolean;
+  emblemas: Boolean;
+  llantas: Boolean;
+  tapones_gasolina: Boolean;
+  carroceria_sin_golpes: Boolean;
+  claxon: Boolean;
+  instrumentos_tablero: Boolean;
+  aire_acondicionado: Boolean;
+  limpiadores: Boolean;
+  radio_estereo: Boolean;
+  encendedor: Boolean;
+  espejo_retrovisor: Boolean;
+  ceniceros: Boolean;
+  botones_interiores: Boolean;
+  manijas_interiores: Boolean;
+  tapetes: Boolean;
+  vestiduras: Boolean;
+  gato:Boolean;
+  maneral_gato: Boolean;
+  llave_ruedas: Boolean;
+  herramientas: Boolean;
+  traing_seguridad: Boolean;
+  llanta_refaccion: Boolean;
+  extinguidor: Boolean;
+  tapon_aceite: Boolean;
+  tapon_radiador: Boolean;
+  filtro_aceite: Boolean;
+  bateria: Boolean;
+  filtro_aire: Boolean;
+} 
+
+export interface Comments {
+  generales: string;
+  carroceria: string;
+  llantas: string;
+  pintura: string;
+  otros: string;
+}
+
+export const AcquisitionType = {
+  // type = 'compras' |'consigna',
+}
+
+export interface AcquisitionDto {
+  acquisition_type: string;
 }

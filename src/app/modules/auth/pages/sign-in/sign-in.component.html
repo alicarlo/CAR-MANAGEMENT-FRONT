@@ -1,12 +1,8 @@
-<!-- login form -->
 <form class="my-10 space-y-6" [formGroup]="form" (ngSubmit)="onSubmit()">
   <div class="text-center">
     <h2 class="text-foreground mb-1 text-3xl font-semibold">Bienvenido <span class="text-primary">!</span></h2>
     <p class="text-muted-foreground text-sm">Ingrese sus credenciales para acceder a su cuenta.</p>
   </div>
-
-
-
 
   <div class="space-y-3 text-left">
     <div class="form__group">
@@ -66,20 +62,13 @@
   </div>
 
   <div class="mb-2 flex items-center justify-between space-x-3">
-
     <!--
-    <div class="flex items-center">
-      <input id="remember-me" name="remember-me" type="checkbox" />
-      <label for="remember-me" class="text-muted-foreground ml-2 block text-sm"> Remember me </label>
-    </div>
-    -->
-
     <app-button routerLink="/auth/forgot-password" impact="none" tone="primary" shape="rounded" size="small">
       ¿Olvidaste tu contraseña?
     </app-button>
+  -->
   </div>
 
-  <!-- Submit Button -->
   <div>
     <app-button [loading]="loading" full impact="bold" tone="primary" shape="rounded" size="medium">Iniciar Sesión</app-button>
   </div>
@@ -89,13 +78,4 @@
       Registrate
     </app-button>
   </div>
-  <!-- Sign-up -->
-   <!--
-  <div class="text-muted-foreground flex items-center text-sm">
-    Not a Member yet?
-    <app-button routerLink="/auth/sign-up" impact="none" tone="primary" shape="rounded" size="small">
-      Sign up
-    </app-button>
-  </div>
-  -->
 </form>

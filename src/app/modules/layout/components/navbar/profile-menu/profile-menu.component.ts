@@ -1,10 +1,11 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { NgClass } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { ThemeService } from '../../../../../core/services/theme.service';
 import { ClickOutsideDirective } from '../../../../../shared/directives/click-outside.directive';
+import { AuthService } from 'src/app/core/services/auth/auth.service';
 
 @Component({
   selector: 'app-profile-menu',
@@ -40,7 +41,7 @@ export class ProfileMenuComponent implements OnInit {
     {
       title: 'Cerrar sesión',
       icon: './assets/icons/heroicons/outline/logout.svg',
-      link: '/auth',
+      action: () => this.closeSession(),
     },
   ];
 
@@ -78,7 +79,11 @@ export class ProfileMenuComponent implements OnInit {
   public themeMode = ['light', 'dark'];
   public themeDirection = ['ltr', 'rtl'];
 
-  constructor(public themeService: ThemeService) {}
+  constructor(
+    public themeService: ThemeService,
+    private _AuthService: AuthService,
+    private _Router: Router 
+  ) {}
 
   ngOnInit(): void {}
 
@@ -103,5 +108,10 @@ export class ProfileMenuComponent implements OnInit {
     this.themeService.theme.update((theme) => {
       return { ...theme, direction: value };
     });
+  }
+
+  closeSession() {
+    this._AuthService.clearSession();
+    this._Router.navigateByUrl('/auth/login');
   }
 }

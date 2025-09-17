@@ -48,8 +48,8 @@ export class ClientsComponent {
   hasNext: boolean = false
   hasPrev: boolean = false;
 
-  anchorsNext: Array<any | undefined> = []; // cursor para ir de p -> p+1
-  anchorsPrev: Array<any | undefined> = []; // cursor para ir de p -> p-1
+  anchorsNext: Array<any | undefined> = []; 
+  anchorsPrev: Array<any | undefined> = [];
 
   private query$ = new Subject<string>();
 
@@ -164,18 +164,17 @@ export class ClientsComponent {
   async deleteClient(id: string) {
     return new Promise((resolve, reject) => {
       this._ClientsService.deleteClient(id).subscribe({
-      next: async (response: any) => {
-        if(response) {
-          this._ToastrService.success('Eliminado con exito', 'Exito');
-         resolve(true);
-        }
-      },
-      error: (err) => {
-        reject(err);
-        // this._ToastrService.error(err.error, 'Error');
-      },
-    })
+        next: async (response: any) => {
+          if(response) {
+            this._ToastrService.success('Eliminado con exito', 'Exito');
+          resolve(true);
+          }
+        },
+        error: (err) => {
+          reject(err);
+          // this._ToastrService.error(err.error, 'Error');
+        },
+      })
     })
   }
-
 }

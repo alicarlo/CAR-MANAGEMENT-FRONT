@@ -26,15 +26,19 @@ export class ClientsModalComponent {
     'email':[
 			{type: 'required', message: 'Correo es requerido'},
       {type: 'email', message: 'Formato invalido'},
+      {type: 'minlength', message: 'Minimo 3 caracteres'},
 		],
 		'full_name':[
-				{type: 'required', message: 'Nombre completo es requerido'},
+      {type: 'required', message: 'Nombre completo es requerido'},
+      {type: 'minlength', message: 'Minimo 3 caracteres'},
 		],
 		'phone':[
 			{type: 'required', message: 'Telefono es requerido'},
+      {type: 'minlength', message: 'Minimo 3 caracteres'},
 		],
 		'address_street_1':[
 			{type: 'required', message: 'La direccion es requerida'},
+      {type: 'minlength', message: 'Minimo 3 caracteres'},
 		],
 		'birthday':[
 			{type: 'required', message: 'Cumpleanos es requerido'},

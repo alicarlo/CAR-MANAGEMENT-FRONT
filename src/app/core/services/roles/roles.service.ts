@@ -27,7 +27,7 @@ export class RolesService {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
-    return this.http.patch<Role>(`${environment.apiUrl}/scope/${bodyData.id}`, bodyData ,httpOptions).pipe(
+    return this.http.patch<Role>(`${environment.apiUrl}/role/${bodyData.id}`, bodyData ,httpOptions).pipe(
       retry(0),
       catchError(this.error.handleError)
     );

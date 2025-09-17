@@ -1,1 +1,180 @@
-<p>users-modal works!</p>
+<mat-dialog-content>
+  <div class="p-[20px]">
+    <!-- New Action-->
+    <div  class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Cliente</p>
+
+      <div>
+        <form  [formGroup]="saveForm" class="flex flex-col gap-6">
+          <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Nombre y Apellido:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Nombre y Apellido"
+                type="text"
+                formControlName="full_name" 
+              />
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.full_name">
+                  <div class="error-message" *ngIf="saveForm.get('full_name').hasError(error.type) && (saveForm.get('full_name').dirty || saveForm.get('full_name').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Correo:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Correo"
+                type="text"
+                formControlName="email" 
+              />
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.email">
+                  <div class="error-message" *ngIf="saveForm.get('email').hasError(error.type) && (saveForm.get('email').dirty || saveForm.get('email').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Contraseña:</p>
+
+              <div class="relative">
+                <input
+                  [type]="showPass1 ? 'text' : 'password'"
+                  class="w-full py-2 pl-8 pr-10 rounded-md"
+                  placeholder="Contraseña"
+                  formControlName="password"
+                  autocomplete="new-password"
+                  spellcheck="false"
+                />
+
+                <button
+                  type="button"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 text-foreground"
+                  (click)="showPass1 = !showPass1"
+                  [attr.aria-label]="showPass1 ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                  [attr.aria-pressed]="showPass1">
+                  <mat-icon>{{ showPass1 ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+              </div>
+
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.password">
+                  <div class="error-message" *ngIf="saveForm.get('password').hasError(error.type) && (saveForm.get('password').dirty || saveForm.get('password').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Role:</label>
+              <div class="relative">
+                <select 
+                  formControlName="role_id"
+                  class="w-full py-2 pl-8 pr-10 rounded-md
+                        bg-background text-foreground
+                        border border-border
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        appearance-none [color-scheme:dark]"
+                >
+                  <option value="" disabled selected hidden>Selecciona…</option>
+
+                  <option *ngFor="let s of roles" [value]="s.id">
+                    {{ s.name }}
+                  </option>
+                </select>
+              </div>
+
+               <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.role_id">
+                  <div class="error-message" *ngIf="saveForm.get('role_id').hasError(error.type) && (saveForm.get('role_id').dirty || saveForm.get('role_id').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Direccion #1 (Opcional):</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Direccion #1"
+                type="text"
+                formControlName="address_street_1" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Direccion #2 (Opcional):</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Direccion #2"
+                type="text"
+                formControlName="address_street_2" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Estado (Opcional):</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Estado"
+                type="text"
+                formControlName="address_state" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Ciudad (Opcional):</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Ciudad"
+                type="text"
+                formControlName="address_city" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Codigo postal (Opcional):</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Codigo postal"
+                type="text"
+                formControlName="address_zip" 
+              />
+            </div>
+            
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Pais (Opcional):</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Pais"
+                type="text"
+                formControlName="address_country" 
+              />
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+</mat-dialog-content>
+
+
+<mat-dialog-actions align="end">
+  <div class="flex gap-2 p-[20px]">
+    <!--[loading]="loading"-->
+    <app-button [loading]="loading" (click)="save()" full impact="bold" tone="primary" shape="rounded" size="medium">Guardar</app-button>
+    <app-button [disabled]="loading"  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
+
+  </div>
+</mat-dialog-actions>

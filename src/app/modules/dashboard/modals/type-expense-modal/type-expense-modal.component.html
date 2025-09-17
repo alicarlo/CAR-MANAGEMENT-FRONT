@@ -1,0 +1,49 @@
+<mat-dialog-content>
+  <div class="p-[20px]">
+    <!-- New Action-->
+    <div  class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Tipos de Gastos</p>
+
+      <div>
+        <form  [formGroup]="saveForm" class="flex flex-col gap-6">
+          <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Nombre:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Nombre"
+                type="text"
+                formControlName="name" 
+              />
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.name">
+                  <div class="error-message" *ngIf="saveForm.get('name').hasError(error.type) && (saveForm.get('name').dirty || saveForm.get('name').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Descripcion:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Descripcion"
+                type="text"
+                formControlName="descriptions" 
+              />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <div class="flex gap-2 p-[20px]">
+    <app-button [loading]="loading" (click)="save()" full impact="bold" tone="primary" shape="rounded" size="medium">Guardar</app-button>
+    <app-button [disabled]="loading"  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
+
+  </div>
+</mat-dialog-actions>

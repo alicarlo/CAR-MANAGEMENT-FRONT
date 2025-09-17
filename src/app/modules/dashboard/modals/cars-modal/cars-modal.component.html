@@ -1,0 +1,329 @@
+<mat-dialog-content>
+  <div class="p-[20px]">
+    <!-- New Action-->
+    <div  class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Vehiculos</p>
+
+      <div>
+        <form  [formGroup]="saveForm" class="flex flex-col gap-6">
+          <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Marca:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Marca"
+                type="email"
+                formControlName="make" 
+              />
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.make">
+                  <div class="error-message" *ngIf="saveForm.get('make').hasError(error.type) && (saveForm.get('make').dirty || saveForm.get('make').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Modelo:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Modelo"
+                type="email"
+                formControlName="model" 
+              />
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.model">
+                  <div class="error-message" *ngIf="saveForm.get('model').hasError(error.type) && (saveForm.get('model').dirty || saveForm.get('model').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Version:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Version"
+                type="text"
+                formControlName="version" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Color:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Color"
+                type="text"
+                formControlName="color" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Vin:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Vin"
+                type="text"
+                formControlName="vin" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">KM:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="KM"
+                type="number"
+                formControlName="km" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Cilindros:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Cilindros"
+                type="number"
+                formControlName="cylinders" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Numero de Motor:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Numero de Motor"
+                type="text"
+                formControlName="engine_number" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Precio:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Precio"
+                type="number"
+                formControlName="sale_price" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Adquisicion:</label>
+              <div class="relative">
+                <select 
+                  formControlName="car_acquisition"
+                  class="w-full py-2 pl-8 pr-10 rounded-md
+                        bg-background text-foreground
+                        border border-border
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        appearance-none [color-scheme:dark]"
+                >
+                  <option value="" disabled selected hidden>Selecciona…</option>
+
+                  <option *ngFor="let s of carAcquisition" [value]="s">
+                    {{ s }}
+                  </option>
+                </select>
+              </div>
+
+               <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.car_acquisition">
+                  <div class="error-message" *ngIf="saveForm.get('car_acquisition').hasError(error.type) && (saveForm.get('car_acquisition').dirty || saveForm.get('car_acquisition').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Fecha de Adquisicion:</p>
+              <div class="relative">
+                 <input
+                    #dob
+                    type="date"
+                    class="py-2 pl-8 pr-2"
+                    formControlName="arrived_at"
+                    [attr.max]="todayStr"       
+                  />
+
+                <button 
+                  type="button"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 text-foreground flex items-center justify-center"
+                  (click)="openPicker(dob)"
+                  >
+                  <mat-icon style="font-size: 20px;">calendar_month</mat-icon>
+                </button>
+              </div>
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.arrived_at">
+                  <div class="error-message" *ngIf="saveForm.get('arrived_at').hasError(error.type) && (saveForm.get('arrived_at').dirty || saveForm.get('arrived_at').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Tipo de Vehiculo:</label>
+              <div class="relative">
+                <select 
+                  formControlName="car_type_id"
+                  class="w-full py-2 pl-8 pr-10 rounded-md
+                        bg-background text-foreground
+                        border border-border
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        appearance-none [color-scheme:dark]"
+                >
+                  <option value="" disabled selected hidden>Selecciona…</option>
+
+                  <option *ngFor="let s of typeCars" [value]="s.id">
+                    {{ s.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.car_type_id">
+                  <div class="error-message" *ngIf="saveForm.get('car_type_id').hasError(error.type) && (saveForm.get('car_type_id').dirty || saveForm.get('car_type_id').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+              
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Sucursales:</label>
+              <div class="relative">
+                <select 
+                  formControlName="store_id"
+                  class="w-full py-2 pl-8 pr-10 rounded-md
+                        bg-background text-foreground
+                        border border-border
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        appearance-none [color-scheme:dark]"
+                >
+                  <option value="" disabled selected hidden>Selecciona…</option>
+
+                  <option *ngFor="let s of store" [value]="s.id">
+                    {{ s.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Clientes:</label>
+              <div class="relative">
+                <select 
+                  formControlName="user_id"
+                  class="w-full py-2 pl-8 pr-10 rounded-md
+                        bg-background text-foreground
+                        border border-border
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        appearance-none [color-scheme:dark]"
+                >
+                  <option value="" disabled selected hidden>Selecciona…</option>
+
+                  <option *ngFor="let s of user" [value]="s.id">
+                    {{ s.full_name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!--
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Inversionista:</label>
+              <div class="relative">
+                <select 
+                  formControlName="investor_id"
+                  class="w-full py-2 pl-8 pr-10 rounded-md
+                        bg-background text-foreground
+                        border border-border
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        appearance-none [color-scheme:dark]"
+                >
+                  <option value="" disabled selected hidden>Selecciona…</option>
+
+                  <option *ngFor="let s of investor" [value]="s.id">
+                    {{ s.full_name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            -->
+
+            <div class="flex flex-col gap-2">
+              <label class="text-foreground text-[11px] font-medium">Inversionista:</label>
+
+              <div class="relative" (click)="$event.stopPropagation()">
+                <button type="button"
+                  (click)="open = !open"
+                  class="w-full py-1 pl-8 pr-2 rounded-md
+                    bg-background text-foreground
+                    border border-border
+                    focus:outline-none focus:ring-2 focus:ring-primary/50
+                    appearance-none [color-scheme:dark] relative text-left"
+                >
+                  <span class="truncate text-[12px]">{{ selectedLabel() }}</span>
+                  <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">▾</span>
+                </button>
+
+                <div *ngIf="open" class="fixed inset-0 z-40" (click)="open = false"></div>
+
+                <div *ngIf="open"
+                    class="absolute z-50 mt-1 w-full max-h-60 overflow-auto
+                            rounded-md bg-background border border-border shadow">
+                  <ul class="py-1">
+                    <li *ngFor="let s of investor" class="px-2 py-1 hover:bg-muted/30">
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox"
+                              class="accent-primary"
+                              [checked]="isChecked(s.id)"
+                              (change)="toggleScope(s.id)">
+                        <span class="text-foreground text-[12px]">{{ s.full_name }}</span>
+                      </label>
+                    </li>
+                  </ul>
+                  <div class="p-2 border-t border-border flex justify-end">
+                    <app-button (click)="open = false" impact="bold" tone="primary" shape="rounded" size="small">Aceptar</app-button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+            <label *ngFor="let f of checks" class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                class="accent-primary"
+                [checked]="getCheck(f.key)"
+                (change)="setCheck(f.key, $any($event.target).checked)"
+              />
+ 
+              <p class="text-foreground font-semibold">{{ f.label }}</p>
+            </label>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+</mat-dialog-content>
+
+
+<mat-dialog-actions align="end">
+  <div class="flex gap-2 p-[20px]">
+    <!--[loading]="loading"-->
+    <app-button [loading]="loading" (click)="save()" full impact="bold" tone="primary" shape="rounded" size="medium">Guardar</app-button>
+    <app-button [disabled]="loading"  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
+
+  </div>
+</mat-dialog-actions>

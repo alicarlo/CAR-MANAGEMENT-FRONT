@@ -53,7 +53,7 @@
                     focus:outline-none focus:ring-2 focus:ring-primary/50
                     appearance-none [color-scheme:dark] relative text-left"
                 >
-                  <span class="truncate">{{ selectedLabel() }}</span>
+                  <span class="truncate text-[12px]">{{ selectedLabel() }}</span>
                   <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">▾</span>
                 </button>
 
@@ -69,7 +69,7 @@
                               class="accent-primary"
                               [checked]="isChecked(s.id)"
                               (change)="toggleScope(s.id)">
-                        <span class="text-foreground">{{ s.name }}</span>
+                        <span class="text-foreground text-[12px]">{{ s.name }}</span>
                       </label>
                     </li>
                   </ul>

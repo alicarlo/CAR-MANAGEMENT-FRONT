@@ -21,9 +21,11 @@ export class ScopesModalComponent {
   error_messages={
     'name':[
 			{type: 'required', message: 'Nombre es requerido'},
+      {type: 'minlength', message: 'Minimo 3 caracteres'},
 		],
 		'descriptions':[
-				{type: 'required', message: 'Descripcion es requerido'},
+      {type: 'required', message: 'Descripcion es requerido'},
+      {type: 'minlength', message: 'Minimo 3 caracteres'},
 		]
 	}
   constructor(

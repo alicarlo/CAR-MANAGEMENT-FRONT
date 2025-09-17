@@ -42,8 +42,8 @@ export class RolesComponent {
   hasNext: boolean = false
   hasPrev: boolean = false;
 
-  anchorsNext: Array<any | undefined> = []; // cursor para ir de p -> p+1
-  anchorsPrev: Array<any | undefined> = []; // cursor para ir de p -> p-1
+  anchorsNext: Array<any | undefined> = []; 
+  anchorsPrev: Array<any | undefined> = [];
 
   private query$ = new Subject<string>();
 
@@ -152,8 +152,7 @@ export class RolesComponent {
         this.loading = true;
         this._ToastrService.error(err.error, 'Error');
       },
-    })
-      
+    }) 
   }
 
   async deleteRole(id: string) {
