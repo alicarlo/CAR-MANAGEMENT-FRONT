@@ -1,0 +1,146 @@
+<mat-dialog-content class="!p-0">
+  <div class="p-[15px]" *ngIf="loadingModal">
+    <div class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Autos</p>
+
+      <div class="mx-[25px]">
+        <label for="sexo" class="text-foreground text-[12px] font-medium">Información del Inversionista:</label>
+        <div class="border border-border/60 rounded-lg bg-card p-2 flex gap-2">
+          <p class="text-foreground text-[11px]"><strong>Nombre:</strong> {{ data.row.full_name }}</p>
+        </div>
+      </div>
+      <!-- CONTENEDOR CON SCROLL -->
+      <div
+        class="border border-border/60 rounded-lg bg-card m-[25px]
+               max-h-[310px] overflow-y-auto overflow-x-auto"
+      >
+        <!-- Wrapper para forzar ancho mínimo de tabla -->
+        <div class="min-w-[1400px]">
+          <table class="w-full table-auto">
+            <!-- Header -->
+            <thead>
+              <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
+                <th class="px-3 py-2 text-left whitespace-nowrap">Clave</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Tipo de auto</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Sucursal</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Marca</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Modelo</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Línea</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Color</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap"># Serie</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Kilometraje</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Cilindros</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap"># de motor</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Fecha de llegada</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Precio de venta</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Enganche</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Estatus</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Tipo de adquisición</th>
+              </tr>
+            </thead>
+
+            <tbody class="divide-y divide-border/40" *ngIf="cars?.length">
+              <tr
+                *ngFor="let item of cars"
+                class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition"
+              >
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.key }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.car_type?.name }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.branch?.name }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.make }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.model }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.version }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.color }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.vin }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.km }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.cylinders }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.engine_number }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.arrived_at | date:'dd/MM/yyyy' }}
+                </td>
+
+                <td class="px-3 py-2 align-middle text-right whitespace-nowrap">
+                  {{ item.sale_price | currency:'MXN':'symbol':'1.2-2':'en-US' }}
+                </td>
+
+                <td class="px-3 py-2 align-middle text-right whitespace-nowrap">
+                  {{ item.down_payment | currency:'MXN':'symbol':'1.2-2':'en-US' }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  <ng-container [ngSwitch]="item.status">
+                    <span *ngSwitchCase="'active'"
+                          class="inline-flex items-center rounded px-1.5 py-0.5 text-[11px] bg-green-500/10 text-green-600">
+                      Activo
+                    </span>
+                    <span *ngSwitchCase="'inactive'"
+                          class="inline-flex items-center rounded px-1.5 py-0.5 text-[11px] bg-rose-500/10 text-rose-600">
+                      Inactivo
+                    </span>
+                    <span *ngSwitchDefault
+                          class="inline-flex items-center rounded px-1.5 py-0.5 text-[11px] bg-muted/30 text-foreground/70">
+                      —
+                    </span>
+                  </ng-container>
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.car_acquisition }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="text-foreground text-[15px] w-full flex justify-center items-center" *ngIf="cars?.length === 0">
+        No hay Autos
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loadingModal" class="h-full flex justify-center items-center">
+    <app-loading></app-loading>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <div class="flex gap-2 p-[20px]">
+    <app-button mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">
+      Cerrar
+    </app-button>
+  </div>
+</mat-dialog-actions>

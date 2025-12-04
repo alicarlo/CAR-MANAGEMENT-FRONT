@@ -2,16 +2,16 @@
   <div class="p-[20px]">
     <!-- New Action-->
     <div  class="flex flex-col gap-4">
-      <p class="text-foreground font-semibold">Tipos de Documentos</p>
+      <p class="text-foreground font-semibold">Tipo de documento</p>
 
       <div>
         <form  [formGroup]="saveForm" class="flex flex-col gap-6">
-          <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="flex flex-col">
             <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Nombre:</p>
+              <p class="text-foreground text-[11px] font-medium">Titulo:</p>
               <input
                 class="py-2 pl-8 pr-2"
-                placeholder="Nombre"
+                placeholder="Titulo"
                 type="text"
                 formControlName="name" 
               />
@@ -33,6 +33,43 @@
                 formControlName="descriptions" 
               />
             </div>
+
+            <div class="flex flex-col gap-2" *ngIf="data.row">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Estatus:</label>
+              <div class="relative">
+                <select 
+                  formControlName="status"
+                  class="w-full py-2 pl-8 pr-10 rounded-md
+                        bg-background text-foreground
+                        border border-border
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        appearance-none [color-scheme:dark]"
+                >
+                  <option value="" disabled selected hidden>Selecciona…</option>
+
+                  <option *ngFor="let s of status" [value]="s">
+                    <span *ngIf="s == 'active'">Activo</span>
+                    <span *ngIf="s == 'inactive'">Inactivo</span>
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <br>
+            <div class="flex flex-col gap-2">
+              <label  class="text-foreground text-[11px] font-medium">Requiere fecha:</label>
+
+              <div class="flex gap-2 items-center">
+                <label  class="text-foreground text-[11px] font-medium">Seleccionar:</label>
+                <input
+                  formControlName="require_date"
+                  type="checkbox"
+                  class="accent-primary cursor-pointer"
+                />
+              </div>
+              
+            </div>
+            
           </div>
         </form>
       </div>

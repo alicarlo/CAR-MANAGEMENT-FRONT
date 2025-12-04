@@ -1,23 +1,8 @@
 {
-  "name": "angular-tailwind",
+  "name": "car-machucas",
   "displayName": "Machucas Automotriz",
-  "version": "0.10.1",
-  "description": "Angular & Tailwind CSS Admin Dashboard Starter Kit, Free and Open Source",
-  "homepage": "https://github.com/lannodev/angular-tailwind#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lannodev/angular-tailwind.git"
-  },
-  "keywords": [
-    "angular",
-    "tailwind",
-    "starter-kit",
-    "tailwind-template",
-    "dark mode",
-    "open source"
-  ],
-  "author": "",
-  "license": "MIT",
+  "version": "1.0.0",
+  "description": "car-machucas",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open",
@@ -51,6 +36,7 @@
     "firebase": "^11.8.1",
     "moment": "^2.30.1",
     "ng-apexcharts": "^1.7.1",
+    "ngx-mask": "^20.0.3",
     "ngx-sonner": "^2.0.1",
     "ngx-toastr": "^19.0.0",
     "rxjs": "^7.8.2",

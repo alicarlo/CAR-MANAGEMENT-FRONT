@@ -8,10 +8,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { InvestorService } from 'src/app/core/services/investors/investor.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
+import { STATUS } from 'src/app/core/constants/global';
 
 @Component({
   selector: 'app-investor-modal',
-  imports: [ButtonComponent, CommonModule, MatDialogModule, FormsModule, ReactiveFormsModule, MatIconModule,MatDatepickerModule, MatNativeDateModule],
+  imports: [NgxMaskDirective, NgxMaskPipe,ButtonComponent, CommonModule, MatDialogModule, FormsModule, ReactiveFormsModule, MatIconModule,MatDatepickerModule, MatNativeDateModule],
+  providers: [provideNgxMask()],
   templateUrl: './investor-modal.component.html',
   styleUrl: './investor-modal.component.css'
 })
@@ -19,10 +22,17 @@ export class InvestorModalComponent {
   saveForm : FormGroup | undefined | any;
   loading: boolean = false;
   cars: any[] = [];
+  status = [STATUS.ACTIVE, STATUS.INACTIVE]; 
   error_messages={
 		'full_name':[
       {type: 'required', message: 'Nombre es requerido'},
       {type: 'minlength', message: 'Minimo 3 caracteres'},
+		],
+    'initial':[
+      {type: 'required', message: 'Inversion inicial es requerido'},
+		],
+    'commission':[
+      {type: 'required', message: '% Comisión es requerido'},
 		],
 	}
 
@@ -42,22 +52,14 @@ export class InvestorModalComponent {
   init() {
     this.saveForm = this._FormBuilder.group({
       full_name: new FormControl (this.data.row === null ? '' : this.data.row.full_name,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
-      phone: new FormControl (this.data.row === null ? '' : this.data.row.phone),
-      address_street_1: new FormControl (this.data.row === null ? '' : this.data.row.address_street_1),
-      address_street_2: new FormControl(this.data.row === null ? '' : this.data.row.address_street_2),
-      address_state: new FormControl(this.data.row === null ? '' : this.data.row.address_state),
-      address_city: new FormControl(this.data.row === null ? '' : this.data.row.address_city),
-      address_zip: new FormControl(this.data.row === null ? '' : this.data.row.address_zip),
-      address_country: new FormControl(this.data.row === null ? '' : this.data.row.address_country),
-      car_id: new FormControl<number[]>(this.data.row === null ? [] : this.data.row.car_id),
+      initial: new FormControl (this.data.row === null ? '' : this.data.row.initial, Validators.compose([Validators.required])),
+      commission: new FormControl (this.data.row === null ? '' : this.data.row.commission, Validators.compose([Validators.required])),
+      status: new FormControl (this.data.row === null ? '' : this.data.row.status),
   	});
 
   }
 
   save() {
-
-    console.log(this.saveForm.invalid)
-    console.log(this.saveForm.value)
     if (this.saveForm.invalid) {
       this.saveForm.markAllAsTouched(); 
       return;

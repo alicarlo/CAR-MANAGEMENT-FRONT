@@ -8,6 +8,8 @@ import { InvestorService } from 'src/app/core/services/investors/investor.servic
 import { InvestorModalComponent } from '../../modals/investor-modal/investor-modal.component';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
+import { InvestmentCarShowModalComponent } from '../../modals/investment-car-show-modal/investment-car-show-modal.component';
+import { InvestmentShoppingShowModalComponent } from '../../modals/investment-shopping-show-modal/investment-shopping-show-modal.component';
 
 @Component({
   selector: 'app-investor',
@@ -18,14 +20,17 @@ import { TableComponent } from 'src/app/modules/uikit/pages/table/table.componen
 export class InvestorComponent {
   investorSelected: any;
   investor: Investor[] = [];
-  investorHeader: string[] = ['Nombre','Direccion','Estatus'];
+  investorHeader: string[] = ['Nombre','Inversión Inicial', '% Comisión' ,'Estatus'];
   columns: any = [
     { key: 'full_name', type: 'text' },
-    { key: 'address_street_1', type: 'text' },
-    { key: 'status', type: 'text' },
+    { key: 'initial', type: 'money' },
+    { key: 'commission', type: 'comas' },
+    { key: 'status', type: 'translate-text' },
   ]
 
   readonly actions: RowAction[] = [
+    { icon: 'directions_car',  id: 'search',  label: 'Visualizar Autos' },
+    { icon: 'credit_card',  id: 'purchase',  label: 'Visualizar Gastos' },
     { icon: 'edit',  id: 'edit',  label: 'Editar' },
     { icon: 'delete', id: 'delete', label: 'Elimnar' },
   ];
@@ -59,6 +64,8 @@ export class InvestorComponent {
   }
 
   onRowAction(e: RowActionEvent<any>) {
+    if (e.id === 'search') this.openShowModal(e.id,e.row);
+    if (e.id === 'purchase') this.openShowPurchaseModal(e.id,e.row);
     if (e.id === 'edit')  this.openModal(e.id,e.row);
     if (e.id === 'delete') this.actionModal(e.id,e.row, 'Desea eliminar el registro?');
   }
@@ -67,10 +74,9 @@ export class InvestorComponent {
     let dataSend = {action, row: data};
     const dialogRef = this._MatDialog.open(InvestorModalComponent, {
       disableClose: true,
-      panelClass: ['custom-dialog-container', 'dialog-90'],
+      panelClass: ['custom-dialog-container'],
       data: dataSend,
-      width: '90vw',
-      height: '90vh',
+      width: '50vw',
       maxWidth: '90vw'
     });
 
@@ -82,6 +88,8 @@ export class InvestorComponent {
   }
 
   actionModal(action: string, data: any, msg: string, color: string = '!text-red-500', icon = 'delete') {
+
+    let style = data === null ? 'dialog-40' : 'dialog-50';
     let dataSend = {action, row: data, msg, color, icon};
     const ref: any = this._MatDialog.open(ActionMessageComponent, {
       data: dataSend,
@@ -170,5 +178,41 @@ export class InvestorComponent {
         },
       })
     })
+  }
+
+  openShowModal(action: string, data: any) {
+    let dataSend = {action, row: data, flag: 0};
+    const dialogRef = this._MatDialog.open(InvestmentCarShowModalComponent, {
+      disableClose: true,
+      data: dataSend,
+      panelClass: ['custom-dialog-container', 'dialog-60'],
+      width: '90vw',
+      height: '90vh',
+      maxWidth: '90vw'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.getInvestor();
+      }
+    });
+  }
+
+  openShowPurchaseModal(action: string, data: any) {
+    let dataSend = {action, row: data, flag: 0};
+    const dialogRef = this._MatDialog.open(InvestmentShoppingShowModalComponent, {
+      disableClose: true,
+      data: dataSend,
+      panelClass: ['custom-dialog-container', 'dialog-60'],
+      width: '90vw',
+      height: '90vh',
+      maxWidth: '90vw'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.getInvestor();
+      }
+    });
   }
 }

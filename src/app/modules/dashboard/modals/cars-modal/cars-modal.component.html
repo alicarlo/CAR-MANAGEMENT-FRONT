@@ -2,11 +2,70 @@
   <div class="p-[20px]">
     <!-- New Action-->
     <div  class="flex flex-col gap-4">
-      <p class="text-foreground font-semibold">Vehiculos</p>
+      <p class="text-foreground font-semibold">Autos</p>
 
       <div>
         <form  [formGroup]="saveForm" class="flex flex-col gap-6">
           <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Tipo de Auto:</label>
+              <div class="relative">
+                <select 
+                  formControlName="car_type_id"
+                  class="w-full py-2 pl-8 pr-10 rounded-md
+                        bg-background text-foreground
+                        border border-border
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        appearance-none [color-scheme:dark]"
+                >
+                  <option *ngIf="!typeCars?.length" [ngValue]="null" selected disabled>
+                    No hay elementos disponibles
+                  </option>
+
+                  <option [ngValue]="null"  disabled selected hidden>
+                    Selecciona…
+                  </option>
+
+                  <option *ngFor="let s of typeCars" [ngValue]="s.id">
+                    {{ s.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.car_type_id">
+                  <div class="error-message" *ngIf="saveForm.get('car_type_id').hasError(error.type) && (saveForm.get('car_type_id').dirty || saveForm.get('car_type_id').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+              
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Sucursal:</label>
+              <div class="relative">
+                <select 
+                  formControlName="store_id"
+                  class="w-full py-2 pl-8 pr-10 rounded-md
+                        bg-background text-foreground
+                        border border-border
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        appearance-none [color-scheme:dark]"
+                >
+
+                  <option *ngIf="!store?.length" [ngValue]="null" selected disabled>
+                    No hay elementos disponibles
+                  </option>
+
+                  <option  [ngValue]="null" disabled selected hidden>Selecciona…</option>
+
+                  <option *ngFor="let s of store" [ngValue]="s.id">
+                    {{ s.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
           
             <div class="flex flex-col gap-2">
               <p class="text-foreground text-[11px] font-medium">Marca:</p>
@@ -26,6 +85,16 @@
             </div>
 
             <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Linea:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Linea"
+                type="text"
+                formControlName="version" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
               <p class="text-foreground text-[11px] font-medium">Modelo:</p>
               <input
                 class="py-2 pl-8 pr-2"
@@ -42,16 +111,7 @@
               </div>
             </div>
 
-            <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Version:</p>
-              <input
-                class="py-2 pl-8 pr-2"
-                placeholder="Version"
-                type="text"
-                formControlName="version" 
-              />
-            </div>
-
+          
             <div class="flex flex-col gap-2">
               <p class="text-foreground text-[11px] font-medium">Color:</p>
               <input
@@ -63,22 +123,26 @@
             </div>
 
             <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Vin:</p>
+              <p class="text-foreground text-[11px] font-medium"># Serie:</p>
               <input
                 class="py-2 pl-8 pr-2"
-                placeholder="Vin"
+                placeholder="# Serie"
                 type="text"
                 formControlName="vin" 
               />
             </div>
 
             <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">KM:</p>
+              <p class="text-foreground text-[11px] font-medium">Kilometraje:</p>
               <input
                 class="py-2 pl-8 pr-2"
-                placeholder="KM"
-                type="number"
+                placeholder="Kilometraje"
+                type="text"
+                inputmode="numeric" 
                 formControlName="km" 
+                mask="separator"
+                thousandSeparator=","   
+                [dropSpecialCharacters]="true"
               />
             </div>
 
@@ -93,55 +157,17 @@
             </div>
 
             <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Numero de Motor:</p>
+              <p class="text-foreground text-[11px] font-medium"># de motor:</p>
               <input
                 class="py-2 pl-8 pr-2"
-                placeholder="Numero de Motor"
+                placeholder="# de motor"
                 type="text"
                 formControlName="engine_number" 
               />
             </div>
 
             <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Precio:</p>
-              <input
-                class="py-2 pl-8 pr-2"
-                placeholder="Precio"
-                type="number"
-                formControlName="sale_price" 
-              />
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <label for="sexo" class="text-foreground text-[11px] font-medium">Adquisicion:</label>
-              <div class="relative">
-                <select 
-                  formControlName="car_acquisition"
-                  class="w-full py-2 pl-8 pr-10 rounded-md
-                        bg-background text-foreground
-                        border border-border
-                        focus:outline-none focus:ring-2 focus:ring-primary/50
-                        appearance-none [color-scheme:dark]"
-                >
-                  <option value="" disabled selected hidden>Selecciona…</option>
-
-                  <option *ngFor="let s of carAcquisition" [value]="s">
-                    {{ s }}
-                  </option>
-                </select>
-              </div>
-
-               <div class="error-messages">
-                <ng-container *ngFor="let error of error_messages.car_acquisition">
-                  <div class="error-message" *ngIf="saveForm.get('car_acquisition').hasError(error.type) && (saveForm.get('car_acquisition').dirty || saveForm.get('car_acquisition').touched)">
-                    {{error.message}}
-                  </div>
-                </ng-container>
-              </div>
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Fecha de Adquisicion:</p>
+              <p class="text-foreground text-[11px] font-medium">Fecha de llegada:</p>
               <div class="relative">
                  <input
                     #dob
@@ -169,10 +195,38 @@
             </div>
 
             <div class="flex flex-col gap-2">
-              <label for="sexo" class="text-foreground text-[11px] font-medium">Tipo de Vehiculo:</label>
+              <p class="text-foreground text-[11px] font-medium">Precio de venta:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Precio"
+                formControlName="sale_price" 
+                type="text"
+                inputmode="numeric" 
+                mask="separator"
+                thousandSeparator=","   
+                [dropSpecialCharacters]="true"
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Enganche:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Enganche"
+                formControlName="down_payment" 
+                type="text"
+                inputmode="numeric" 
+                mask="separator"
+                thousandSeparator=","   
+                [dropSpecialCharacters]="true"
+              />
+            </div>
+
+            <!--
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Estatus:</label>
               <div class="relative">
                 <select 
-                  formControlName="car_type_id"
                   class="w-full py-2 pl-8 pr-10 rounded-md
                         bg-background text-foreground
                         border border-border
@@ -181,41 +235,46 @@
                 >
                   <option value="" disabled selected hidden>Selecciona…</option>
 
-                  <option *ngFor="let s of typeCars" [value]="s.id">
-                    {{ s.name }}
+                  <option *ngFor="let s of status" [value]="s">
+                    {{ s.value }}
                   </option>
                 </select>
               </div>
-              <div class="error-messages">
-                <ng-container *ngFor="let error of error_messages.car_type_id">
-                  <div class="error-message" *ngIf="saveForm.get('car_type_id').hasError(error.type) && (saveForm.get('car_type_id').dirty || saveForm.get('car_type_id').touched)">
+            </div>
+            -->
+
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Tipo de adquisicion :</label>
+              <div class="relative">
+                <select 
+                  formControlName="car_acquisition"
+                  class="w-full py-2 pl-8 pr-10 rounded-md
+                        bg-background text-foreground
+                        border border-border
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        appearance-none [color-scheme:dark]"
+                >
+                  <option value="" disabled selected hidden>Selecciona…</option>
+
+                  <option *ngFor="let s of carAcquisition" [value]="s">
+                    {{ s }}
+                  </option>
+                </select>
+              </div>
+
+               <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.car_acquisition">
+                  <div class="error-message" *ngIf="saveForm.get('car_acquisition').hasError(error.type) && (saveForm.get('car_acquisition').dirty || saveForm.get('car_acquisition').touched)">
                     {{error.message}}
                   </div>
                 </ng-container>
               </div>
-              
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label for="sexo" class="text-foreground text-[11px] font-medium">Sucursales:</label>
-              <div class="relative">
-                <select 
-                  formControlName="store_id"
-                  class="w-full py-2 pl-8 pr-10 rounded-md
-                        bg-background text-foreground
-                        border border-border
-                        focus:outline-none focus:ring-2 focus:ring-primary/50
-                        appearance-none [color-scheme:dark]"
-                >
-                  <option value="" disabled selected hidden>Selecciona…</option>
+            <!--
+            
 
-                  <option *ngFor="let s of store" [value]="s.id">
-                    {{ s.name }}
-                  </option>
-                </select>
-              </div>
-            </div>
-
+          
             <div class="flex flex-col gap-2">
               <label for="sexo" class="text-foreground text-[11px] font-medium">Clientes:</label>
               <div class="relative">
@@ -235,8 +294,9 @@
                 </select>
               </div>
             </div>
+            -->
 
-            <!--
+            <!--Temp
             <div class="flex flex-col gap-2">
               <label for="sexo" class="text-foreground text-[11px] font-medium">Inversionista:</label>
               <div class="relative">
@@ -256,8 +316,92 @@
                 </select>
               </div>
             </div>
-            -->
+          -->
+<div class="flex flex-col gap-2 relative">
+  <label class="text-foreground text-[11px] font-medium">
+    Inversionistas:
+  </label>
 
+  <!-- Botón que abre/cierra -->
+  <button
+    type="button"
+    (click)="dropdownOpen = !dropdownOpen"
+    class="w-full py-2 px-3 rounded-md
+           bg-background text-foreground text-[12px]
+           border border-border
+           flex items-center justify-between
+           focus:outline-none focus:ring-2 focus:ring-primary/50 h-[34px]"
+  >
+    <span class="truncate">
+      {{ selectedInvestorsLabel }}
+    </span>
+
+    <span class="ml-2 flex items-center">
+      <svg
+        class="h-3 w-3 text-muted-foreground"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </span>
+
+  </button>
+
+  <!-- Dropdown: ahora debajo del botón -->
+  <div
+    *ngIf="dropdownOpen"
+    class="absolute left-0 right-0 top-full mt-1
+           z-20 rounded-md border border-border bg-background
+           shadow-lg max-h-56 overflow-y-auto"
+  >
+    <div class="py-1">
+      <button
+        type="button"
+        class="w-full text-left px-3 py-1.5 text-[11px] text-muted-foreground hover:bg-muted/40 "
+        (click)="saveForm.patchValue({ investor_id: [] })"
+      >
+        Limpiar selección
+      </button>
+
+      <div class="h-[1px] bg-border/60 my-1"></div>
+
+      <div *ngFor="let s of investor">
+        <button
+          type="button"
+          class="w-full flex items-center gap-2 px-3 py-1.5 text-[12px]
+                 hover:bg-muted/40 text-foreground"
+          (click)="toggleInvestor(s.id)"
+        >
+          <span
+            class="h-4 w-4 rounded border flex items-center justify-center
+                   text-[10px]"
+            [ngClass]="
+              isInvestorSelected(s.id)
+                ? 'bg-primary border-primary text-white'
+                : 'bg-transparent border-border text-transparent'
+            "
+          >
+            ✓
+          </span>
+          <span class="truncate">
+            {{ s.full_name }}
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+            
+            <!--
             <div class="flex flex-col gap-2">
               <label class="text-foreground text-[11px] font-medium">Inversionista:</label>
 
@@ -296,7 +440,7 @@
                 </div>
               </div>
             </div>
-
+            -->
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
@@ -311,6 +455,73 @@
               <p class="text-foreground font-semibold">{{ f.label }}</p>
             </label>
           </div>
+
+          <div formGroupName="comments" class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              <div class="flex flex-col gap-2">
+                <label class="text-foreground text-[11px] font-medium">Comentarios:</label>
+                <textarea
+                  class="
+                    py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
+                    border-border bg-background text-foreground
+                    scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
+                  "
+                  placeholder="Comentarios"
+                  formControlName="generales">
+                </textarea>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <label class="text-foreground text-[11px] font-medium">Comentarios Carroceria:</label>
+                <textarea
+                  class="
+                    py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
+                    border-border bg-background text-foreground
+                    scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
+                  "
+                  placeholder="Comentarios Carroceria"
+                  formControlName="carroceria">
+                </textarea>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <label class="text-foreground text-[11px] font-medium">Comentarios Llantas:</label>
+                <textarea
+                  class="
+                    py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
+                    border-border bg-background text-foreground
+                    scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
+                  "
+                  placeholder="Comentarios Llantas"
+                  formControlName="llantas">
+                </textarea>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <label class="text-foreground text-[11px] font-medium">Comentarios Pintura:</label>
+                <textarea
+                  class="
+                    py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
+                    border-border bg-background text-foreground
+                    scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
+                  "
+                  placeholder="Comentarios Pintura"
+                  formControlName="pintura">
+                </textarea>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <label class="text-foreground text-[11px] font-medium">Comentarios Otros:</label>
+                <textarea
+                  class="
+                    py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
+                    border-border bg-background text-foreground
+                    scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
+                  "
+                  placeholder="Comentarios Otros"
+                  formControlName="otros">
+                </textarea>
+              </div>
+            </div>
         </form>
       </div>
     </div>

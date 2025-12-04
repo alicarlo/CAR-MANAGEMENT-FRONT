@@ -143,12 +143,10 @@ export class RoleModalComponent {
   }
 
   toggleScope(id: number) {
-    console.log(id)
     const curr = (this.saveForm.value.scope_id ?? []).map(Number);
     const nid = Number(id);
     const next = curr.includes(nid) ? curr.filter((x: any) => x !== nid) : [...curr, nid];
     this.saveForm.patchValue({ scope_id: next }, { emitEvent: true });
-      console.log(this,this.saveForm.value)
   }
 
   selectedLabel() {

@@ -68,7 +68,7 @@ export class UsersComponent {
     let dataSend = {action, row: data};
     const dialogRef = this._MatDialog.open(UsersModalComponent, {
       disableClose: true,
-      panelClass: ['custom-dialog-container', 'dialog-90'],
+      panelClass: ['custom-dialog-container', 'dialog-60'],
       data: dataSend,
       width: '90vw',
       height: '90vh',

@@ -19,16 +19,20 @@ import { ToastrService } from 'ngx-toastr';
 export class ClientsComponent {
   clientsSelected: any;
   clients: Clients[] = [];
-  clientsHeader: string[] = ['Nombre','Correo','Telefono', 'Direccion', 'Cumpleanos', 'Genero', 'RFC', 'Estatus'];
+  clientsHeader: string[] = ['Nombre', 'Direccion', 'Telefono', 'Celular', 'Telefono trabajo' ,'Fecha de nacimiento', 'Estado', 'Ciudad', 'Correo',  'Sexo', 'RFC', 'Estatus'];
   columns: any = [
     { key: 'full_name', type: 'text' },
-    { key: 'email', type: 'text' },
-    { key: 'phone', type: 'text' },
     { key: 'address_street_1', type: 'text' },
+    { key: 'phone', type: 'phone' },
+    { key: 'phone_mobile', type: 'phone' },
+    { key: 'phone_work', type: 'phone' },
     { key: 'birthday', type: 'dob' },
+    { key: 'address_state', type: 'text' },
+    { key: 'address_city', type: 'text' },
+    { key: 'email', type: 'text' },
     { key: 'gender', type: 'text' },
     { key: 'rfc', type: 'text' },
-    { key: 'status', type: 'text' },
+    { key: 'status', type: 'translate-text' },
   ]
 
   readonly actions: RowAction[] = [
@@ -73,7 +77,7 @@ export class ClientsComponent {
     let dataSend = {action, row: data};
     const dialogRef = this._MatDialog.open(ClientsModalComponent, {
       disableClose: true,
-      panelClass: ['custom-dialog-container', 'dialog-90'],
+      panelClass: ['custom-dialog-container', 'dialog-65'],
       data: dataSend,
       width: '90vw',
       height: '90vh',

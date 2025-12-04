@@ -67,10 +67,10 @@ export class RolesComponent {
     let dataSend = {action, row: data};
     const dialogRef = this._MatDialog.open(RoleModalComponent, {
       disableClose: true,
-      panelClass: ['custom-dialog-container', 'dialog-90'],
+      panelClass: ['custom-dialog-container'],
       data: dataSend,
-      width: '90vw',
-      height: '90vh',
+      minHeight: '55vh',
+      width: '50vw',
       maxWidth: '90vw'
     });
 

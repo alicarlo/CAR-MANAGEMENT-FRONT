@@ -6,6 +6,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
+import { STATUS } from 'src/app/core/constants/global';
 import { StoreService } from 'src/app/core/services/store/store.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 
@@ -21,7 +22,7 @@ export class StoreModalComponent {
 
   error_messages={
 		'name':[
-      {type: 'required', message: 'Nombre es requerido'},
+      {type: 'required', message: 'Titulo es requerido'},
       {type: 'minlength', message: 'Minimo 3 caracteres'},
 		],
 		'phone':[
@@ -33,7 +34,7 @@ export class StoreModalComponent {
       {type: 'minlength', message: 'Minimo 3 caracteres'},
 		],
 	}
-
+  status = [STATUS.ACTIVE, STATUS.INACTIVE]; 
   constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 
@@ -52,11 +53,12 @@ export class StoreModalComponent {
       name: new FormControl (this.data.row === null ? '' : this.data.row.name,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
       phone: new FormControl (this.data.row === null ? '' : this.data.row.phone,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
       address_street_1: new FormControl (this.data.row === null ? '' : this.data.row.address_street_1,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
-      address_street_2: new FormControl(this.data.row === null ? '' : this.data.row.address_street_2),
-      address_state: new FormControl(this.data.row === null ? '' : this.data.row.address_state),
-      address_city: new FormControl(this.data.row === null ? '' : this.data.row.address_city),
-      address_zip: new FormControl(this.data.row === null ? '' : this.data.row.address_zip),
-      address_country: new FormControl(this.data.row === null ? '' : this.data.row.address_country),
+      status: new FormControl (this.data.row === null ? '' : this.data.row.status),
+      // address_street_2: new FormControl(this.data.row === null ? '' : this.data.row.address_street_2),
+      // address_state: new FormControl(this.data.row === null ? '' : this.data.row.address_state),
+      // address_city: new FormControl(this.data.row === null ? '' : this.data.row.address_city),
+      // address_zip: new FormControl(this.data.row === null ? '' : this.data.row.address_zip),
+      // address_country: new FormControl(this.data.row === null ? '' : this.data.row.address_country),
   	});
 
   }

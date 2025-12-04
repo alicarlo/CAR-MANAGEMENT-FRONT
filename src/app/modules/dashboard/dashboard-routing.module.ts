@@ -12,6 +12,12 @@ import { TypeExpenseComponent } from './pages/type-expense/type-expense.componen
 import { ExpenseClassificationComponent } from './pages/expense-classification/expense-classification.component';
 import { StoreComponent } from './pages/store/store.component';
 import { InvestorComponent } from './pages/investor/investor.component';
+import { InvestmentComponent } from './pages/investment/investment.component';
+import { ShoppingComponent } from './pages/shopping/shopping.component';
+import { TypePaymentsComponent } from './pages/type-payments/type-payments.component';
+import { DocumentsComponent } from './pages/documents/documents.component';
+import { ArrivalReviewComponent } from './pages/arrival-review/arrival-review.component';
+import { BillsComponent } from './pages/bills/bills.component';
 
 
 const routes: Routes = [
@@ -31,6 +37,11 @@ const routes: Routes = [
       { path: 'store', component: StoreComponent },
       { path: 'expense-classification', component: ExpenseClassificationComponent },
       { path: 'investor', component: InvestorComponent },
+      { path: 'shopping', component: ShoppingComponent },
+      { path: 'type-payments', component: TypePaymentsComponent },
+      { path: 'documents', component: DocumentsComponent },
+      { path: 'arrival-review', component: ArrivalReviewComponent },
+      { path: 'bills', component: BillsComponent },
       { path: '**', redirectTo: 'errors/404' },
     ],
   },

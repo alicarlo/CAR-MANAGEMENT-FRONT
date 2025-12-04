@@ -74,3 +74,9 @@ export const CHECKS_FIELDS: Array<{ key: CheckKey; label: string }> = [
   { key: 'filtro_aire', label: 'Filtro de aire' },
 ];
 
+export const STATUS = [
+  { value: 'EN VENTA' },
+  { value: 'APARTADO' },
+  { value: 'EN PAGOS' },
+  { value: 'LIQUIDADO'},
+]

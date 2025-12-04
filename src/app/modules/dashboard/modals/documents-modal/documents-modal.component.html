@@ -1,0 +1,238 @@
+<mat-dialog-content>
+  <div class="p-[20px]">
+    <!-- New Action-->
+    <div  class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Carga de Documento</p>
+
+      <div>
+        <form  [formGroup]="saveForm" class="flex flex-col gap-6">
+          <div class="flex flex-col">
+            
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Tipo de Documento:</label>
+              <div class="relative">
+                <select 
+                  formControlName="document_type_id"
+                  class="w-full py-2 pl-8 pr-10 rounded-md
+                        bg-background text-foreground
+                        border border-border
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        appearance-none [color-scheme:dark]"
+                >
+                  <option value="" disabled selected hidden>Selecciona…</option>
+
+                  <option *ngFor="let s of typeDocument" [ngValue]="s.id">
+                    {{ s.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.document_type_id">
+                  <div class="error-message" *ngIf="saveForm.get('document_type_id').hasError(error.type) && (saveForm.get('document_type_id').dirty || saveForm.get('document_type_id').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+              
+            </div>
+
+          <div class="flex flex-col gap-2">
+          <label class="text-foreground text-[11px] font-medium">Auto:</label>
+
+          <div class="relative">
+            <!-- "Select" visible -->
+            <button
+              type="button"
+              class="w-full py-2 pl-8 pr-10 rounded-md bg-background text-foreground
+                    border border-border text-left
+                    focus:outline-none focus:ring-2 focus:ring-primary/50
+                    flex items-center justify-between"
+              (click)="toggleCarsDropdown()"
+            >
+              <span class="truncate text-[13px]">
+                {{ selectedCarLabel || 'Selecciona…' }}
+              </span>
+              <span class="absolute right-3 text-xs opacity-70">▼</span>
+            </button>
+
+            <!-- Dropdown -->
+            <div
+              *ngIf="carsDropdownOpen"
+              class="absolute z-30 mt-1 w-full rounded-md bg-background border border-border shadow-lg"
+            >
+              <!-- Filtro dentro del dropdown -->
+              <div class="p-2 border-b border-border">
+                <input
+                  type="text"
+                  placeholder="Filtrar autos…"
+                  class="w-full py-1.5 px-3 rounded-md
+                        bg-background text-foreground
+                        border border-border text-[11px]
+                        focus:outline-none focus:ring-1 focus:ring-primary/50
+                        box-border"
+                  [formControl]="carFilterControl"
+                  (keydown.escape)="closeCarsDropdown()"
+                />
+              </div>
+
+              <!-- Lista -->
+              <div class="max-h-60 overflow-y-auto">
+                <button
+                  type="button"
+                  class="w-full text-left px-3 py-2 text-[13px] text-white
+                        hover:bg-card flex items-center gap-2"
+                  *ngFor="let s of filteredCars"
+                  (click)="selectCar(s)"
+                >
+                  {{ s.make }} - {{ s.model }}
+                </button>
+
+                <div
+                  *ngIf="filteredCars.length === 0"
+                  class="px-3 py-2 text-[11px] text-muted-foreground"
+                >
+                  Sin resultados
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.car_id">
+                  <div class="error-message" *ngIf="saveForm.get('car_id').hasError(error.type) && (saveForm.get('car_id').dirty || saveForm.get('car_id').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+        </div>
+
+
+
+            <div class="flex flex-col gap-2">
+              <label class="text-foreground text-[11px] font-medium">Descripcion:</label>
+              <textarea
+                class="
+                  py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
+                  border-border bg-background text-foreground
+                  scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
+                "
+                placeholder="Descripcion"
+                formControlName="descriptions">
+              </textarea>
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.descriptions">
+                  <div class="error-message" *ngIf="saveForm.get('descriptions').hasError(error.type) && (saveForm.get('descriptions').dirty || saveForm.get('descriptions').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <!-- Campo: Archivo adjunto -->
+            <div class="flex flex-col gap-2">
+              <label class="text-foreground text-[11px] font-medium">Archivo adjunto:</label>
+
+              <!-- Dropzone: solo se muestra si NO hay archivo seleccionado -->
+              <label
+                *ngIf="!selectedFile"
+                for="attachmentInput"
+                class="
+                  w-full py-6 px-4 rounded-md
+                  border border-dotted border-border
+                  bg-background text-foreground
+                  flex flex-col items-center justify-center gap-2
+                  cursor-pointer hover:bg-background/70 transition text-center
+                "
+              >
+                <mat-icon class="text-foreground/80">insert_drive_file</mat-icon>
+                <span class="text-foreground text-sm">Agrega un archivo (imagen, video, PDF o Word)</span>
+                <span class="text-foreground/60 text-xs">Tamaño máx. recomendado: 25 MB</span>
+              </label>
+
+              <!-- Input real (oculto) -->
+              <input
+                id="attachmentInput"
+                type="file"
+                class="hidden"
+                (change)="onFileSelected($event)"
+                accept="image/*,video/*,.pdf,.doc,.docx"
+              />
+
+              <!-- Vista del archivo (centrada) -->
+              <div *ngIf="selectedFile" class="rounded-md border border-border bg-background p-4">
+                <div class="flex flex-col items-center text-center gap-2">
+                  <mat-icon class="!text-foreground text-2xl">{{ fileIcon }}</mat-icon>
+                  
+                  <p class="text-foreground whitespace-normal break-words [hyphens:auto]">
+                    <strong>Archivo:</strong> {{ selectedFile.name }}
+                  </p>
+                  <p class="text-foreground/70 text-xs">
+                    {{ (selectedFile.size / 1024 / 1024) | number:'1.0-2' }} MB • {{ selectedFile.type || fileExt }}
+                  </p>
+
+                  <!-- Preview (imagen) -->
+                  <img
+                    *ngIf="previewUrl && isImage"
+                    [src]="previewUrl"
+                    alt="Vista previa"
+                    class="max-h-48 rounded-md border border-border"
+                  />
+
+                  <!-- Preview (video) -->
+                  <video
+                    *ngIf="previewUrl && isVideo"
+                    [src]="previewUrl"
+                    class="max-h-48 rounded-md border border-border"
+                    controls
+                    muted
+                  ></video>
+
+                  <!-- Acciones -->
+                  <button
+                    type="button"
+                    class="text-foreground text-sm underline underline-offset-2 hover:opacity-80"
+                    (click)="removeFile()"
+                  >
+                    Remover
+                  </button>
+                </div>
+              </div>
+
+              <!-- Errores -->
+              <div class="error-messages">
+                <div class="error-message" *ngIf="attachmentCtrl?.hasError('invalidType')">
+                  <span class="text-foreground">Formato no permitido. Solo imagen, video, PDF o Word.</span>
+                </div>
+                <div class="error-message" *ngIf="attachmentCtrl?.hasError('maxSize')">
+                  <span class="text-foreground">El archivo excede el tamaño máximo permitido.</span>
+                </div>
+                <div class="error-message" *ngIf="attachmentCtrl?.hasError('required')">
+                  <span class="text-foreground">Este campo es obligatorio.</span>
+                </div>
+              </div>
+            </div>
+            <div class="error-messages">
+              <ng-container *ngFor="let error of error_messages.file">
+                <div class="error-message" *ngIf="saveForm.get('file').hasError(error.type) && (saveForm.get('file').dirty || saveForm.get('file').touched)">
+                  {{error.message}}
+                </div>
+              </ng-container>
+            </div>
+
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+  
+</mat-dialog-content>
+
+
+<mat-dialog-actions align="end">
+  <div class="flex gap-2 p-[20px]">
+    <!--[loading]="loading"-->
+    <app-button [loading]="loading" (click)="save()" full impact="bold" tone="primary" shape="rounded" size="medium">Guardar</app-button>
+    <app-button [disabled]="loading"  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
+
+  </div>
+</mat-dialog-actions>

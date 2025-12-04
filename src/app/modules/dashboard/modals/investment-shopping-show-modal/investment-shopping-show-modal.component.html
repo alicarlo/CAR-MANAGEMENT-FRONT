@@ -1,0 +1,95 @@
+<mat-dialog-content class="!p-0">
+  <div class="p-[15px]" *ngIf="loadingModal">
+    <div class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Gastos</p>
+
+      <div class="mx-[25px]">
+        <label for="sexo" class="text-foreground text-[12px] font-medium">Información del Inversionista:</label>
+        <div class="border border-border/60 rounded-lg bg-card p-2 flex gap-2">
+          <p class="text-foreground text-[11px]"><strong>Nombre:</strong> {{ data.row.full_name }}</p>
+        </div>
+      </div>
+      
+      <!-- CONTENEDOR CON SCROLL -->
+      <div
+        class="border border-border/60 rounded-lg bg-card m-[25px]
+              max-h-[310px] overflow-y-auto overflow-x-auto"
+      >
+        <!-- Wrapper con ancho mínimo solo en pantallas grandes -->
+        <div class="min-w-full md:min-w-[1100px]">
+          <table class="w-full table-auto">
+            <!-- Header -->
+            <thead>
+              <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
+  
+                
+                <th class="px-3 py-2 text-left whitespace-nowrap">Clave</th>
+
+                <th class="px-3 py-2 text-left whitespace-nowrap">Marca</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Modelo</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Línea</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Color</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Nombre del gasto</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Total</th>
+
+              </tr>
+            </thead>
+
+            <tbody class="divide-y divide-border/40" *ngIf="purchases?.length">
+              <tr
+                *ngFor="let item of purchases"
+                class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition"
+              >
+              
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.cars[0].key }}
+                </td>
+
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.cars[0].make }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.cars[0].model }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.cars[0].version }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.cars[0].color }}
+                </td>
+
+                 <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.name }}
+                </td>
+
+                 <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.total | currency:'MXN':'symbol':'1.2-2':'en-US' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="text-foreground text-[15px] w-full flex justify-center items-center" *ngIf="purchases?.length === 0">
+        No hay Autos
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loadingModal" class="h-full flex justify-center items-center">
+    <app-loading></app-loading>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <div class="flex gap-2 p-[20px]">
+    <app-button mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">
+      Cerrar
+    </app-button>
+  </div>
+</mat-dialog-actions>

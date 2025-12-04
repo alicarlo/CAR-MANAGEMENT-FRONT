@@ -18,10 +18,12 @@ import { TypeDocumentsModalComponent } from '../../modals/type-documents-modal/t
 export class TypDocumentsComponent {
   typeDocumentSelected: TypeDocument | undefined;
   typeDocument: TypeDocument[] = [];
-  typeDocumentHeader: string[] = ['Nombre','Descripcion'];
+  typeDocumentHeader: string[] = ['Titulo','Descripcion', 'Estatus', 'Requiere fecha'];
   columns: any = [
     { key: 'name', type: 'text' },
     { key: 'descriptions', type: 'text' },
+    { key: 'status', type: 'translate-text' },
+    { key: 'require_date', type: 'translate-boolean' },
   ]
 
   readonly actions: RowAction[] = [
@@ -66,10 +68,9 @@ export class TypDocumentsComponent {
     let dataSend = {action, row: data};
     const dialogRef = this._MatDialog.open(TypeDocumentsModalComponent, {
       disableClose: true,
-      panelClass: ['custom-dialog-container', 'dialog-90'],
+      panelClass: ['custom-dialog-container'],
       data: dataSend,
-      width: '90vw',
-      height: '90vh',
+      width: '50vw',
       maxWidth: '90vw'
     });
 

@@ -23,6 +23,27 @@ export class CarsService {
     );
   }
 
+  public getCarInvestor(id: string, pageSize?: number, currentPage?: number): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.get<any>(`${environment.apiUrl}/car/investor/${id}?page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
+  public getCarDocuments(id: string, pageSize?: number, currentPage?: number): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.get<any>(`${environment.apiUrl}/document/car/${id}?page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
+
   public updateCars(bodyData: Cars): Observable<Cars> {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -33,11 +54,14 @@ export class CarsService {
     );
   }
 
-  public getCars(pageSize?: number, currentPage?: number): Observable<Cars> {
+  public getCars(filter: string = '', pageSize?: number, currentPage?: number, active: string = 'active'): Observable<Cars> {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
-    return this.http.get<Cars>(`${environment.apiUrl}/car/?column=status&value=active&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+
+    let column = filter.length ? 'all' : 'status';
+    let filterSearch = filter.length ? filter : active;
+    return this.http.get<Cars>(`${environment.apiUrl}/car/?column=${column}&value=${filterSearch}&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
       retry(0),
       catchError(this.error.handleError)
     );

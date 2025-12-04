@@ -1,0 +1,151 @@
+<mat-dialog-content>
+  <div class="p-[20px]">
+    <!-- New Action-->
+    <div  class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Revisión de llegada</p>
+
+      <div>
+        <form [formGroup]="saveForm" class="flex flex-col gap-6 w-full">
+          <div class="grid gap-4  w-full">
+            <!-- REVIEW -->
+            <div formGroupName="review" class="w-full space-y-4">
+
+              <!-- Servicio -->
+              <div class="border border-border/60 rounded-lg bg-card p-4 flex flex-col gap-4 md:flex-row md:items-center">
+                <!-- Checkbox Servicio -->
+                <div class="flex items-center gap-2">
+                  <label class="text-foreground text-[11px] font-medium">
+                    Servicio:
+                  </label>
+                  <input
+                    formControlName="servicio"
+                    type="checkbox"
+                    class="accent-primary cursor-pointer"
+                  />
+                </div>
+
+                <!-- Fecha próximo servicio -->
+                <div
+                  class="w-full flex flex-col gap-2 md:max-w-xs"
+                  *ngIf="saveForm.get('review.servicio')?.value"
+                >
+                  <p class="text-foreground text-[11px] font-medium">
+                    Fecha del próximo servicio:
+                  </p>
+                  <div class="relative">
+                    <input
+                      #dob1
+                      type="date"
+                      class="py-2 pl-8 pr-2"
+                      formControlName="proximo_servicio"
+                    />
+
+                    <button
+                      type="button"
+                      class="absolute right-2 top-1/2 -translate-y-1/2 text-foreground flex items-center justify-center"
+                      (click)="openPicker(dob1)"
+                    >
+                      <mat-icon style="font-size: 20px;">calendar_month</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Agua / Aceite -->
+              <div class="w-full space-y-2">
+                <p class="text-foreground text-[11px] font-medium">
+                  Servicios adicionales:
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <!-- Agua -->
+                  <div class="border border-border/60 rounded-lg bg-card p-3 flex items-center gap-2">
+                    <div class="flex items-center gap-2">
+                      <label class="text-foreground text-[11px] font-medium">
+                        Agua
+                      </label>
+                    </div>
+                    <input
+                      formControlName="servicio_agua"
+                      type="checkbox"
+                      class="accent-primary cursor-pointer"
+                    />
+                  </div>
+
+                  <!-- Aceite -->
+                  <div class="border border-border/60 rounded-lg bg-card p-3 flex items-center gap-2">
+                    <div class="flex items-center gap-2">
+                      <label class="text-foreground text-[11px] font-medium">
+                        Aceite
+                      </label>
+                    </div>
+                    <input
+                      formControlName="servicio_aceite"
+                      type="checkbox"
+                      class="accent-primary cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- Garantía -->
+              <div class="border border-border/60 rounded-lg bg-card p-4 flex flex-col gap-4 md:flex-row md:items-center">
+                <!-- Checkbox Garantía -->
+                <div class="flex items-center gap-2">
+                  <label class="text-foreground text-[11px] font-medium">
+                    Garantía:
+                  </label>
+                  <input
+                    formControlName="garantia"
+                    type="checkbox"
+                    class="accent-primary cursor-pointer"
+                  />
+                </div>
+
+                <!-- Fecha expiración garantía -->
+                <div
+                  class="w-full flex flex-col gap-2 md:max-w-xs"
+                  *ngIf="saveForm.get('review.garantia')?.value"
+                >
+                  <p class="text-foreground text-[11px] font-medium">
+                    Expira garantía en:
+                  </p>
+                  <div class="relative">
+                    <input
+                      #dob2
+                      type="date"
+                      class="py-2 pl-8 pr-2"
+                      formControlName="expira_garantia"
+                    />
+
+                    <button
+                      type="button"
+                      class="absolute right-2 top-1/2 -translate-y-1/2 text-foreground flex items-center justify-center"
+                      (click)="openPicker(dob2)"
+                    >
+                      <mat-icon style="font-size: 20px;">calendar_month</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+  
+</mat-dialog-content>
+
+
+<mat-dialog-actions align="end">
+  <div class="flex gap-2 p-[20px]">
+    <!--[loading]="loading"-->
+    <app-button [loading]="loading" (click)="save()" full impact="bold" tone="primary" shape="rounded" size="medium">Guardar</app-button>
+    <app-button [disabled]="loading"  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
+
+  </div>
+</mat-dialog-actions>

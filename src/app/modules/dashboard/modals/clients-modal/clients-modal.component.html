@@ -7,36 +7,35 @@
       <div>
         <form  [formGroup]="saveForm" class="flex flex-col gap-6">
           <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          
+            
             <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Correo:</p>
+              <p class="text-foreground text-[11px] font-medium">Nombre completo:</p>
               <input
                 class="py-2 pl-8 pr-2"
-                placeholder="Correo"
-                type="email"
-                formControlName="email" 
-              />
-              <div class="error-messages">
-                <ng-container *ngFor="let error of error_messages.email">
-                  <div class="error-message" *ngIf="saveForm.get('email').hasError(error.type) && (saveForm.get('email').dirty || saveForm.get('email').touched)">
-                    {{error.message}}
-                  </div>
-                </ng-container>
-              </div>
-            </div>
-
-        
-            <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Nombre y Apellidos:</p>
-              <input
-                class="py-2 pl-8 pr-2"
-                placeholder="Nombre y Apellidos"
+                placeholder="Nombre completo"
                 type="text"
                 formControlName="full_name" 
               />
               <div class="error-messages">
                 <ng-container *ngFor="let error of error_messages.full_name">
                   <div class="error-message" *ngIf="saveForm.get('full_name').hasError(error.type) && (saveForm.get('full_name').dirty || saveForm.get('full_name').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Direccion:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Direccion"
+                type="text"
+                formControlName="address_street_1" 
+              />
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.address_street_1">
+                  <div class="error-message" *ngIf="saveForm.get('address_street_1').hasError(error.type) && (saveForm.get('address_street_1').dirty || saveForm.get('address_street_1').touched)">
                     {{error.message}}
                   </div>
                 </ng-container>
@@ -60,95 +59,28 @@
               </div>
             </div>
 
-            <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Telefono #2:</p>
+             <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Celular:</p>
               <input
                 class="py-2 pl-8 pr-2"
-                placeholder="Telefono #2"
+                placeholder="Celular"
                 type="text"
                 formControlName="phone_mobile" 
               />
             </div>
 
             <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Telefono #3:</p>
+              <p class="text-foreground text-[11px] font-medium">Telefono trabajo:</p>
               <input
                 class="py-2 pl-8 pr-2"
-                placeholder="Telefono #3"
+                placeholder="Telefono trabajo"
                 type="text"
                 formControlName="phone_work" 
               />
             </div>
 
             <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Direccion:</p>
-              <input
-                class="py-2 pl-8 pr-2"
-                placeholder="Direccion"
-                type="text"
-                formControlName="address_street_1" 
-              />
-              <div class="error-messages">
-                <ng-container *ngFor="let error of error_messages.address_street_1">
-                  <div class="error-message" *ngIf="saveForm.get('address_street_1').hasError(error.type) && (saveForm.get('address_street_1').dirty || saveForm.get('address_street_1').touched)">
-                    {{error.message}}
-                  </div>
-                </ng-container>
-              </div>
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Direccion #2 (Opcional):</p>
-              <input
-                class="py-2 pl-8 pr-2"
-                placeholder="Direccion #2"
-                type="text"
-                formControlName="address_street_2" 
-              />
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Estado (Opcional):</p>
-              <input
-                class="py-2 pl-8 pr-2"
-                placeholder="Estado"
-                type="text"
-                formControlName="address_state" 
-              />
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Ciudad (Opcional):</p>
-              <input
-                class="py-2 pl-8 pr-2"
-                placeholder="Ciudad"
-                type="text"
-                formControlName="address_city" 
-              />
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Codigo postal (Opcional):</p>
-              <input
-                class="py-2 pl-8 pr-2"
-                placeholder="Codigo postal"
-                type="text"
-                formControlName="address_zip" 
-              />
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Pais (Opcional):</p>
-              <input
-                class="py-2 pl-8 pr-2"
-                placeholder="Pais"
-                type="text"
-                formControlName="address_country" 
-              />
-            </div>
-
-            <div class="flex flex-col gap-2">
-              <p class="text-foreground text-[11px] font-medium">Cumpleanos:</p>
+              <p class="text-foreground text-[11px] font-medium">Fecha de nacimiento:</p>
               <div class="relative">
                  <input
                     #dob
@@ -174,9 +106,47 @@
                 </ng-container>
               </div>
             </div>
+            
 
             <div class="flex flex-col gap-2">
-              <label for="sexo" class="text-foreground text-[11px] font-medium">Genero:</label>
+              <p class="text-foreground text-[11px] font-medium">Estado (Opcional):</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Estado"
+                type="text"
+                formControlName="address_state" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Ciudad (Opcional):</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Ciudad"
+                type="text"
+                formControlName="address_city" 
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Correo:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Correo"
+                type="email"
+                formControlName="email" 
+              />
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.email">
+                  <div class="error-message" *ngIf="saveForm.get('email').hasError(error.type) && (saveForm.get('email').dirty || saveForm.get('email').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Sexo:</label>
               <div class="relative">
                 <select 
                   id="sexo"
@@ -213,6 +183,27 @@
                 type="text"
                 formControlName="rfc" 
               />
+            </div>
+
+            <div class="flex flex-col gap-2" *ngIf="data.row">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Estatus:</label>
+              <div class="relative">
+                <select 
+                  formControlName="status"
+                  class="w-full py-2 pl-8 pr-10 rounded-md
+                        bg-background text-foreground
+                        border border-border
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        appearance-none [color-scheme:dark]"
+                >
+                  <option value="" disabled selected hidden>Selecciona…</option>
+
+                  <option *ngFor="let s of status" [value]="s">
+                    <span *ngIf="s == 'active'">Activo</span>
+                    <span *ngIf="s == 'inactive'">Inactivo</span>
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
 

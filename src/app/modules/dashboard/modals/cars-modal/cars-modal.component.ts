@@ -7,7 +7,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angu
 import { MatIconModule } from '@angular/material/icon';
 import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
-import { CHECKS_FIELDS, CHECKS_INIT } from 'src/app/core/constants/cars';
+import { CHECKS_FIELDS, CHECKS_INIT, STATUS } from 'src/app/core/constants/cars';
 import { AcquisitionDto, AcquisitionType, Checks } from 'src/app/core/models/cars.model';
 import { Clients } from 'src/app/core/models/clients.model';
 import { CreateClientError } from 'src/app/core/models/error';
@@ -22,11 +22,14 @@ import { StoreService } from 'src/app/core/services/store/store.service';
 import { TypeCarsService } from 'src/app/core/services/typeCars/type-cars.service';
 import { UsersService } from 'src/app/core/services/users/users.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
+import { AuthService } from 'src/app/core/services/auth/auth.service';
 
 type CheckKey = keyof Checks;
 @Component({
   selector: 'app-cars-modal',
-  imports: [ButtonComponent, CommonModule, MatDialogModule, FormsModule, ReactiveFormsModule, MatIconModule,MatDatepickerModule, MatNativeDateModule],
+  imports: [NgxMaskDirective, NgxMaskPipe,ButtonComponent, CommonModule, MatDialogModule, FormsModule, ReactiveFormsModule, MatIconModule,MatDatepickerModule, MatNativeDateModule],
+  providers: [provideNgxMask()],
   templateUrl: './cars-modal.component.html',
   styleUrl: './cars-modal.component.css'
 })
@@ -61,9 +64,11 @@ export class CarsModalComponent {
   store: Store[] = [];
   clients: Clients[] = [];
   user: Users[] = [];
-  investor: Investor[] = [];
+  investor: Investor[] | any = [];
   checks = CHECKS_FIELDS;
-  
+  status = STATUS;
+
+  dropdownOpen = false;
    constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 
@@ -75,9 +80,44 @@ export class CarsModalComponent {
     private _StoreService: StoreService,
     private _ClientsService: ClientsService,
     private _UsersService: UsersService,
-    private _InvestorService: InvestorService
+    private _InvestorService: InvestorService,
+    private _AuthService: AuthService
   ) {}
   
+  get investorIds(): number[] {
+    return this.saveForm.get('investor_id')?.value ?? [];
+  }
+
+  toggleInvestor(id: number) {
+  const current = this.investorIds;
+  const exists = current.includes(id);
+  const updated = exists
+    ? current.filter(x => x !== id)
+    : [...current, id];
+
+    console.log(updated)
+  this.saveForm.patchValue({ investor_id: updated });
+}
+
+isInvestorSelected(id: number): boolean {
+  return this.investorIds.includes(id);
+}
+
+  get selectedInvestorsLabel(): string {
+    if (!this.investor || !this.investor.length) return 'Selecciona…';
+
+    const selected = this.investor.filter((i: any) =>
+      this.investorIds.includes(i.id)
+    );
+
+    if (!selected.length) return 'Selecciona…';
+    if (selected.length === 1) return selected[0].full_name;
+    if (selected.length <= 3) return selected.map((s: any) => s.full_name).join(', ');
+
+    return `${selected.length} inversionistas seleccionados`;
+  }
+
+
   ngOnInit(): void {
     this.init();
     this.getTypeCar();
@@ -88,6 +128,7 @@ export class CarsModalComponent {
   }
 
   init() {
+    console.log(this.data)
     this.saveForm = this._FormBuilder.group({
       make: new FormControl (this.data.row === null ? '' : this.data.row.make,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
       model: new FormControl (this.data.row === null ? '' : this.data.row.model,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
@@ -98,30 +139,54 @@ export class CarsModalComponent {
       cylinders: new FormControl(this.data.row === null ? '' : this.data.row.cylinders),
       engine_number: new FormControl(this.data.row === null ? '' : this.data.row.engine_number),
       sale_price: new FormControl(this.data.row === null ? null : this.data.row.sale_price),
+      down_payment: new FormControl(this.data.row === null ? null : this.data.row.down_payment),
       car_acquisition: new FormControl(this.data.row === null ? '' : this.data.row.car_acquisition, Validators.compose([Validators.required])),
       arrived_at: new FormControl (this.data.row === null ? '' : this.dateFormat(this.data.row.arrived_at),Validators.compose([Validators.required])),
       car_type_id: new FormControl(this.data.row === null ? null : this.data.row.car_type_id,Validators.compose([Validators.required])),
-      store_id: new FormControl(this.data.row === null ? '' : this.data.row.store_id),
-      user_id: new FormControl(this.data.row === null ? '' : this.data.row.user_id),
+      store_id: new FormControl(this.data.row === null ? null : this.data.row.store_id),
+      user_id: new FormControl(this._AuthService.user()?.user_id), // this.data.row.user_id
       client_id: new FormControl(this.data.row === null ? '' : this.data.row.client_id),
       status: new FormControl(this.data.row === null ? '' : this.data.row.status),
-      investor_id: new FormControl<string[]>(this.data.row === null ? [] : this.data.row.investor_id),
+      // investor_id: new FormControl<string[]>(this.data.row === null ? [] : this.data.row.investor_id),
+      // investor_id: new FormControl(this.data.row === null ? '' : this.data.row.investors),
+      investor_id: new FormControl<number[]>(
+        this.data.row === null
+          ? []
+          : this.data.row.investors?.map((i: any) => i.id) ?? [],
+        { nonNullable: true }
+      ),
       checks: new FormControl<Checks>(
         this.data?.row?.checks ? { ...CHECKS_INIT, ...this.data.row.checks } : CHECKS_INIT,
         { nonNullable: true }
       ),
+      comments: new FormGroup({
+        generales: new FormControl(this.data.row === null ? '' : this.data.row.comments.generales ),
+        carroceria: new FormControl(this.data.row === null ? '' : this.data.row.comments.carroceria),
+        llantas:     new FormControl(this.data.row === null ? '' : this.data.row.comments.llantas),
+        pintura:   new FormControl(this.data.row === null ? '' : this.data.row.comments.pintura),
+        otros:   new FormControl(this.data.row === null ? '' : this.data.row.comments.otros),
+      })
     });
   }
 
+
   save() {
-    console.log(this.saveForm.value)
- 
+    /*
+      const investorsSelected: number[] = this.saveForm.value.investor_id || [];
+      console.log('IDs de inversionistas seleccionados:', investorsSelected);
+      console.log()
+      return
+    */
     if (this.saveForm.invalid) {
       this.saveForm.markAllAsTouched(); 
       return;
     }
 
+
+
+
     this.loading = true;
+    this.saveForm.patchValue({ investor_id: this.saveForm.value.investor_id });  
     let filledValues = Object.keys(this.saveForm.value).reduce((acc, key) => {
       const val = this.saveForm.value[key as keyof typeof this.saveForm.value];
       if (val !== null && val !== '' && val !== undefined) {
@@ -294,19 +359,16 @@ export class CarsModalComponent {
   }
 
   toggleScope(id: string) {
-    console.log(id)
     const curr = (this.saveForm.value.investor_id ?? []).map(String);
     const nid = id
     const next = curr.includes(nid) ? curr.filter((x: any) => x !== nid) : [...curr, nid];
-    console.log(next)
     this.saveForm.patchValue({ investor_id: next }, { emitEvent: true });
-    console.log(this.saveForm.value)
   }
 
   selectedLabel() {
     const ids = (this.saveForm.value.investor_id ?? []).map(String);
     if (!ids.length) return 'Selecciona…';
-    return this.investor.filter(s => ids.includes(s.id)).map(s => s.full_name).join(', ');
+    return this.investor.filter((s: any) => ids.includes(s.id)).map((s: any) => s.full_name).join(', ');
   }
   
 }

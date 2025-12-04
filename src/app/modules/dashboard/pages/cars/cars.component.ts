@@ -8,6 +8,9 @@ import { CarsService } from 'src/app/core/services/cars/cars.service';
 import { ToastrService } from 'ngx-toastr';
 import { CarsModalComponent } from '../../modals/cars-modal/cars-modal.component';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
+import { BillService } from 'src/app/core/services/bill/bill.service';
+import { CarBillsShowModalComponent } from '../../modals/car-bills-show-modal/car-bills-show-modal.component';
+import { CarDocumentsShowModalComponent } from '../../modals/car-documents-show-modal/car-documents-show-modal.component';
 
 @Component({
   selector: 'app-cars',
@@ -18,21 +21,51 @@ import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-messa
 export class CarsComponent {
   carsSelected: any;
   cars: Cars[] = [];
-  carsHeader: string[] = ['Marca','Modelo','Version', 'Color', 'Vin', 'KM', 'Cilindros', 'Precio', 'Enganche' ,'Estatus'];
+  carsHeader: string[] = [
+    'Clave',
+    'Tipo de auto','Sucursal', 'Marca',
+    'Modelo','Linea', 'Color', '# Serie', 
+    'Kilometraje', 'Cilindros', '# de motor', 
+    'Fecha de llegada' ,'Precio de venta', 'Enganche' ,
+    'Estatus', 'Tipo de adquisicion','Accesorios y Varios', 
+    'Comentarios', 'Comentarios Carroceria', 'Comentarios Llantas',
+    'Comentarios Pintura', 'Comentarios Otros'
+  ];
+
   columns: any = [
+    { key: 'key', type: 'text' },
+    { key: 'car_type.name', type: 'text' },
+    { key: 'store.name', type: 'text' },
     { key: 'make', type: 'text' },
     { key: 'model', type: 'text' },
     { key: 'version', type: 'text' },
     { key: 'color', type: 'text' },
     { key: 'vin', type: 'text' },
-    { key: 'km', type: 'text' },
+    { key: 'km', type: 'comas' },
     { key: 'cylinders', type: 'text' },
-    { key: 'sale_price', type: 'text' },
-    { key: 'down_payment', type: 'text' },
-    { key: 'status', type: 'text' },
+    { key: 'engine_number', type: 'text' },
+    { key: 'arrived_at', type: 'dob' },
+
+    { key: 'sale_price', type: 'money' },
+    { key: 'down_payment', type: 'money' },
+    { key: '', type: 'text' },
+    { key: 'car_acquisition', type: 'text' , show: [
+        { id: 'delete', value: ['compras'] },
+      ] 
+    },
+    { key: 'checks', type: 'checks' },
+
+    { key: 'comments.generales', type: 'area' },
+    { key: 'comments.carroceria', type: 'area' },
+    { key: 'comments.llantas', type: 'area' },
+    { key: 'comments.pintura', type: 'area' },
+    { key: 'comments.otros', type: 'area' },
+
   ]
 
   readonly actions: RowAction[] = [
+    { icon: 'attach_money',  id: 'bill',  label: 'Visualizar Gastos' },
+    { icon: 'attach_file',  id: 'documents',  label: 'Visualizar Documentos' },
     { icon: 'edit',  id: 'edit',  label: 'Editar' },
     { icon: 'delete', id: 'delete', label: 'Elimnar' },
   ];
@@ -55,10 +88,12 @@ export class CarsComponent {
   private query$ = new Subject<string>();
 
   pages: number = 0;
+  filter: string = '';
   constructor(
     private _MatDialog: MatDialog,
     private _CarsService: CarsService,
-    private _ToastrService: ToastrService
+    private _ToastrService: ToastrService,
+    private _BillService: BillService
   ) {}
 
   ngOnInit() {
@@ -66,6 +101,8 @@ export class CarsComponent {
   }
 
   onRowAction(e: RowActionEvent<any>) {
+    if (e.id === 'bill')  this.openBillModal(e.id,e.row);
+    if (e.id === 'documents')  this.openDocumentsModal(e.id,e.row);
     if (e.id === 'edit')  this.openModal(e.id,e.row);
     if (e.id === 'delete') this.actionModal(e.id,e.row, 'Desea eliminar el registro?');
   }
@@ -119,7 +156,13 @@ export class CarsComponent {
     }
 
     if (event.length < 3) return;
-    this.query$.next((event));
+    this.filter = event
+    this.currentPage = 1
+    this.pageSize = 10;
+    setTimeout(() => {
+      this.getCars();
+    }, 500);
+    // this.query$.next((event));
   }
 
   changePageNextPrev(event: any) {
@@ -139,7 +182,7 @@ export class CarsComponent {
 
   getCars() {
     this.loading = false;
-    this._CarsService.getCars(this.pageSize, this.currentPage).subscribe({
+    this._CarsService.getCars(this.filter,this.pageSize, this.currentPage).subscribe({
       next: async (response: any) => {
         if(response) {
 
@@ -178,4 +221,41 @@ export class CarsComponent {
       })
     })
   }
+
+  openBillModal(action: string, data: any) {
+    let dataSend = {action, row: data};
+    const dialogRef = this._MatDialog.open(CarBillsShowModalComponent, {
+      disableClose: true,
+      data: dataSend,
+      panelClass: ['custom-dialog-container', 'dialog-60'],
+      width: '90vw',
+      height: '90vh',
+      maxWidth: '90vw'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.getCars();
+      }
+    });
+  }
+
+  openDocumentsModal(action: string, data: any) {
+    let dataSend = {action, row: data};
+    const dialogRef = this._MatDialog.open(CarDocumentsShowModalComponent, {
+      disableClose: true,
+      data: dataSend,
+      panelClass: ['custom-dialog-container', 'dialog-60'],
+      width: '90vw',
+      height: '90vh',
+      maxWidth: '90vw'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.getCars();
+      }
+    });
+  }
+
 }

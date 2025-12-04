@@ -23,7 +23,7 @@ export class StoreComponent {
     { key: 'name', type: 'text' },
     { key: 'phone', type: 'text' },
     { key: 'address_street_1', type: 'text' },
-    { key: 'status', type: 'text' },
+    { key: 'status', type: 'translate-text' },
   ]
 
   readonly actions: RowAction[] = [
@@ -68,10 +68,9 @@ export class StoreComponent {
     let dataSend = {action, row: data};
     const dialogRef = this._MatDialog.open(StoreModalComponent, {
       disableClose: true,
-      panelClass: ['custom-dialog-container', 'dialog-90'],
+      panelClass: ['custom-dialog-container'],
       data: dataSend,
-      width: '90vw',
-      height: '90vh',
+      width: '50vw',
       maxWidth: '90vw'
     });
 

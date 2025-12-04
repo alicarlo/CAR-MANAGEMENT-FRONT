@@ -4,6 +4,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, 
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
+import { STATUS } from 'src/app/core/constants/global';
 import { TypeCars } from 'src/app/core/models/typeCars.model';
 import { TypeCarsService } from 'src/app/core/services/typeCars/type-cars.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
@@ -19,7 +20,7 @@ export class TypeCarsModalComponent {
   loading: boolean = false;
   error_messages={
     'name':[
-			{type: 'required', message: 'Nombre es requerido'},
+			{type: 'required', message: 'Titulo es requerido'},
       {type: 'minlength', message: 'Minimo 3 caracteres'},
 		],
 		'abbreviation':[
@@ -27,6 +28,8 @@ export class TypeCarsModalComponent {
       {type: 'minlength', message: 'Minimo 3 caracteres'},
 		]
 	}
+
+  status = [STATUS.ACTIVE, STATUS.INACTIVE]; 
   constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 
@@ -54,12 +57,11 @@ export class TypeCarsModalComponent {
         Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(60)])
       ),
       descriptions: new FormControl(this.data.row === null ? '' : this.data.row.descriptions),
+      status: new FormControl (this.data.row === null ? '' : this.data.row.status),
   	});
   }
 
   save() {
-    console.log(this.saveForm.invalid)
-    console.log(this.saveForm.value)
     if (this.saveForm.invalid) {
       this.saveForm.markAllAsTouched(); 
       return;

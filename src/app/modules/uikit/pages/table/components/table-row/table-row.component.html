@@ -10,11 +10,28 @@
   <!-- celdas dinámicas: imprime TODOS los valores del objeto -->
   <ng-container *ngFor="let val of  dataFilterColumns; trackBy: trackByCol">
     <td [ngClass]="val.class" [ngSwitch]="val.type">
+
+       <ng-container *ngSwitchCase="'translate-text'">
+        <span *ngIf="getValue(val.key) === 'active'">
+          Activo
+        </span>
+
+         <span *ngIf="getValue(val.key) === 'inactive'">
+          Inactivo
+        </span>
+       </ng-container>
+
+      <ng-container *ngSwitchCase="'translate-boolean'">
+        <ng-container *ngIf="getValue(val.key) as v">
+          {{ v === true ? 'Sí' : v === false ? 'No' : '—' }}
+        </ng-container>
+      </ng-container>
+
        <ng-container *ngSwitchCase="'text'">
         {{ getValue(val.key)  }}
        </ng-container>
 
-        <ng-container *ngSwitchCase="'split'">
+      <ng-container *ngSwitchCase="'split'">
         {{ getValue(val.key).length  }} / 2 
        </ng-container>
 
@@ -22,27 +39,63 @@
         {{ getValue(val.key) | date:'dd/MM/yyyy'  }} 
        </ng-container>
 
+       <ng-container *ngSwitchCase="'phone'">
+        {{ formatPhone(getValue(val.key), 'MX') }}
+       </ng-container>
+
+       <ng-container *ngSwitchCase="'comas'">
+        {{ getValue(val.key) | number:'1.0-0':'en-US'  }} 
+       </ng-container>
+
+       <ng-container *ngSwitchCase="'money'">
+        {{ getValue(val.key) | currency:'MXN':'symbol':'1.2-2':'en-US'  }} 
+       </ng-container>
+
+      <ng-container *ngSwitchCase="'checks'">
+        <div class="max-h-20 overflow-y-auto pr-2 scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted "> <!-- ← scroll vertical con altura máx -->
+          <div class="flex flex-wrap gap-2 items-center">
+            <ng-container *ngFor="let kv of (getValue(val.key) | keyvalue)">
+              <span *ngIf="kv.value"
+                    class="px-2 py-1 text-[10px] rounded-full border border-border
+                          bg-background text-foreground whitespace-nowrap">
+                {{ ('' + kv.key).split('_').join(' ') }}
+              </span>
+            </ng-container>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="'area'">
+        <div class="max-h-20 overflow-y-auto pr-2 scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted "> <!-- ← scroll vertical con altura máx -->
+          {{ getValue(val.key)  }}
+        </div>
+      </ng-container>
+
     </td>
   </ng-container>
 
-  <!-- acciones -->
   <td 
     class="text-center"
      [ngClass]="stickyActions
           ? 'sticky right-0 z-2  bg-background ]'
           : ''"
     >
-    <ng-container >
-      <div class="flex gap-2">
-        <button 
-          *ngFor="let val of  actions; trackBy: trackByAction"
+    <div class="flex gap-2">
+      <ng-container *ngFor="let a of actions; trackBy: trackByAction">
+        <button
+          *ngIf="canShowActionForRow(a.id, data)"
           class="text-muted-foreground hover:bg-card hover:text-foreground flex h-7 w-7 items-center justify-center rounded-md"
-          (click)="emitAction(val)"
-          [attr.aria-label]="val.label || val.id" 
-        >
-          <mat-icon>{{val.icon}}</mat-icon>
+          (click)="emitAction(a)"
+          [attr.aria-label]="a.label || a.id"
+          [matTooltip]="a.label"
+          matTooltipPosition="above"
+          matTooltipClass="bg-background text-foreground"
+          >        
+          
+          <mat-icon>{{ a.icon }}</mat-icon>
         </button>
-      </div>
-    </ng-container>
+      </ng-container>
+    </div>
+
   </td>
 </ng-container>

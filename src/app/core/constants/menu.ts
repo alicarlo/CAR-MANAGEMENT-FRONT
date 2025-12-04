@@ -3,22 +3,23 @@ import { MenuItem } from '../models/menu.model';
 export class Menu {
   public static pages: MenuItem[] = [
     {
-      group: 'Base',
-      separator: false,
+      group: 'Menu',
+      separator: true,
       items: [
         {
           icon: 'assets/icons/heroicons/outline/chart-pie.svg',
-          label: 'Dashboard',
+          label: 'Catalogos',
           route: '/dashboard',
           children: [
             { label: 'Clientes', route: '/layout/dashboard/clients' },
-            { label: 'Vehiculos', route: '/layout/dashboard/cars' },
-            { label: 'Tipos de vehiculos', route: '/layout/dashboard/type-cars' },
-            { label: 'Tipos de documentos', route: '/layout/dashboard/typ-documents' },
+            { label: 'Autos', route: '/layout/dashboard/cars' },
+            { label: 'Tipos de Autos', route: '/layout/dashboard/type-cars' },
+            { label: 'Tipo de documento', route: '/layout/dashboard/typ-documents' },
             { label: 'Tipos de gastos', route: '/layout/dashboard/typ-expense' },
+            { label: 'Tipos de pagos', route: '/layout/dashboard/type-payments' },
             { label: 'Sucursales', route: '/layout/dashboard/store' },
-            { label: 'Documentos', route: '/layout/dashboard/expense-classification' },
-            { label: 'Inversores', route: '/layout/dashboard/investor' },
+            { label: 'Clasificación de gasto', route: '/layout/dashboard/expense-classification' },
+            // { label: 'Documentos', route: '/layout/dashboard/expense-classification' },
           ],
         },
         {
@@ -31,7 +32,31 @@ export class Menu {
             { label: 'Scopes', route: '/layout/dashboard/scopes' },
           ],
         },
-        
+        {
+          icon: 'assets/icons/heroicons/outline/user-groups.svg',
+          label: 'Inversionistas',
+          route: '/layout/dashboard/investor',
+        },
+        {
+          icon: 'assets/icons/heroicons/outline/shopping.svg',
+          label: 'Compras',
+          route: '/layout/dashboard/shopping',
+        },
+        {
+          icon: 'assets/icons/heroicons/outline/check.svg',
+          label: 'Revisión de llegada',
+          route: '/layout/dashboard/arrival-review',
+        },
+         {
+          icon: 'assets/icons/heroicons/outline/bills.svg',
+          label: 'Gastos',
+          route: '/layout/dashboard/bills',
+        },
+        { 
+           icon: 'assets/icons/heroicons/outline/document-upload.svg',
+          label: 'Carga de Documentos', 
+          route: '/layout/dashboard/documents' 
+        },
       ],
     }
   ];

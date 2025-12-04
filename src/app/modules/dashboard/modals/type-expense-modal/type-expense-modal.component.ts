@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { TypeExpenseService } from 'src/app/core/services/typeExpense/type-expense.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { STATUS } from 'src/app/core/constants/global';
 
 @Component({
   selector: 'app-type-expense-modal',
@@ -16,6 +17,7 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
 export class TypeExpenseModalComponent {
   saveForm : FormGroup | undefined | any;
   loading: boolean = false;
+  status = [STATUS.ACTIVE, STATUS.INACTIVE]; 
   error_messages={
     'name':[
 			{type: 'required', message: 'Nombre es requerido'},
@@ -41,12 +43,11 @@ export class TypeExpenseModalComponent {
     this.saveForm = this._FormBuilder.group({
       name: new FormControl (this.data.row === null ? '' : this.data.row.name,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
       descriptions: new FormControl(this.data.row === null ? '' : this.data.row.descriptions),
+      status: new FormControl (this.data.row === null ? '' : this.data.row.status),
   	});
   }
 
   save() {
-    console.log(this.saveForm.invalid)
-    console.log(this.saveForm.value)
     if (this.saveForm.invalid) {
       this.saveForm.markAllAsTouched(); 
       return;

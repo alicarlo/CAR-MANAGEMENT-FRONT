@@ -1,0 +1,125 @@
+<mat-dialog-content>
+  <div class="p-[20px]" *ngIf="loadingModal">
+    <!-- New Action-->
+    <div  class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Pagos</p>
+      
+      <label class="text-foreground text-[12px] font-medium">Información del Auto:</label>
+      <div class="flex gap-2">
+        <p class="text-foreground text-[11px]"><strong>Clave:</strong> {{ data.row.key }}</p>
+        <p class="text-foreground text-[11px]"><strong>Modelo:</strong> {{ data.row.model }}</p>
+        <p class="text-foreground text-[11px]"><strong>Marca:</strong> {{ data.row.make }}</p>
+      </div>
+      <div
+        class="border border-border/60 rounded-lg bg-card m-[25px]
+              max-h-[310px] overflow-y-auto overflow-x-auto"
+      >
+        <table class="w-full table-fixed">
+          <!-- Header -->
+          <thead>
+            <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
+              <th class="px-3 py-2 text-left">Método de Pago</th>
+              <th class="px-3 py-2 text-right">Total</th>
+              <th class="px-3 py-2 text-left">Estatus</th>
+              <th class="px-3 py-2 text-left">Documento</th>
+              <th class="px-3 py-2 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/40" *ngIf="!payments">
+            <div class="text-foreground text-[12px] leading-tight"></div>
+          </tbody>
+          <tbody class="divide-y divide-border/40" *ngIf="!!payments">
+
+            <tr
+              *ngFor="let item of payments"
+              class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition"
+            >
+              <!-- Método de pago -->
+              <td class="px-3 py-2 align-middle">
+                <div class="min-w-0 whitespace-normal break-words [hyphens:auto]">
+                  {{ item.payment_method?.name }}
+                </div>
+              </td>
+
+              <!-- Total -->
+              <td class="px-3 py-2 align-middle text-right">
+                {{ item.amount | currency:'MXN':'symbol':'1.2-2':'en-US' }}
+              </td>
+
+              <!-- Estatus -->
+              <td class="px-3 py-2 align-middle">
+                <ng-container [ngSwitch]="item.status">
+                  <span *ngSwitchCase="'active'"
+                        class="inline-flex items-center rounded px-1.5 py-0.5 text-[11px] bg-green-500/10 text-green-600">
+                    Activo
+                  </span>
+                  <span *ngSwitchCase="'inactive'"
+                        class="inline-flex items-center rounded px-1.5 py-0.5 text-[11px] bg-rose-500/10 text-rose-600">
+                    Inactivo
+                  </span>
+                  <span *ngSwitchDefault
+                        class="inline-flex items-center rounded px-1.5 py-0.5 text-[11px] bg-muted/30 text-foreground/70">
+                    —
+                  </span>
+                </ng-container>
+              </td>
+
+              <!-- Documento -->
+              <td class="px-3 py-2 align-middle">
+                <div class="min-w-0 whitespace-normal break-words [hyphens:auto]">
+                  {{ item.document?.name }}
+                </div>
+              </td>
+
+              <!-- Acciones -->
+              <td class="px-2 py-1 align-middle">
+                <div class="flex items-center justify-end gap-1">
+                  <button mat-icon-button aria-label="Descargar"
+                    matTooltip="Descargar Archivo"
+                    matTooltipPosition="above"
+                    matTooltipClass="bg-background text-foreground"        
+                  (click)="actionModal(1,'delete', item, 'Desea descargar el archivo?')"
+                    
+                          >
+                    <mat-icon class="!text-foreground/80 text-[18px] leading-none">attach_file</mat-icon>
+                  </button>
+    
+                  <button mat-icon-button aria-label="Editar" (click)="openAddModal('edit', item)"
+                  
+                    matTooltip="Editar Pago"
+                    matTooltipPosition="above"
+                    matTooltipClass="bg-background text-foreground" 
+                  >
+                    <mat-icon class="!text-foreground/80 text-[18px] leading-none">edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" aria-label="Eliminar"
+                    matTooltip="Eliminar Pago"
+                    matTooltipPosition="above"
+                    matTooltipClass="bg-background text-foreground" 
+                          (click)="actionModal(2,'delete', item, 'Desea  elimnar el registro?')">
+                    <mat-icon class="!text-foreground/80 text-[18px] leading-none">delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="text-foreground text-[15px]  w-full flex justify-center items-center" *ngIf="payments.length === 0">
+        No hay pagos
+      </div>
+
+    </div>
+  </div>
+
+   <div *ngIf="!loadingModal" class="h-full flex justify-center items-center">
+      <app-loading></app-loading>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <div class="flex gap-2 p-[20px]">
+    <app-button  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
+  </div>
+</mat-dialog-actions>

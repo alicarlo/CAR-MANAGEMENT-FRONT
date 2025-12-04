@@ -19,7 +19,8 @@ export class AuthService {
   token = computed(() => this._token());
   
   private _user = signal<UserSet | null>(null);
-  user = computed(() => this._user());
+  readonly user = this._user.asReadonly();
+  // user = computed(() => this._user());
 
   initFromStorage() {
     const t = sessionStorage.getItem(this.TOKEN_KEY);

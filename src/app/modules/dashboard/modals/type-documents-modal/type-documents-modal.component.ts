@@ -4,6 +4,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, 
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
+import { STATUS } from 'src/app/core/constants/global';
 import { TypeDocumentsService } from 'src/app/core/services/typeDocuments/type-documents.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 
@@ -23,6 +24,8 @@ export class TypeDocumentsModalComponent {
       {type: 'minlength', message: 'Minimo 3 caracteres'},
 		],
 	}
+  status = [STATUS.ACTIVE, STATUS.INACTIVE]; 
+  todayStr = new Date().toISOString().slice(0, 10); 
   constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 
@@ -43,12 +46,12 @@ export class TypeDocumentsModalComponent {
     this.saveForm = this._FormBuilder.group({
       name: new FormControl (this.data.row === null ? '' : this.data.row.name,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
       descriptions: new FormControl(this.data.row === null ? '' : this.data.row.descriptions),
+      require_date: new FormControl(this.data.row === null ? null : this.data.row.require_date),
+      status: new FormControl(this.data.row === null ? null : this.data.row.status),
   	});
   }
 
   save() {
-    console.log(this.saveForm.invalid)
-    console.log(this.saveForm.value)
     if (this.saveForm.invalid) {
       this.saveForm.markAllAsTouched(); 
       return;
@@ -107,7 +110,14 @@ export class TypeDocumentsModalComponent {
     })
   }
 
-   close(flag: boolean = false) {
+  close(flag: boolean = false) {
     this.dialogRef?.close(flag);
+  }
+
+  openPicker(input: HTMLInputElement) {
+    (input as any).showPicker?.();
+    if (!('showPicker' in (HTMLInputElement.prototype as any))) {
+      input.focus();
+    }
   }
 }

@@ -53,4 +53,24 @@ export class TypeExpenseService {
       catchError(this.error.handleError)
     );
   }
+
+  public getPurchase(pageSize?: number, currentPage?: number): Observable<TypeExpense> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.get<TypeExpense>(`${environment.apiUrl}/purchase/?column=status&value=active&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
+   public deletePurchase(id: string): Observable<TypeDocument> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.delete<TypeDocument>(`${environment.apiUrl}/purchase/${id}` ,{ responseType: 'text' as 'json' }).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
 }

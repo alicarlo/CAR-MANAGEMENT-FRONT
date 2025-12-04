@@ -69,10 +69,9 @@ export class ScopesComponent {
     let dataSend = {action, row: data};
     const dialogRef = this._MatDialog.open(ScopesModalComponent, {
       disableClose: true,
-      panelClass: ['custom-dialog-container', 'dialog-90'],
+      panelClass: ['custom-dialog-container'],
       data: dataSend,
-      width: '90vw',
-      height: '90vh',
+      width: '50vw',
       maxWidth: '90vw'
     });
 

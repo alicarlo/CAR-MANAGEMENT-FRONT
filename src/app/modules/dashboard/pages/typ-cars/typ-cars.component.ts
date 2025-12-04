@@ -18,11 +18,12 @@ import { TypeCarsModalComponent } from '../../modals/type-cars-modal/type-cars-m
 export class TypCarsComponent {
   typeCarsSelected: TypeCars | undefined;
   typeCars: TypeCars[] = [];
-  typeCarsHeader: string[] = ['Nombre','Abreviación','Descripcion'];
+  typeCarsHeader: string[] = ['Titulo', 'Descripcion', 'Abreviación', 'Estatus'];
   columns: any = [
     { key: 'name', type: 'text' },
-    { key: 'abbreviation', type: 'text' },
     { key: 'descriptions', type: 'text' },
+    { key: 'abbreviation', type: 'text' },
+    { key: 'status', type: 'translate-text' },
   ]
 
   readonly actions: RowAction[] = [
@@ -67,10 +68,9 @@ export class TypCarsComponent {
     let dataSend = {action, row: data};
     const dialogRef = this._MatDialog.open(TypeCarsModalComponent, {
       disableClose: true,
-      panelClass: ['custom-dialog-container', 'dialog-90'],
+      panelClass: ['custom-dialog-container'],
       data: dataSend,
-      width: '90vw',
-      height: '90vh',
+      width: '50vw',
       maxWidth: '90vw'
     });
 

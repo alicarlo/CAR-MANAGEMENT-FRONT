@@ -18,10 +18,11 @@ import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-messa
 export class TypeExpenseComponent {
   typeExpenseSelected: TypeExpense | undefined;
   typeExpense: TypeExpense[] = [];
-  typeExpenseHeader: string[] = ['Nombre','Descripcion'];
+  typeExpenseHeader: string[] = ['Nombre','Descripcion', 'Estatus'];
   columns: any = [
     { key: 'name', type: 'text' },
     { key: 'descriptions', type: 'text' },
+    { key: 'status', type: 'translate-text' },
   ]
 
   readonly actions: RowAction[] = [
@@ -66,10 +67,9 @@ export class TypeExpenseComponent {
     let dataSend = {action, row: data};
     const dialogRef = this._MatDialog.open(TypeExpenseModalComponent, {
       disableClose: true,
-      panelClass: ['custom-dialog-container', 'dialog-90'],
+      panelClass: ['custom-dialog-container'],
       data: dataSend,
-      width: '90vw',
-      height: '90vh',
+      width: '50vw',
       maxWidth: '90vw'
     });
 

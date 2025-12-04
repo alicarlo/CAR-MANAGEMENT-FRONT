@@ -1,0 +1,278 @@
+<mat-dialog-content>
+  <div class="p-[20px]">
+    <!-- New Action-->
+    <div  class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Gastos</p>
+
+      <div class="w-full space-y-2">
+        <p class="text-foreground text-[11px] font-medium">
+          Elige una opcion:
+        </p>
+
+        <form [formGroup]="saveForm" class="flex flex-col gap-6 w-full">
+          <div class="flex flex-wrap gap-4">
+            <!-- Radio: Auto -->
+            <label class="flex items-center gap-2 cursor-pointer text-foreground text-[11px]">
+              <input
+                type="radio"
+                class="accent-primary cursor-pointer"
+                formControlName="option"
+                value="auto"
+              />
+              <span>Agregar gasto de Auto</span>
+            </label>
+
+            <!-- Radio: Oficinas -->
+            <label class="flex items-center gap-2 cursor-pointer text-foreground text-[11px]">
+              <input
+                type="radio"
+                class="accent-primary cursor-pointer"
+                formControlName="option"
+                value="oficina"
+              />
+              <span>Agregar gasto Oficinas</span>
+            </label>
+          </div>
+          <div class="error-messages">
+            <ng-container *ngFor="let error of error_messages.option">
+              <div class="error-message" *ngIf="saveForm.get('option').hasError(error.type) && (saveForm.get('option').dirty || saveForm.get('option').touched)">
+                {{error.message}}
+              </div>
+            </ng-container>
+          </div>
+
+          <div class="flex flex-col gap-2" *ngIf="saveForm.get('option').value === 'auto' ">
+            <label for="sexo" class="text-foreground text-[11px] font-medium">Auto:</label>
+            <div class="relative">
+              <select 
+                formControlName="car_id"
+                class="w-full py-2 pl-8 pr-10 rounded-md
+                      bg-background text-foreground
+                      border border-border
+                      focus:outline-none focus:ring-2 focus:ring-primary/50
+                      appearance-none [color-scheme:dark]"
+              >
+                <option value="" disabled selected hidden>Selecciona…</option>
+
+                <option *ngFor="let s of cars" [value]="s.id">
+                  Clave:{{ s.key}}  - {{ s.make }} - {{ s.model }} - {{ s.version}}  - {{ s.color }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="sexo" class="text-foreground text-[11px] font-medium">Clasificacion de Gasto:</label>
+            <div class="relative">
+              <select 
+                formControlName="classification_bill_id"
+                class="w-full py-2 pl-8 pr-10 rounded-md
+                      bg-background text-foreground
+                      border border-border
+                      focus:outline-none focus:ring-2 focus:ring-primary/50
+                      appearance-none [color-scheme:dark]"
+              >
+                <option value="" disabled selected hidden>Selecciona…</option>
+
+                <option *ngFor="let s of classification" [value]="s.id">
+                  {{ s.name }}
+                </option>
+              </select>
+            </div>
+
+              <div class="error-messages">
+              <ng-container *ngFor="let error of error_messages.classification_bill_id">
+                <div class="error-message" *ngIf="saveForm.get('classification_bill_id').hasError(error.type) && (saveForm.get('classification_bill_id').dirty || saveForm.get('classification_bill_id').touched)">
+                  {{error.message}}
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <!--
+          <div class="flex flex-col gap-2">
+            <label for="sexo" class="text-foreground text-[11px] font-medium">Usuario:</label>
+            <div class="relative">
+              <select 
+                formControlName="user_created_id"
+                class="w-full py-2 pl-8 pr-10 rounded-md
+                      bg-background text-foreground
+                      border border-border
+                      focus:outline-none focus:ring-2 focus:ring-primary/50
+                      appearance-none [color-scheme:dark]"
+              >
+                <option value="" disabled selected hidden>Selecciona…</option>
+
+                <option *ngFor="let s of user" [value]="s.id">
+                  {{ s.full_name  }}
+                </option>
+              </select>
+            </div>
+
+              <div class="error-messages">
+              <ng-container *ngFor="let error of error_messages.user_created_id">
+                <div class="error-message" *ngIf="saveForm.get('user_created_id').hasError(error.type) && (saveForm.get('user_created_id').dirty || saveForm.get('user_created_id').touched)">
+                  {{error.message}}
+                </div>
+              </ng-container>
+            </div>
+          </div>
+          -->
+
+          <div class="flex flex-col gap-2">
+            <label for="sexo" class="text-foreground text-[11px] font-medium">Tipo de Pago:</label>
+            <div class="relative">
+              <select 
+                formControlName="payment_method_id"
+                class="w-full py-2 pl-8 pr-10 rounded-md
+                      bg-background text-foreground
+                      border border-border
+                      focus:outline-none focus:ring-2 focus:ring-primary/50
+                      appearance-none [color-scheme:dark]"
+              >
+                <option value="" disabled selected hidden>Selecciona…</option>
+
+                <option *ngFor="let s of typePayments" [value]="s.id">
+                  {{ s.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="error-messages">
+              <ng-container *ngFor="let error of error_messages.payment_method_id">
+                <div class="error-message" *ngIf="saveForm.get('payment_method_id').hasError(error.type) && (saveForm.get('payment_method_id').dirty || saveForm.get('payment_method_id').touched)">
+                  {{error.message}}
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <p class="text-foreground text-[11px] font-medium">Monto:</p>
+            <input
+              class="py-2 pl-8 pr-2"
+              placeholder="Monto"
+              type="number"
+              formControlName="amount" 
+            />
+            <div class="error-messages">
+              <ng-container *ngFor="let error of error_messages.amount">
+                <div class="error-message" *ngIf="saveForm.get('amount').hasError(error.type) && (saveForm.get('amount').dirty || saveForm.get('amount').touched)">
+                  {{error.message}}
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-foreground text-[11px] font-medium">Concepto:</label>
+            <textarea
+              class="
+                py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
+                border-border bg-background text-foreground
+                scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
+              "
+              placeholder="Agrega un concepto"
+              formControlName="name">
+            </textarea>
+          </div>
+
+
+          <div class="flex flex-col gap-2">
+            <label class="text-foreground text-[11px] font-medium">Archivo adjunto:</label>
+
+              <!-- Dropzone: solo se muestra si NO hay archivo seleccionado -->
+              <label
+                *ngIf="!selectedFile"
+                for="attachmentInput"
+                class="
+                  w-full py-6 px-4 rounded-md
+                  border border-dotted border-border
+                  bg-background text-foreground
+                  flex flex-col items-center justify-center gap-2
+                  cursor-pointer hover:bg-background/70 transition text-center
+                "
+              >
+                <mat-icon class="text-foreground/80">insert_drive_file</mat-icon>
+                <span class="text-foreground text-sm">Agrega un archivo (imagen, video, PDF o Word)</span>
+                <span class="text-foreground/60 text-xs">Tamaño máx. recomendado: 25 MB</span>
+              </label>
+
+              <!-- Input real (oculto) -->
+              <input
+                id="attachmentInput"
+                type="file"
+                class="hidden"
+                (change)="onFileSelected($event)"
+                accept="image/*,video/*,.pdf,.doc,.docx"
+              />
+
+              <!-- Vista del archivo (centrada) -->
+              <div *ngIf="selectedFile" class="rounded-md border border-border bg-background p-4">
+                <div class="flex flex-col items-center text-center gap-2">
+                  <mat-icon class="!text-foreground text-2xl">{{ fileIcon }}</mat-icon>
+                  
+                  <p class="text-foreground whitespace-normal break-words [hyphens:auto]">
+                    <strong>Archivo:</strong> {{ selectedFile.name }}
+                  </p>
+                  <p class="text-foreground/70 text-xs">
+                    {{ (selectedFile.size / 1024 / 1024) | number:'1.0-2' }} MB • {{ selectedFile.type || fileExt }}
+                  </p>
+
+                  <!-- Preview (imagen) -->
+                  <img
+                    *ngIf="previewUrl && isImage"
+                    [src]="previewUrl"
+                    alt="Vista previa"
+                    class="max-h-48 rounded-md border border-border"
+                  />
+
+                  <!-- Preview (video) -->
+                  <video
+                    *ngIf="previewUrl && isVideo"
+                    [src]="previewUrl"
+                    class="max-h-48 rounded-md border border-border"
+                    controls
+                    muted
+                  ></video>
+
+                  <!-- Acciones -->
+                  <button
+                    type="button"
+                    class="text-foreground text-sm underline underline-offset-2 hover:opacity-80"
+                    (click)="removeFile()"
+                  >
+                    Remover
+                  </button>
+                </div>
+              </div>
+
+              <!-- Errores -->
+              <div class="error-messages">
+                <div class="error-message" *ngIf="attachmentCtrl?.hasError('invalidType')">
+                  <span class="text-foreground">Formato no permitido. Solo imagen, video, PDF o Word.</span>
+                </div>
+                <div class="error-message" *ngIf="attachmentCtrl?.hasError('maxSize')">
+                  <span class="text-foreground">El archivo excede el tamaño máximo permitido.</span>
+                </div>
+                <div class="error-message" *ngIf="attachmentCtrl?.hasError('required')">
+                  <span class="text-foreground">Este campo es obligatorio.</span>
+                </div>
+              </div>
+            </div>
+        </form>
+        
+      </div>
+
+      
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <div class="flex gap-2 p-[20px]">
+    <app-button [loading]="loading" (click)="save()" full impact="bold" tone="primary" shape="rounded" size="medium">Guardar</app-button>
+    <app-button [disabled]="loading"  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
+
+  </div>
+</mat-dialog-actions>

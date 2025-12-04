@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "buscadordeempleos-cd62b"
+  },
+  "targets": {
+    "buscadordeempleos-cd62b": {
+      "hosting": {
+        "car-machucas": [
+          "car-machucas"
+        ]
+      }
+    }
+  }
+}

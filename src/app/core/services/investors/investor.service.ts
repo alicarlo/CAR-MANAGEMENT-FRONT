@@ -4,6 +4,7 @@ import { ErrorHandlerService } from '../error-handler/error-handler.service';
 import { Investor } from '../../models/investor.model';
 import { environment } from 'src/environments/environment';
 import { catchError, Observable, retry } from 'rxjs';
+import { Investment } from '../../models/investment.model';
 
 @Injectable({
   providedIn: 'root'
@@ -48,6 +49,46 @@ export class InvestorService {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
     return this.http.delete<Investor>(`${environment.apiUrl}/investor/${id}` ,{ responseType: 'text' as 'json' }).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
+  public registerInvestment(bodyData: Investment): Observable<Investment> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.post<Investment>(`${environment.apiUrl}/investment/`, bodyData ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
+  public updateInvestment(bodyData: Investment): Observable<Investment> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.patch<Investment>(`${environment.apiUrl}/investment/${bodyData.id}`, bodyData ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
+  public getInvestment(pageSize?: number, currentPage?: number): Observable<Investment> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.get<Investment>(`${environment.apiUrl}/investment/?column=status&value=active&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
+  public deleteInvestment(id: string): Observable<Investment> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.delete<Investment>(`${environment.apiUrl}/investment/${id}` ,{ responseType: 'text' as 'json' }).pipe(
       retry(0),
       catchError(this.error.handleError)
     );

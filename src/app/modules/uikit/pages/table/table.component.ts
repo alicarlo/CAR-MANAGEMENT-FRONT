@@ -90,7 +90,7 @@ export class TableComponent {
 
     if (s === this.last) return;
     this.last = s;
-    this.activateSearch = s.length > 0 ? false : true;
+    // this.activateSearch = s.length > 0 ? false : true;
     this.searchData.emit(s);
   });
 
