@@ -26,15 +26,19 @@ import { BillsModalComponent } from '../../modals/bills-modal/bills-modal.compon
 export class BillsComponent {
   bills: any[] = [];
   billsSelected: TypeExpense | undefined;
-  billsHeader: string[] = ['Fecha', 'Concepto', 'Total', 'Clave','Marca','Tipo de auto', 'Linea', 'Modelo'];
+  billsHeader: string[] = ['Fecha', 'Concepto', 'Total', 'Clave','Auto'];
   columns: any = [
     { key: 'created_at', type: 'dob' },
     { key: 'name', type: 'text' },
     { key: 'total', type: 'money' },
     { key: 'key', type: 'text' },
+    { key: 'car', type: 'text' },
+
+    /*
     { key: 'make', type: 'text' },
     { key: 'version', type: 'text' },
     { key: 'model', type: 'text' },
+     */
     // { key: 'color', type: 'text' },
   ]
   readonly actions: RowAction[] = [
@@ -217,6 +221,7 @@ export class BillsComponent {
             make: r.cars.length > 0 ? r.cars[0].make : '-', 
             line: r.cars.length > 0 ? r.cars[0].version : '-', 
             model: r.cars.length > 0 ? r.cars[0].model : '-', 
+            car:  r.cars.length > 0 ?  `${r.cars[0].make } ${r.cars[0].version} ${r.cars[0].model } ${r.cars[0].color }` : '-'
             // color: r.cars.length > 0 ? r.cars[0].color : '-', 
           }));
           this.total = response.pagination.total_items;

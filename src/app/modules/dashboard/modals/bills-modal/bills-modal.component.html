@@ -55,7 +55,7 @@
                 <option value="" disabled selected hidden>Selecciona…</option>
 
                 <option *ngFor="let s of cars" [value]="s.id">
-                  Clave:{{ s.key}}  - {{ s.make }} - {{ s.model }} - {{ s.version}}  - {{ s.color }}
+                  {{ s.key}} -  {{ s.make }} {{ s.version}} {{ s.model }} {{ s.color }}
                 </option>
               </select>
             </div>
@@ -255,9 +255,12 @@
                 <div class="error-message" *ngIf="attachmentCtrl?.hasError('maxSize')">
                   <span class="text-foreground">El archivo excede el tamaño máximo permitido.</span>
                 </div>
+
+                <!--
                 <div class="error-message" *ngIf="attachmentCtrl?.hasError('required')">
                   <span class="text-foreground">Este campo es obligatorio.</span>
                 </div>
+                -->
               </div>
             </div>
         </form>

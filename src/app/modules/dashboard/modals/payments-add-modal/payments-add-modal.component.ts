@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { STATUS } from 'src/app/core/constants/global';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { BillService } from 'src/app/core/services/bill/bill.service';
 import { DocumentsService } from 'src/app/core/services/documents/documents.service';
 import { InvestorService } from 'src/app/core/services/investors/investor.service';
 import { ShopingService } from 'src/app/core/services/shoping/shoping.service';
@@ -71,6 +72,7 @@ export class PaymentsAddModalComponent {
     private _AuthService: AuthService,
     private _DocumentsService: DocumentsService,
     private _TypeDocumentsService: TypeDocumentsService,
+    private _BillService: BillService
   ) 
   { }
 
@@ -106,7 +108,7 @@ export class PaymentsAddModalComponent {
         document_id: new FormControl (this.data.row === null ? '' : this.data.row.document_id),
         id: new FormControl (this.data.row === null ? '' : this.data.row.id),
         document_type_id: new FormControl (this.data.row === null ? '' : 1,Validators.compose([Validators.required])),
-        descriptions: new FormControl (this.data.row === null ? '' : this.data.row.document.descriptions,Validators.compose([Validators.required])),
+        descriptions: new FormControl (this.data.row === null ? '' : this.data.row.bill.name,Validators.compose([Validators.required])),
         file: new FormControl (this.data.row === null ? '' : this.data.row.document.url,Validators.compose([Validators.required])),
         bill_id: new FormControl (this.data.row === null ? '' : this.data.row.bill.id,Validators.compose([Validators.required])),
   	  });
@@ -242,11 +244,12 @@ export class PaymentsAddModalComponent {
         ? { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, document_id: id, bill_id: this.saveForm.value.bill_id } 
         : { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, bill_id: this.saveForm.value.bill_id } 
         */
-       filledValues = { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, document_id: id, bill_id: this.saveForm.value.bill_id }
+       filledValues = { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, document_id: id, bill_id: this.saveForm.value.bill_id, id: this.data.row.id };
     }else{
       filledValues = {...filledValues, id: this.data.row.id};
     }
 
+    // this.data.flag  === 0
     const methodMap = {
       registerPayment: this._ShopingService.registerPayment.bind(this._ShopingService),
       updatePayment:   this._ShopingService.updatePayment.bind(this._ShopingService),
@@ -254,12 +257,41 @@ export class PaymentsAddModalComponent {
     
     type MethodKey = keyof typeof methodMap; 
 
+    /*
     const methodSelect: MethodKey =
       this.data.flag === 1 || this.data.flag === 0 ? 'registerPayment' : 'updatePayment';
-    
+
+      */
+    const methodSelect: MethodKey = this.data.flag === 1 ? 'registerPayment' : 'updatePayment';
       methodMap[methodSelect](filledValues).subscribe({
       next: async (response) => {
         if(response) {
+          /*
+          if (this.data.flag === 0) {
+             let data = {
+              id: this.saveForm.value.bill_id,
+              car_id: this.data.row.cars
+            }
+            this._BillService.updateBill(data).subscribe({
+              next: async (response: any) => {
+                if(response) {
+                  this._ToastrService.success('Registro exitoso', 'Exito');
+
+                  this.loading = false;
+                  this.close(true);
+                  return;
+                }
+              },
+              error: (err) => {
+                if (err.error === "Token expired") return;
+                this.loading = true;
+                this._ToastrService.error(err.error, 'Error');
+              },
+            }) 
+          }
+            */
+         
+          //  updateBill
           this._ToastrService.success('Registro exitoso', 'Exito');
           this.loading = false;
           this.close(true);

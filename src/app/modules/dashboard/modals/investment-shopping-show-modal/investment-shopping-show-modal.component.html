@@ -16,7 +16,7 @@
               max-h-[310px] overflow-y-auto overflow-x-auto"
       >
         <!-- Wrapper con ancho mínimo solo en pantallas grandes -->
-        <div class="min-w-full md:min-w-[1100px]">
+        <div class="min-w-full md:min-w-[900px]">
           <table class="w-full table-auto">
             <!-- Header -->
             <thead>
@@ -24,11 +24,13 @@
   
                 
                 <th class="px-3 py-2 text-left whitespace-nowrap">Clave</th>
-
+                <th class="px-3 py-2 text-left whitespace-nowrap">Auto</th>
+                <!--
                 <th class="px-3 py-2 text-left whitespace-nowrap">Marca</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Modelo</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Línea</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Color</th>
+              -->
                 <th class="px-3 py-2 text-left whitespace-nowrap">Nombre del gasto</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Total</th>
 
@@ -45,7 +47,12 @@
                   {{ item.cars[0].key }}
                 </td>
 
+                 {{ item.make }} {{ item.version }} {{ item.model }} {{ item.color }}
 
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.cars[0].make }} {{ item.cars[0].version }} {{ item.cars[0].model }} {{ item.cars[0].color }}
+                </td>
+                <!--
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
                   {{ item.cars[0].make }}
                 </td>
@@ -61,6 +68,7 @@
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
                   {{ item.cars[0].color }}
                 </td>
+                -->
 
                  <td class="px-3 py-2 align-middle whitespace-nowrap">
                   {{ item.name }}

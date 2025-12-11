@@ -51,6 +51,8 @@ export class PaymentsShowModalComponent {
         if(response) {
           this.payments = response.items.map((r: any) => ({ ...r}));
           this.loadingModal = true;
+          console.log(this.payments)
+          console.log(this.data)
         }
       },
       error: (err) => {
@@ -68,6 +70,8 @@ export class PaymentsShowModalComponent {
         if(response) {
           this.payments = response.items.map((r: any) => ({ ...r}));
           this.loadingModal = true;
+             console.log(this.payments)
+          console.log(this.data)
         }
       },
       error: (err) => {

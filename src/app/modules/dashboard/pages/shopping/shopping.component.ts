@@ -21,14 +21,15 @@ import { PaymentsShowModalComponent } from '../../modals/payments-show-modal/pay
 export class ShoppingComponent {
   purchaseSelected: TypeExpense | undefined;
   purchase: TypeExpense[] = [];
-  purchaseHeader: string[] = ['Clave','Marca','Tipo de auto', 'Linea', 'Modelo', 'Color', 'Fecha de llegada','Total',];
+  purchaseHeader: string[] = ['Clave','Auto','Tipo de auto', 'Fecha de llegada','Total',];
   columns: any = [
     { key: 'key', type: 'text' },
-    { key: 'make', type: 'text' },
+    { key: 'car', type: 'text' },
+    // { key: 'make', type: 'text' },
     { key: 'car_type', type: 'text' },
-    { key: 'line', type: 'text' },
-    { key: 'model', type: 'text' },
-    { key: 'color', type: 'text' },
+    // { key: 'line', type: 'text' },
+    // { key: 'model', type: 'text' },
+    // { key: 'color', type: 'text' },
     { key: 'arrived_at', type: 'dob' },
     { key: 'total', type: 'money' },
   ]
@@ -213,11 +214,12 @@ export class ShoppingComponent {
           this.hasNext = response.pagination.has_next;
           this.hasPrev = response.pagination.has_prev;
           this.purchase = response.items.map((r: any) => ({ ...r, 
-            make: r.car.make, 
+            car:  r.car ?  `${r.car.make } ${r.car.version} ${r.car.model } ${r.car.color }` : '-',
+            // make: r.car.make, 
             car_type: r.car.car_type.name, 
-            line: r.car.version, 
-            model: r.car.model, 
-            color: r.car.color, 
+            // line: r.car.version, 
+            // model: r.car.model, 
+            // color: r.car.color, 
             key: r.car.key,
             arrived_at: r.car.arrived_at,  }));
           this.total = response.pagination.total_items;

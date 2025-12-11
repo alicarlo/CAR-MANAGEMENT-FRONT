@@ -1,6 +1,7 @@
 import { Cars } from "./cars.model"
 
 export interface Shopping {
+  bill_id: number;
   id: number;
   car: Cars;
   commission: number;

@@ -160,11 +160,11 @@ isInvestorSelected(id: number): boolean {
         { nonNullable: true }
       ),
       comments: new FormGroup({
-        generales: new FormControl(this.data.row === null ? '' : this.data.row.comments.generales ),
-        carroceria: new FormControl(this.data.row === null ? '' : this.data.row.comments.carroceria),
-        llantas:     new FormControl(this.data.row === null ? '' : this.data.row.comments.llantas),
-        pintura:   new FormControl(this.data.row === null ? '' : this.data.row.comments.pintura),
-        otros:   new FormControl(this.data.row === null ? '' : this.data.row.comments.otros),
+        generales: new FormControl(this.data.row === null || this.data.row.comments === null ? '' : this.data.row.comments.generales ),
+        carroceria: new FormControl(this.data.row === null || this.data.row.comments === null ? '' : this.data.row.comments.carroceria),
+        llantas:     new FormControl(this.data.row === null || this.data.row.comments === null ? '' : this.data.row.comments.llantas),
+        pintura:   new FormControl(this.data.row === null || this.data.row.comments === null ? '' : this.data.row.comments.pintura),
+        otros:   new FormControl(this.data.row === null || this.data.row.comments === null ? '' : this.data.row.comments.otros),
       })
     });
   }

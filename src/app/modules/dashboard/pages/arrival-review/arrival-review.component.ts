@@ -25,14 +25,15 @@ import { CarsService } from 'src/app/core/services/cars/cars.service';
 export class ArrivalReviewComponent {
   arrival: any[] = [];
   carsSelected: TypeExpense | undefined;
-  carsHeader: string[] = ['Clave','Marca','Tipo de auto', 'Linea', 'Modelo', 'Color', 'Fecha de llegada'];
+  carsHeader: string[] = ['Clave','Auto','Tipo de auto', 'Fecha de llegada'];
   columns: any = [
     { key: 'key', type: 'text' },
-    { key: 'make', type: 'text' },
+    { key: 'car', type: 'text' },
+    //{ key: 'make', type: 'text' },
     { key: 'car_type', type: 'text' },
-    { key: 'version', type: 'text' },
-    { key: 'model', type: 'text' },
-    { key: 'color', type: 'text' },
+    // { key: 'version', type: 'text' },
+    // { key: 'model', type: 'text' },
+    // { key: 'color', type: 'text' },
     { key: 'arrived_at', type: 'dob' },
   ]
   readonly actions: RowAction[] = [
@@ -167,10 +168,12 @@ export class ArrivalReviewComponent {
           this.cars = response.items.map((r: any) => ({ 
             ...r,
             car_type: r.car_type.name, 
-    
+            car:  `${r.make } ${r.version} ${r.model } ${r.color }`
           }));
           this.total = response.pagination.total_items;
         }
+
+        console.log(this.cars)
       },
       error: (err) => {
         if (err.error === "Token expired") return;

@@ -23,14 +23,17 @@
                 <th class="px-3 py-2 text-left whitespace-nowrap">Clave</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Tipo de auto</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Sucursal</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Auto</th>
+                <!--
                 <th class="px-3 py-2 text-left whitespace-nowrap">Marca</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Modelo</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Línea</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Color</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap"># Serie</th>
-                <th class="px-3 py-2 text-left whitespace-nowrap">Kilometraje</th>
+                <!--<th class="px-3 py-2 text-left whitespace-nowrap">Kilometraje</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Cilindros</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap"># de motor</th>
+                -->
                 <th class="px-3 py-2 text-left whitespace-nowrap">Fecha de llegada</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Precio de venta</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Enganche</th>
@@ -56,6 +59,11 @@
                   {{ item.branch?.name }}
                 </td>
 
+                 <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.make }} {{ item.version }} {{ item.model }} {{ item.color }}
+                </td>
+             
+                <!--
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
                   {{ item.make }}
                 </td>
@@ -87,6 +95,7 @@
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
                   {{ item.engine_number }}
                 </td>
+                -->
 
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
                   {{ item.arrived_at | date:'dd/MM/yyyy' }}

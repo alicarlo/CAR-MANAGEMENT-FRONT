@@ -61,7 +61,8 @@ export class CarsService {
 
     let column = filter.length ? 'all' : 'status';
     let filterSearch = filter.length ? filter : active;
-    return this.http.get<Cars>(`${environment.apiUrl}/car/?column=${column}&value=${filterSearch}&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+    // column=${column}&value=${filterSearch}&
+    return this.http.get<Cars>(`${environment.apiUrl}/car/?page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
       retry(0),
       catchError(this.error.handleError)
     );

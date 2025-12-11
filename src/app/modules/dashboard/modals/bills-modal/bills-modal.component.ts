@@ -296,6 +296,26 @@ export class BillsModalComponent {
       return acc;
     }, {} as typeof this.saveForm.value);
     
+    if (this.data.row === null) {
+      console.log(documentId)
+      if (documentId !== null && documentId !== '') {
+        filledValues =  { 
+          payment_method_id: filledValues.payment_method_id,
+          document_id: documentId,
+          amount: filledValues.amount,
+          bill_id: billId
+        }
+      }else{
+        filledValues =  { 
+          payment_method_id: filledValues.payment_method_id,
+          amount: filledValues.amount,
+          bill_id: billId
+        }
+      }
+    }else{
+      filledValues = {...filledValues, id: this.data.row.id};
+    }
+    /*
     filledValues = this.data.row === null ? 
       { 
         payment_method_id: filledValues.payment_method_id,
@@ -304,6 +324,7 @@ export class BillsModalComponent {
         bill_id: billId
        } : 
       {...filledValues, id: this.data.row.id};
+      */
 
     const methodMap = {
       registerPayment: this._ShopingService.registerPayment.bind(this._ShopingService),

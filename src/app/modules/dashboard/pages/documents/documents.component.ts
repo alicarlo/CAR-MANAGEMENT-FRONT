@@ -22,13 +22,15 @@ import { DocumentsModalComponent } from '../../modals/documents-modal/documents-
 export class DocumentsComponent {
   documentsSelected: any;
   documents: any[] = [];
-  documentsHeader: string[] = ['Clave','Marca', 'Linea', 'Modelo', 'Color','Nombre', 'Descripcion', 'Tipo de documento','Estatus'];
+  documentsHeader: string[] = ['Clave','Auto','Nombre', 'Descripcion', 'Tipo de documento','Estatus'];
   columns: any = [
     { key: 'key', type: 'text' },
-    { key: 'make', type: 'text' },
+    { key: 'car', type: 'text' },
+    /*{ key: 'make', type: 'text' },
     { key: 'line', type: 'text' },
     { key: 'model', type: 'text' },
     { key: 'color', type: 'text' },
+     */
     { key: 'name', type: 'text' },
     { key: 'descriptions', type: 'area' },
     { key: 'document_type', type: 'text' },
@@ -89,10 +91,12 @@ export class DocumentsComponent {
             ...r, 
             document_type: r.document_type.name,
             key: r.cars.length > 0 ? r.cars[0].key : '',
-            make: r.cars.length > 0 ? r.cars[0].make : '', 
+            /*make: r.cars.length > 0 ? r.cars[0].make : '', 
             line: r.cars.length > 0 ? r.cars[0].version : '', 
             model: r.cars.length > 0 ? r.cars[0].model : '', 
             color: r.cars.length > 0 ? r.cars[0].color : '', 
+            */
+           car:  r.cars.length > 0 ?  `${r.cars[0].make } ${r.cars[0].version} ${r.cars[0].model } ${r.cars[0].color }` : '-'
           }));
           this.total = response.pagination.total_items;
           setTimeout(() => {
