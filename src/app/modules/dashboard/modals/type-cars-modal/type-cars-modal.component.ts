@@ -5,7 +5,6 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angu
 import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { STATUS } from 'src/app/core/constants/global';
-import { TypeCars } from 'src/app/core/models/typeCars.model';
 import { TypeCarsService } from 'src/app/core/services/typeCars/type-cars.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 
@@ -40,8 +39,6 @@ export class TypeCarsModalComponent {
   ) 
   { }
   
-
-
   ngOnInit(): void {
     this.init();
   }

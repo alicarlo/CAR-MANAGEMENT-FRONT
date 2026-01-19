@@ -1,4 +1,4 @@
-import { Component, model } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
@@ -6,7 +6,6 @@ import { RowAction, RowActionEvent } from 'src/app/core/models/actions.model';
 import { TypeExpense } from 'src/app/core/models/typeExpense.model';
 import { TypeExpenseService } from 'src/app/core/services/typeExpense/type-expense.service';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
-import { TypeExpenseModalComponent } from '../../modals/type-expense-modal/type-expense-modal.component';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
 import { ShoppingModalComponent } from '../../modals/shopping-modal/shopping-modal.component';
 import { PaymentsAddModalComponent } from '../../modals/payments-add-modal/payments-add-modal.component';
@@ -21,15 +20,12 @@ import { PaymentsShowModalComponent } from '../../modals/payments-show-modal/pay
 export class ShoppingComponent {
   purchaseSelected: TypeExpense | undefined;
   purchase: TypeExpense[] = [];
-  purchaseHeader: string[] = ['Clave','Auto','Tipo de auto', 'Fecha de llegada','Total',];
+  purchaseHeader: string[] = ['Inversionista','Clave','Auto','Tipo de auto', 'Fecha de llegada','Total',];
   columns: any = [
+    { key: 'investor', type: 'text' },
     { key: 'key', type: 'text' },
-    { key: 'car', type: 'text' },
-    // { key: 'make', type: 'text' },
+    { key: 'carData', type: 'text' },
     { key: 'car_type', type: 'text' },
-    // { key: 'line', type: 'text' },
-    // { key: 'model', type: 'text' },
-    // { key: 'color', type: 'text' },
     { key: 'arrived_at', type: 'dob' },
     { key: 'total', type: 'money' },
   ]
@@ -94,7 +90,7 @@ export class ShoppingComponent {
   }
 
   openAddModal(action: string, data: any) {
-    let dataSend = {action, row: data, flag: 1};
+    let dataSend = {action, row: data, flag: 4};
     const dialogRef = this._MatDialog.open(PaymentsAddModalComponent, {
       disableClose: true,
       data: dataSend,
@@ -164,43 +160,17 @@ export class ShoppingComponent {
 
   changePageNextPrev(event: any) {
     this.currentPage = event === 'next' ? ++this.currentPage : --this.currentPage;
-    this.getTypeExpense();
+    this.getPurchase();
   }
 
   currentPageReturn(event: any) {
     this.currentPage = event;
-    this.getTypeExpense();
+    this.getPurchase();
   }
 
   pageSizeSelectReturn(event: any) {
     this.pageSize = event;
-    this.getTypeExpense();
-  }
-
-  getTypeExpense() {
-    /*this.loading = false;
-    this._TypeExpenseService.getTypeExpense(this.pageSize, this.currentPage).subscribe({
-      next: async (response: any) => {
-        if(response) {
-  
-          this.totalPages = response.pagination.total_pages;
-          this.currentPage = response.pagination.current_page;
-          this.hasNext = response.pagination.has_next;
-          this.hasPrev = response.pagination.has_prev;
-          this.typeExpense = response.items.map((r: any) => ({ ...r }));
-          this.total = response.pagination.total_items;
-          setTimeout(() => {
-            this.loading = true;  
-          },400)
-        }
-      },
-      error: (err) => {
-        if (err.error === "Token expired") return;
-        this.loading = true;
-        this._ToastrService.error(err.error, 'Error');
-      },
-    }) 
-      */
+    this.getPurchase();
   }
 
   getPurchase() {
@@ -214,14 +184,12 @@ export class ShoppingComponent {
           this.hasNext = response.pagination.has_next;
           this.hasPrev = response.pagination.has_prev;
           this.purchase = response.items.map((r: any) => ({ ...r, 
-            car:  r.car ?  `${r.car.make } ${r.car.version} ${r.car.model } ${r.car.color }` : '-',
-            // make: r.car.make, 
+            carData:  r.car ?  `${r.car.make } ${r.car.version} ${r.car.model } ${r.car.color }` : '-',
             car_type: r.car.car_type.name, 
-            // line: r.car.version, 
-            // model: r.car.model, 
-            // color: r.car.color, 
+            investor: r.investor.full_name,
             key: r.car.key,
             arrived_at: r.car.arrived_at,  }));
+
           this.total = response.pagination.total_items;
           setTimeout(() => {
             this.loading = true;  

@@ -1,21 +1,20 @@
 <mat-dialog-content>
   <div class="p-[20px]" *ngIf="loadingModal">
-    <!-- New Action-->
     <div  class="flex flex-col gap-4">
-      <p class="text-foreground font-semibold">Pagos</p>
-      
+      <p class="text-foreground font-semibold">Pagos1</p>
       <label class="text-foreground text-[12px] font-medium">Información del Auto:</label>
       <div class="flex gap-2">
-        <p class="text-foreground text-[11px]"><strong>Clave:</strong> {{ data.row.key }}</p>
-        <p class="text-foreground text-[11px]"><strong>Modelo:</strong> {{ data.row.model }}</p>
-        <p class="text-foreground text-[11px]"><strong>Marca:</strong> {{ data.row.make }}</p>
+          <p class="text-foreground text-[11px]"><strong>Clave:</strong> {{ data.row.car.key }}</p>
+          <p class="text-foreground text-[11px]"><strong>Modelo:</strong> {{ data.row.car.model }}</p>
+          <p class="text-foreground text-[11px]"><strong>Marca:</strong> {{ data.row.car.make }}</p>
+          <p class="text-foreground text-[11px]"><strong>Linea:</strong> {{ data.row.car.version }}</p>
+          <p class="text-foreground text-[11px]"><strong>Color:</strong> {{ data.row.car.color }}</p>
       </div>
       <div
         class="border border-border/60 rounded-lg bg-card m-[25px]
               max-h-[310px] overflow-y-auto overflow-x-auto"
       >
         <table class="w-full table-fixed">
-          <!-- Header -->
           <thead>
             <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
               <th class="px-3 py-2 text-left">Método de Pago</th>
@@ -34,19 +33,17 @@
               *ngFor="let item of payments"
               class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition"
             >
-              <!-- Método de pago -->
+
               <td class="px-3 py-2 align-middle">
                 <div class="min-w-0 whitespace-normal break-words [hyphens:auto]">
                   {{ item.payment_method?.name }}
                 </div>
               </td>
 
-              <!-- Total -->
               <td class="px-3 py-2 align-middle text-right">
                 {{ item.amount | currency:'MXN':'symbol':'1.2-2':'en-US' }}
               </td>
 
-              <!-- Estatus -->
               <td class="px-3 py-2 align-middle">
                 <ng-container [ngSwitch]="item.status">
                   <span *ngSwitchCase="'active'"
@@ -64,7 +61,6 @@
                 </ng-container>
               </td>
 
-              <!-- Documento -->
               <td class="px-3 py-2 align-middle">
                 <div class="min-w-0 whitespace-normal break-words [hyphens:auto]">
                   <span *ngIf="item.document_id !== null">{{ item.document?.name }}</span>
@@ -72,7 +68,6 @@
                 </div>
               </td>
 
-              <!-- Acciones -->
               <td class="px-2 py-1 align-middle">
                 <div class="flex items-center justify-end gap-1">
                   <button 
@@ -116,9 +111,9 @@
     </div>
   </div>
 
-   <div *ngIf="!loadingModal" class="h-full flex justify-center items-center">
-      <app-loading></app-loading>
-    </div>
+  <div *ngIf="!loadingModal" class="h-full flex justify-center items-center">
+    <app-loading></app-loading>
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">

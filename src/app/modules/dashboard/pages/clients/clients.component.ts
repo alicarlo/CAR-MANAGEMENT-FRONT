@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-// import { CLIENTS, clientsHeader } from 'src/app/core/constants/client';
 import { Clients } from 'src/app/core/models/clients.model';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -30,7 +29,7 @@ export class ClientsComponent {
     { key: 'address_state', type: 'text' },
     { key: 'address_city', type: 'text' },
     { key: 'email', type: 'text' },
-    { key: 'gender', type: 'text' },
+    { key: 'gender', type: 'sex' },
     { key: 'rfc', type: 'text' },
     { key: 'status', type: 'translate-text' },
   ]

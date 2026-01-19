@@ -19,7 +19,6 @@ export class Menu {
             { label: 'Tipos de pagos', route: '/layout/dashboard/type-payments' },
             { label: 'Sucursales', route: '/layout/dashboard/store' },
             { label: 'Clasificación de gasto', route: '/layout/dashboard/expense-classification' },
-            // { label: 'Documentos', route: '/layout/dashboard/expense-classification' },
           ],
         },
         {
@@ -57,6 +56,21 @@ export class Menu {
           label: 'Carga de Documentos', 
           route: '/layout/dashboard/documents' 
         },
+        { 
+          icon: 'assets/icons/heroicons/outline/wallet.svg',
+          label: 'Apartados', 
+          route: '/layout/dashboard/layaway' 
+        },
+         { 
+          icon: 'assets/icons/heroicons/outline/layaway.svg',
+          label: 'Ventas', 
+          route: '/layout/dashboard/sales' 
+        },
+        {
+          icon: 'assets/icons/heroicons/outline/income.svg',
+          label: 'Ingresos', 
+          route: '/layout/dashboard/incomes' 
+        }
       ],
     }
   ];

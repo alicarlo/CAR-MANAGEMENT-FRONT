@@ -1,9 +1,6 @@
 import { Component } from '@angular/core';
-// import { CLIENTS, clientsHeader } from 'src/app/core/constants/client';
-import { Clients } from 'src/app/core/models/clients.model';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ClientsModalComponent } from '../../modals/clients-modal/clients-modal.component';
 import { Subject } from 'rxjs';
 import { RowAction, RowActionEvent } from 'src/app/core/models/actions.model';
 import { ClientsService } from 'src/app/core/services/clients/clients.service';
@@ -26,11 +23,6 @@ export class DocumentsComponent {
   columns: any = [
     { key: 'key', type: 'text' },
     { key: 'car', type: 'text' },
-    /*{ key: 'make', type: 'text' },
-    { key: 'line', type: 'text' },
-    { key: 'model', type: 'text' },
-    { key: 'color', type: 'text' },
-     */
     { key: 'name', type: 'text' },
     { key: 'descriptions', type: 'area' },
     { key: 'document_type', type: 'text' },
@@ -65,7 +57,6 @@ export class DocumentsComponent {
     private _ClientsService: ClientsService,
     private _ToastrService: ToastrService,
     private _DocumentsService: DocumentsService
-
   ) {}
 
   ngOnInit() {
@@ -91,11 +82,6 @@ export class DocumentsComponent {
             ...r, 
             document_type: r.document_type.name,
             key: r.cars.length > 0 ? r.cars[0].key : '',
-            /*make: r.cars.length > 0 ? r.cars[0].make : '', 
-            line: r.cars.length > 0 ? r.cars[0].version : '', 
-            model: r.cars.length > 0 ? r.cars[0].model : '', 
-            color: r.cars.length > 0 ? r.cars[0].color : '', 
-            */
            car:  r.cars.length > 0 ?  `${r.cars[0].make } ${r.cars[0].version} ${r.cars[0].model } ${r.cars[0].color }` : '-'
           }));
           this.total = response.pagination.total_items;
@@ -114,10 +100,8 @@ export class DocumentsComponent {
 
   async searchData(event: any) {
     if (!event) {
-
       return;
     }
-
     if (event.length < 3) return;
     this.query$.next((event));
   }

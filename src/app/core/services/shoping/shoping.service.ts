@@ -5,12 +5,11 @@ import { environment } from 'src/environments/environment';
 import { ErrorHandlerService } from '../error-handler/error-handler.service';
 import { Shopping } from '../../models/shopping.model';
 
-
 @Injectable({
   providedIn: 'root'
 })
 export class ShopingService {
- private http = inject(HttpClient);
+  private http = inject(HttpClient);
   private error = inject(ErrorHandlerService);
   constructor() { }
 
@@ -113,5 +112,4 @@ export class ShopingService {
       catchError(this.error.handleError)
     );
   }
-
 }

@@ -4,9 +4,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angu
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ToastrService } from 'ngx-toastr';
-import { BillService } from 'src/app/core/services/bill/bill.service';
 import { CarsService } from 'src/app/core/services/cars/cars.service';
-import { ShopingService } from 'src/app/core/services/shoping/shoping.service';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
 import { LoadingComponent } from 'src/app/modules/uikit/pages/loading/loading.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
@@ -29,22 +27,14 @@ export class CarDocumentsShowModalComponent {
     private dialog: MatDialog,                                 
     @Optional() public dialogRef: MatDialogRef<CarDocumentsShowModalComponent> | null, 
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-    // private _DocumentsService: DocumentsService,
     private _ToastrService: ToastrService,
-    // private _ShopingService: ShopingService,
     private _MatDialog: MatDialog,
-    private _BillService: BillService,
     private _CarsService: CarsService,
-    private _ShopingService: ShopingService
-  ) { 
- 
-  }
-
+  ) { }
 
   ngOnInit(): void {
     this.getDocumentsCar();
   }
-
 
   getDocumentsCar() {
     this._CarsService.getCarDocuments(this.data.row.id,500, 1).subscribe({
@@ -90,9 +80,8 @@ export class CarDocumentsShowModalComponent {
     });
   }
     
-  
-    async downloadDirect(url: string, filename?: string) {
-       window.open(url, '_blank', 'noopener,noreferrer');
-       return;
-    }
+  async downloadDirect(url: string, filename?: string) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    return;
+  }
 }

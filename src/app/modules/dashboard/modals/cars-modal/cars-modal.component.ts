@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { CHECKS_FIELDS, CHECKS_INIT, STATUS } from 'src/app/core/constants/cars';
-import { AcquisitionDto, AcquisitionType, Checks } from 'src/app/core/models/cars.model';
+import { Checks } from 'src/app/core/models/cars.model';
 import { Clients } from 'src/app/core/models/clients.model';
 import { CreateClientError } from 'src/app/core/models/error';
 import { Investor } from 'src/app/core/models/investor.model';
@@ -95,13 +95,13 @@ export class CarsModalComponent {
     ? current.filter(x => x !== id)
     : [...current, id];
 
-    console.log(updated)
+   
   this.saveForm.patchValue({ investor_id: updated });
 }
 
-isInvestorSelected(id: number): boolean {
-  return this.investorIds.includes(id);
-}
+  isInvestorSelected(id: number): boolean {
+    return this.investorIds.includes(id);
+  }
 
   get selectedInvestorsLabel(): string {
     if (!this.investor || !this.investor.length) return 'Selecciona…';
@@ -128,7 +128,6 @@ isInvestorSelected(id: number): boolean {
   }
 
   init() {
-    console.log(this.data)
     this.saveForm = this._FormBuilder.group({
       make: new FormControl (this.data.row === null ? '' : this.data.row.make,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
       model: new FormControl (this.data.row === null ? '' : this.data.row.model,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
@@ -147,8 +146,6 @@ isInvestorSelected(id: number): boolean {
       user_id: new FormControl(this._AuthService.user()?.user_id), // this.data.row.user_id
       client_id: new FormControl(this.data.row === null ? '' : this.data.row.client_id),
       status: new FormControl(this.data.row === null ? '' : this.data.row.status),
-      // investor_id: new FormControl<string[]>(this.data.row === null ? [] : this.data.row.investor_id),
-      // investor_id: new FormControl(this.data.row === null ? '' : this.data.row.investors),
       investor_id: new FormControl<number[]>(
         this.data.row === null
           ? []
@@ -169,22 +166,11 @@ isInvestorSelected(id: number): boolean {
     });
   }
 
-
   save() {
-    /*
-      const investorsSelected: number[] = this.saveForm.value.investor_id || [];
-      console.log('IDs de inversionistas seleccionados:', investorsSelected);
-      console.log()
-      return
-    */
     if (this.saveForm.invalid) {
       this.saveForm.markAllAsTouched(); 
       return;
     }
-
-
-
-
     this.loading = true;
     this.saveForm.patchValue({ investor_id: this.saveForm.value.investor_id });  
     let filledValues = Object.keys(this.saveForm.value).reduce((acc, key) => {
@@ -194,7 +180,6 @@ isInvestorSelected(id: number): boolean {
       }
       return acc;
     }, {} as typeof this.saveForm.value);
-
 
     this.saveForm.patchValue({ arrived_at: moment(this.saveForm.value.arrived_at).format('YYYY-MM-DD HH:mm:ss.SSS') })
     filledValues = this.data.row === null ? filledValues : {...filledValues, id: this.data.row.id};

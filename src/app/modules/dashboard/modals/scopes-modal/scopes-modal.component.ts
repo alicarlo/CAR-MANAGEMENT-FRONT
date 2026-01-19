@@ -4,7 +4,6 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, 
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
-import { CreateClientError } from 'src/app/core/models/error';
 import { ScopesService } from 'src/app/core/services/scopes/scopes.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 
@@ -106,7 +105,6 @@ export class ScopesModalComponent {
         this._ToastrService.error(err.error, 'Error');
       },
     })
-    
   }
 
   close(flag: boolean = false) {

@@ -73,17 +73,13 @@ export class ClientsModalComponent {
       phone_mobile: new FormControl(this.data.row === null ? '' : this.data.row.phone_mobile),
       phone_work: new FormControl(this.data.row === null ? '' : this.data.row.phone_work),
       address_street_1: new FormControl (this.data.row === null ? '' : this.data.row.address_street_1,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
-      // address_street_2: new FormControl(this.data.row === null ? '' : this.data.row.address_street_2),
       address_state: new FormControl(this.data.row === null ? '' : this.data.row.address_state),
       address_city: new FormControl(this.data.row === null ? '' : this.data.row.address_city),
-      // address_zip: new FormControl(this.data.row === null ? '' : this.data.row.address_zip),
-      // address_country: new FormControl(this.data.row === null ? '' : this.data.row.address_country),
       birthday: new FormControl(this.data.row === null ? '' : this.dateFormat(this.data.row.birthday),Validators.compose([Validators.required])),
       gender: new FormControl(this.data.row === null ? '' : this.data.row.gender,Validators.compose([Validators.required])),
       rfc: new FormControl(this.data.row === null ? '' : this.data.row.rfc),
       status: new FormControl(this.data.row === null ? '' : this.data.row.status),
   	});
-
   }
 
   save() {
@@ -146,7 +142,6 @@ export class ClientsModalComponent {
   
       },
     })
-    
   }
 
   openPicker(input: HTMLInputElement) {

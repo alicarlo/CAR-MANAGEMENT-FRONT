@@ -7,7 +7,6 @@ import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { STATUS } from 'src/app/core/constants/global';
 import { CreateClientError } from 'src/app/core/models/error';
-import { TypeCars } from 'src/app/core/models/typeCars.model';
 import { ArrivalreviewService } from 'src/app/core/services/arrivalReview/arrivalreview.service';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { CarsService } from 'src/app/core/services/cars/cars.service';
@@ -51,8 +50,6 @@ export class ArrivalReviewModalComponent {
   ) 
   { }
   
-
-
   ngOnInit(): void {
     this.init();
     this.getCars();
@@ -66,56 +63,55 @@ export class ArrivalReviewModalComponent {
         servicio: new FormControl(
           {
             value: this.data.row?.review?.servicio ?? false,
-            disabled: false//this.data.row === null
+            disabled: false
           }
         ),
         proximo_servicio: new FormControl(
           {
             value: this.data.row?.review?.proximo_servicio ?? null,
-            disabled: false// this.data.row !== null
+            disabled: false
           }
         ),
         servicio_agua: new FormControl(
           {
             value: this.data.row?.review?.servicio_agua ?? false,
-            disabled: false // disabled: this.data.row !== null
+            disabled: false 
           }
         ),
         proximo_servicio_agua: new FormControl(
           {
             value: this.data.row?.review?.proximo_servicio_agua ?? null,
-            disabled: false// disabled: this.data.row !== null
+            disabled: false
           }
         ),
         servicio_aceite: new FormControl(
           {
             value: this.data.row?.review?.servicio_aceite ?? false,
-            disabled: false// disabled: this.data.row !== null
+            disabled: false
           }
         ),
         proximo_servicio_aceite: new FormControl(
           {
             value: this.data.row?.review?.proximo_servicio_aceite ?? null,
-            disabled: false// disabled: this.data.row !== null
+            disabled: false
           }
         ),
         garantia: new FormControl(
           {
             value: this.data.row?.review?.garantia ?? false,
-            disabled: false// disabled: this.data.row !== null
+            disabled: false
           }
         ),
         expira_garantia: new FormControl(
           {
             value: this.data.row?.review?.expira_garantia ?? null,
-            disabled: false// disabled: this.data.row === null
+            disabled: false
           }
         ),
       }),
       status: new FormControl (this.data.row === null ? '' : this.data.row.status),
   	});
   }
-
 
   getPurchase() {
     this.loading = false;
@@ -238,8 +234,7 @@ export class ArrivalReviewModalComponent {
     return moment.utc(date).format('YYYY-MM-DD');
   }
 
-   close(flag: boolean = false) {
+  close(flag: boolean = false) {
     this.dialogRef?.close(flag);
   }
-
 }

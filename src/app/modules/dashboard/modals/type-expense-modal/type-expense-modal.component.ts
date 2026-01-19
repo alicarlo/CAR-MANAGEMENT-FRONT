@@ -34,7 +34,6 @@ export class TypeExpenseModalComponent {
   ) 
   { }
   
-
   ngOnInit(): void {
     this.init();
   }
@@ -106,7 +105,7 @@ export class TypeExpenseModalComponent {
     })
   }
 
-   close(flag: boolean = false) {
+  close(flag: boolean = false) {
     this.dialogRef?.close(flag);
   }
 }

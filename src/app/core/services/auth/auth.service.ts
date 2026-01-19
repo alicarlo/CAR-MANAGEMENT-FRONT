@@ -20,7 +20,8 @@ export class AuthService {
   
   private _user = signal<UserSet | null>(null);
   readonly user = this._user.asReadonly();
-  // user = computed(() => this._user());
+  
+  get tokenValue() { return this._token(); }
 
   initFromStorage() {
     const t = sessionStorage.getItem(this.TOKEN_KEY);
@@ -42,8 +43,6 @@ export class AuthService {
     sessionStorage.removeItem(this.TOKEN_KEY);
     sessionStorage.removeItem(this.USER_KEY);
   }
-
-  get tokenValue() { return this._token(); }
 
   isTokenExpired(): boolean {
     const t = this._token();

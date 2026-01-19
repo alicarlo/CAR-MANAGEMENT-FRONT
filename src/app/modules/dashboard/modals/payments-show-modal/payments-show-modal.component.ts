@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject, Optional } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { DocumentsService } from 'src/app/core/services/documents/documents.service';
 import { LoadingComponent } from 'src/app/modules/uikit/pages/loading/loading.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { ToastrService } from 'ngx-toastr';
@@ -28,15 +27,12 @@ export class PaymentsShowModalComponent {
     private dialog: MatDialog,                                 
     @Optional() public dialogRef: MatDialogRef<PaymentsShowModalComponent> | null, 
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-    private _DocumentsService: DocumentsService,
     private _ToastrService: ToastrService,
     private _ShopingService: ShopingService,
     private _MatDialog: MatDialog,
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    // if (this.data.flag === 2) this.getPayments();
-    // this.getPayments();
      if (this.data.flag === 0) {
       this.getPaymentsBills();
     } else {
@@ -51,8 +47,6 @@ export class PaymentsShowModalComponent {
         if(response) {
           this.payments = response.items.map((r: any) => ({ ...r}));
           this.loadingModal = true;
-          console.log(this.payments)
-          console.log(this.data)
         }
       },
       error: (err) => {
@@ -70,8 +64,7 @@ export class PaymentsShowModalComponent {
         if(response) {
           this.payments = response.items.map((r: any) => ({ ...r}));
           this.loadingModal = true;
-             console.log(this.payments)
-          console.log(this.data)
+
         }
       },
       error: (err) => {
@@ -96,8 +89,6 @@ export class PaymentsShowModalComponent {
         maxWidth: '40vw'
       });
       
-
-  
       ref.componentInstance.accept.subscribe(async () => {
         ref.componentInstance.loading = true;
         try {
@@ -137,7 +128,6 @@ export class PaymentsShowModalComponent {
         error: (err) => {
           reject(err);
           // this._ToastrService.error(err.error, 'Error');
-
         },
       })
     })

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, inject, Inject, Optional, ViewChild } from '@angular/core';
+import { Component, Inject, Optional } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -8,8 +8,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { ClientsService } from 'src/app/core/services/clients/clients.service';
-import { CreateClientError } from 'src/app/core/models/error';
-import { Clients } from 'src/app/core/models/clients.model';
 import  moment from 'moment';
 import { STATUS } from 'src/app/core/constants/global';
 import { TypeDocumentsService } from 'src/app/core/services/typeDocuments/type-documents.service';
@@ -47,12 +45,13 @@ export class DocumentsModalComponent {
   todayStr = new Date().toISOString().slice(0, 10); 
   status = [STATUS.ACTIVE, STATUS.INACTIVE]; 
 
-
   maxSizeBytes = 25 * 1024 * 1024; // 25MB
   selectedFile: File | null = null;
   previewUrl: string | null = null;
   fileIcon: string = 'insert_drive_file';
   fileExt: string = '';
+  allowMultiple = true;
+  maxFiles = 5;
 
   carFilterControl = new FormControl('');
   cars: any[] = [];
@@ -74,7 +73,6 @@ export class DocumentsModalComponent {
   ngOnInit(): void {
     this.init();
     this.getTypeDocument();
-
      this.carFilterControl.valueChanges.subscribe(term => {
         const value = (term || '').toString().toLowerCase().trim();
 
@@ -83,30 +81,8 @@ export class DocumentsModalComponent {
           return text.includes(value);
         });
       });
-
-    // carga los autos
     this.getCars();
   }
-
-
-  toggleCarsDropdown() {
-  this.carsDropdownOpen = !this.carsDropdownOpen;
-  if (this.carsDropdownOpen) {
-    // limpiar filtro al abrir
-    this.carFilterControl.setValue('');
-    this.filteredCars = [...this.cars];
-  }
-}
-
-closeCarsDropdown() {
-  this.carsDropdownOpen = false;
-}
-
-selectCar(car: any) {
-  this.selectedCarLabel = `${car.make} - ${car.model}`;
-  this.saveForm.patchValue({ car_id: car.id }); // ajusta si tu form se llama diferente
-  this.closeCarsDropdown();
-}
 
   init() {
     this.saveForm = this._FormBuilder.group({
@@ -116,17 +92,31 @@ selectCar(car: any) {
       id: new FormControl (this.data.row === null ? '' : this.data.row.id,),
       car_id: new FormControl (this.data.row === null ? '' : this.data.row.car_id,),
   	});
-
   }
 
-  
+  toggleCarsDropdown() {
+    this.carsDropdownOpen = !this.carsDropdownOpen;
+    if (this.carsDropdownOpen) {
+      this.carFilterControl.setValue('');
+      this.filteredCars = [...this.cars];
+    }
+  }
+
+  closeCarsDropdown() {
+    this.carsDropdownOpen = false;
+  }
+
+  selectCar(car: any) {
+    this.selectedCarLabel = `${car.make} - ${car.model}`;
+    this.saveForm.patchValue({ car_id: car.id });
+    this.closeCarsDropdown();
+  }
 
   getCars() {
     this._CarsService.getCars('',500, 1).subscribe({
       next: async (response: any) => {
         if(response) {
           this.cars = response.items.map((r: any) => ({ ...r }));
-          // importante: inicializar la lista filtrada
           this.filteredCars = [...this.cars];
           }
       },
@@ -136,7 +126,6 @@ selectCar(car: any) {
       },
     })
   }
-
 
   getTypeDocument() {
     this._TypeDocumentsService.getTypeDocument(500, 1).subscribe({
@@ -166,9 +155,7 @@ selectCar(car: any) {
       formData.append('document_type_id', this.saveForm.value.document_type_id);
       formData.append('descriptions', this.saveForm.value.descriptions);
       formData.append('file', this.saveForm.value.file);
-      if (this.data.row !== null) {
-        // formData.append('id', this.saveForm.value.id);
-      }
+
       const token = this._AuthService.tokenValue;
       const response = await fetch(`https://automotriz-api.naatteam.com/document/${this.saveForm.value.id}`, {
         method: this.data.row == null ? 'POST' : 'PATCH',
@@ -182,14 +169,12 @@ selectCar(car: any) {
         this.loading = false;
         throw new Error(`Error en la solicitud: ${response.statusText}`);
       }
-
       this.loading = false;
       this.close(true);
     } catch (err: any) {
       this.loading = false;
       this._ToastrService.error(err.message, 'Error');
     }
-    
   }
 
   close(flag: boolean = false) {

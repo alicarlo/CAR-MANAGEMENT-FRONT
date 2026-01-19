@@ -24,22 +24,22 @@ export class ArrivalreviewService {
   }
 
   public registerArrival(bodyData: any): Observable<any> {
-      const httpOptions = {
-        headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-      };
-      return this.http.post<any>(`${environment.apiUrl}/arrival/`, bodyData ,httpOptions).pipe(
-        retry(0),
-        catchError(this.error.handleError)
-      );
-    }
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.post<any>(`${environment.apiUrl}/arrival/`, bodyData ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
   
-    public updateArrival(bodyData: any): Observable<any> {
-      const httpOptions = {
-        headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-      };
-      return this.http.patch<any>(`${environment.apiUrl}/arrival/${bodyData.id}`, bodyData ,httpOptions).pipe(
-        retry(0),
-        catchError(this.error.handleError)
-      );
-    }
+  public updateArrival(bodyData: any): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.patch<any>(`${environment.apiUrl}/arrival/${bodyData.id}`, bodyData ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
 }

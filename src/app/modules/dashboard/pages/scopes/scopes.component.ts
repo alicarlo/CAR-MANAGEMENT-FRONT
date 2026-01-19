@@ -4,7 +4,6 @@ import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 import { RowAction, RowActionEvent } from 'src/app/core/models/actions.model';
 import { Scopes } from 'src/app/core/models/scopes.model';
-import { ClientsService } from 'src/app/core/services/clients/clients.service';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
 import { ScopesModalComponent } from '../../modals/scopes-modal/scopes-modal.component';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';

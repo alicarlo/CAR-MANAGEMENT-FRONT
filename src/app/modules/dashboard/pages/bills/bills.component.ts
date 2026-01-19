@@ -6,13 +6,10 @@ import { RowAction, RowActionEvent } from 'src/app/core/models/actions.model';
 import { TypeExpense } from 'src/app/core/models/typeExpense.model';
 import { TypeExpenseService } from 'src/app/core/services/typeExpense/type-expense.service';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
-import { TypeExpenseModalComponent } from '../../modals/type-expense-modal/type-expense-modal.component';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
-import { ShoppingModalComponent } from '../../modals/shopping-modal/shopping-modal.component';
 import { PaymentsAddModalComponent } from '../../modals/payments-add-modal/payments-add-modal.component';
 import { PaymentsShowModalComponent } from '../../modals/payments-show-modal/payments-show-modal.component';
 import { ArrivalreviewService } from 'src/app/core/services/arrivalReview/arrivalreview.service';
-import { ArrivalReviewModalComponent } from '../../modals/arrival-review-modal/arrival-review-modal.component';
 import { CarsService } from 'src/app/core/services/cars/cars.service';
 import { BillService } from 'src/app/core/services/bill/bill.service';
 import { BillsModalComponent } from '../../modals/bills-modal/bills-modal.component';
@@ -28,18 +25,11 @@ export class BillsComponent {
   billsSelected: TypeExpense | undefined;
   billsHeader: string[] = ['Fecha', 'Concepto', 'Total', 'Clave','Auto'];
   columns: any = [
-    { key: 'created_at', type: 'dob' },
+    { key: 'bill_date', type: 'dob' },
     { key: 'name', type: 'text' },
     { key: 'total', type: 'money' },
     { key: 'key', type: 'text' },
     { key: 'car', type: 'text' },
-
-    /*
-    { key: 'make', type: 'text' },
-    { key: 'version', type: 'text' },
-    { key: 'model', type: 'text' },
-     */
-    // { key: 'color', type: 'text' },
   ]
   readonly actions: RowAction[] = [
     { icon: 'search',  id: 'search',  label: 'Visualizar Pagos' },
@@ -67,15 +57,11 @@ export class BillsComponent {
   pages: number = 0;
   constructor(
     private _MatDialog: MatDialog,
-    private _TypeExpenseService: TypeExpenseService,
     private _ToastrService: ToastrService,
-    private _ArrivalreviewService: ArrivalreviewService,
-    private _CarsService: CarsService,
     private _BillService: BillService
   ) {}
 
   ngOnInit() {
-    // this.getArrival();
     this.getBills();
   }
 
@@ -105,6 +91,14 @@ export class BillsComponent {
   }
 
   openAddModal(action: string, data: any) {
+    data['car'] = {
+      key: data.cars.length > 0 ? data.cars[0].key : '-',
+          make: data.cars.length > 0 ? data.cars[0].make : '-', 
+          line: data.cars.length > 0 ? data.cars[0].version : '-', 
+          model: data.cars.length > 0 ? data.cars[0].model : '-', 
+          color: data.cars.length > 0 ? data.cars[0].color : '-',
+    }
+    
     let dataSend = {action, row: data, flag: 1};
     const dialogRef = this._MatDialog.open(PaymentsAddModalComponent, {
       disableClose: true,
@@ -164,10 +158,8 @@ export class BillsComponent {
 
   async searchData(event: any) {
     if (!event) {
-
       return;
     }
-
     if (event.length < 3) return;
     this.query$.next((event));
   }
@@ -222,7 +214,6 @@ export class BillsComponent {
             line: r.cars.length > 0 ? r.cars[0].version : '-', 
             model: r.cars.length > 0 ? r.cars[0].model : '-', 
             car:  r.cars.length > 0 ?  `${r.cars[0].make } ${r.cars[0].version} ${r.cars[0].model } ${r.cars[0].color }` : '-'
-            // color: r.cars.length > 0 ? r.cars[0].color : '-', 
           }));
           this.total = response.pagination.total_items;
 
@@ -238,5 +229,4 @@ export class BillsComponent {
       },
     }) 
   }
-  
 }

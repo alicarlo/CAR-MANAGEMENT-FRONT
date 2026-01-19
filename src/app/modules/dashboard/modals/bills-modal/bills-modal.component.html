@@ -1,8 +1,7 @@
 <mat-dialog-content>
   <div class="p-[20px]">
-    <!-- New Action-->
     <div  class="flex flex-col gap-4">
-      <p class="text-foreground font-semibold">Gastos</p>
+      <p class="text-foreground font-semibold">Gastos2</p>
 
       <div class="w-full space-y-2">
         <p class="text-foreground text-[11px] font-medium">
@@ -11,7 +10,6 @@
 
         <form [formGroup]="saveForm" class="flex flex-col gap-6 w-full">
           <div class="flex flex-wrap gap-4">
-            <!-- Radio: Auto -->
             <label class="flex items-center gap-2 cursor-pointer text-foreground text-[11px]">
               <input
                 type="radio"
@@ -22,7 +20,6 @@
               <span>Agregar gasto de Auto</span>
             </label>
 
-            <!-- Radio: Oficinas -->
             <label class="flex items-center gap-2 cursor-pointer text-foreground text-[11px]">
               <input
                 type="radio"
@@ -40,6 +37,33 @@
               </div>
             </ng-container>
           </div>
+
+          <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Fecha de gasto:</p>
+              <div class="relative">
+                 <input
+                    #dob
+                    type="date"
+                    class="py-2 pl-8 pr-2"
+                    formControlName="bill_date"   
+                  />
+
+                <button 
+                  type="button"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 text-foreground flex items-center justify-center"
+                  (click)="openPicker(dob)"
+                  >
+                  <mat-icon style="font-size: 20px;">calendar_month</mat-icon>
+                </button>
+              </div>
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.bill_date">
+                  <div class="error-message" *ngIf="saveForm.get('bill_date').hasError(error.type) && (saveForm.get('bill_date').dirty || saveForm.get('bill_date').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
 
           <div class="flex flex-col gap-2" *ngIf="saveForm.get('option').value === 'auto' ">
             <label for="sexo" class="text-foreground text-[11px] font-medium">Auto:</label>
@@ -88,36 +112,6 @@
               </ng-container>
             </div>
           </div>
-
-          <!--
-          <div class="flex flex-col gap-2">
-            <label for="sexo" class="text-foreground text-[11px] font-medium">Usuario:</label>
-            <div class="relative">
-              <select 
-                formControlName="user_created_id"
-                class="w-full py-2 pl-8 pr-10 rounded-md
-                      bg-background text-foreground
-                      border border-border
-                      focus:outline-none focus:ring-2 focus:ring-primary/50
-                      appearance-none [color-scheme:dark]"
-              >
-                <option value="" disabled selected hidden>Selecciona…</option>
-
-                <option *ngFor="let s of user" [value]="s.id">
-                  {{ s.full_name  }}
-                </option>
-              </select>
-            </div>
-
-              <div class="error-messages">
-              <ng-container *ngFor="let error of error_messages.user_created_id">
-                <div class="error-message" *ngIf="saveForm.get('user_created_id').hasError(error.type) && (saveForm.get('user_created_id').dirty || saveForm.get('user_created_id').touched)">
-                  {{error.message}}
-                </div>
-              </ng-container>
-            </div>
-          </div>
-          -->
 
           <div class="flex flex-col gap-2">
             <label for="sexo" class="text-foreground text-[11px] font-medium">Tipo de Pago:</label>
@@ -181,7 +175,6 @@
           <div class="flex flex-col gap-2">
             <label class="text-foreground text-[11px] font-medium">Archivo adjunto:</label>
 
-              <!-- Dropzone: solo se muestra si NO hay archivo seleccionado -->
               <label
                 *ngIf="!selectedFile"
                 for="attachmentInput"
@@ -198,7 +191,6 @@
                 <span class="text-foreground/60 text-xs">Tamaño máx. recomendado: 25 MB</span>
               </label>
 
-              <!-- Input real (oculto) -->
               <input
                 id="attachmentInput"
                 type="file"
@@ -207,7 +199,6 @@
                 accept="image/*,video/*,.pdf,.doc,.docx"
               />
 
-              <!-- Vista del archivo (centrada) -->
               <div *ngIf="selectedFile" class="rounded-md border border-border bg-background p-4">
                 <div class="flex flex-col items-center text-center gap-2">
                   <mat-icon class="!text-foreground text-2xl">{{ fileIcon }}</mat-icon>
@@ -219,7 +210,6 @@
                     {{ (selectedFile.size / 1024 / 1024) | number:'1.0-2' }} MB • {{ selectedFile.type || fileExt }}
                   </p>
 
-                  <!-- Preview (imagen) -->
                   <img
                     *ngIf="previewUrl && isImage"
                     [src]="previewUrl"
@@ -227,7 +217,6 @@
                     class="max-h-48 rounded-md border border-border"
                   />
 
-                  <!-- Preview (video) -->
                   <video
                     *ngIf="previewUrl && isVideo"
                     [src]="previewUrl"
@@ -236,7 +225,6 @@
                     muted
                   ></video>
 
-                  <!-- Acciones -->
                   <button
                     type="button"
                     class="text-foreground text-sm underline underline-offset-2 hover:opacity-80"
@@ -247,7 +235,6 @@
                 </div>
               </div>
 
-              <!-- Errores -->
               <div class="error-messages">
                 <div class="error-message" *ngIf="attachmentCtrl?.hasError('invalidType')">
                   <span class="text-foreground">Formato no permitido. Solo imagen, video, PDF o Word.</span>
@@ -255,19 +242,10 @@
                 <div class="error-message" *ngIf="attachmentCtrl?.hasError('maxSize')">
                   <span class="text-foreground">El archivo excede el tamaño máximo permitido.</span>
                 </div>
-
-                <!--
-                <div class="error-message" *ngIf="attachmentCtrl?.hasError('required')">
-                  <span class="text-foreground">Este campo es obligatorio.</span>
-                </div>
-                -->
               </div>
             </div>
         </form>
-        
-      </div>
-
-      
+      </div> 
     </div>
   </div>
 </mat-dialog-content>
@@ -276,6 +254,5 @@
   <div class="flex gap-2 p-[20px]">
     <app-button [loading]="loading" (click)="save()" full impact="bold" tone="primary" shape="rounded" size="medium">Guardar</app-button>
     <app-button [disabled]="loading"  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
-
   </div>
 </mat-dialog-actions>

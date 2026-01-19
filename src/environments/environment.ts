@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://automotriz-api.naatteam.com'
+ //  apiUrl: 'https://machucas-api.naatteam.com'// 'https://automotriz-api.naatteam.com'
+ apiUrl: 'https://automotriz-api.naatteam.com'
 };
 
 /*

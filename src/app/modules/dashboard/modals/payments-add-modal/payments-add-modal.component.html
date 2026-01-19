@@ -1,14 +1,15 @@
 <mat-dialog-content>
   <div class="p-[20px]">
-    <!-- New Action-->
     <div  class="flex flex-col gap-4">
-      <p class="text-foreground font-semibold">Pagos</p>
+      <p class="text-foreground font-semibold">Pagos2</p>
 
       <label for="sexo" class="text-foreground text-[12px] font-medium">Información del Auto:</label>
       <div class="border border-border/60 rounded-lg bg-card p-2 flex gap-2">
-        <p class="text-foreground text-[11px]"><strong>Clave:</strong> {{ data.row.key }}</p>
-        <p class="text-foreground text-[11px]"><strong>Modelo:</strong> {{ data.row.model }}</p>
-        <p class="text-foreground text-[11px]"><strong>Marca:</strong> {{ data.row.make }}</p>
+          <p class="text-foreground text-[11px]"><strong>Clave:</strong> {{ data.row.car.key }}</p>
+          <p class="text-foreground text-[11px]"><strong>Modelo:</strong> {{ data.row.car.model }}</p>
+          <p class="text-foreground text-[11px]"><strong>Marca:</strong> {{ data.row.car.make }}</p>
+          <p class="text-foreground text-[11px]"><strong>Linea:</strong> {{ data.row.car.version }}</p>
+          <p class="text-foreground text-[11px]"><strong>Color:</strong> {{ data.row.car.color }}</p>
       </div>
       <div>
         <form  [formGroup]="saveForm" class="flex flex-col gap-6">
@@ -42,95 +43,19 @@
               </div>
             </div>
 
-            <!--
-            <div class="flex flex-col gap-2">
-              <label for="sexo" class="text-foreground text-[11px] font-medium">Documento:</label>
-              <div class="relative">
-                <select 
-                  formControlName="document_id"
-                  class="w-full py-2 pl-8 pr-10 rounded-md
-                        bg-background text-foreground
-                        border border-border
-                        focus:outline-none focus:ring-2 focus:ring-primary/50
-                        appearance-none [color-scheme:dark]"
-                >
-                  <option value="" disabled selected hidden>Selecciona…</option>
-
-                  <option *ngFor="let s of documents" [ngValue]="s.id">
-                    {{ s.name }} - {{ s.descriptions }}
-                  </option>
-                </select>
-              </div>
-            </div>
-            -->
-
-            <!--
-            <div class="flex flex-col gap-2">
-              <label for="sexo" class="text-foreground text-[11px] font-medium">Tipo de Documento:</label>
-              <div class="relative">
-                <select 
-                  formControlName="document_type_id"
-                  class="w-full py-2 pl-8 pr-10 rounded-md
-                        bg-background text-foreground
-                        border border-border
-                        focus:outline-none focus:ring-2 focus:ring-primary/50
-                        appearance-none [color-scheme:dark]"
-                >
-                  <option value="" disabled selected hidden>Selecciona…</option>
-
-                  <option *ngFor="let s of typeDocument" [ngValue]="s.id">
-                    {{ s.name }}
-                  </option>
-                </select>
-              </div>
-              <div class="error-messages">
-                <ng-container *ngFor="let error of error_messages.document_type_id">
-                  <div class="error-message" *ngIf="saveForm.get('document_type_id').hasError(error.type) && (saveForm.get('document_type_id').dirty || saveForm.get('document_type_id').touched)">
-                    {{error.message}}
-                  </div>
-                </ng-container>
-              </div>
-              
-            </div>
-          -->
-
-            <div class="flex flex-col gap-2">
-              <label class="text-foreground text-[11px] font-medium">Descripcion:</label>
-              <textarea
-                class="
-                  py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
-                  border-border bg-background text-foreground
-                  scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
-                "
-                placeholder="Descripcion"
-                formControlName="descriptions">
-              </textarea>
-              <div class="error-messages">
-                <ng-container *ngFor="let error of error_messages.descriptions">
-                  <div class="error-message" *ngIf="saveForm.get('descriptions').hasError(error.type) && (saveForm.get('descriptions').dirty || saveForm.get('descriptions').touched)">
-                    {{error.message}}
-                  </div>
-                </ng-container>
-              </div>
-            </div>
-
-            <!-- Campo: Archivo adjunto -->
-            
             <div *ngIf="isUrl" class="rounded-md border border-border bg-background p-4">
-                <div class="flex flex-col items-center text-center gap-2">
-                   <label class="text-foreground text-[11px] font-medium">Archivo adjunto: {{ data.row.document.name }}</label>
+              <div class="flex flex-col items-center text-center gap-2">
+                <label class="text-foreground text-[11px] font-medium">Archivo adjunto: {{ data.row.document.name }}</label>
 
-                   <div class="flex flex-col items-center gap-2" (click)="isUrl = false">
-                     <mat-icon class="!text-red-500 cursor-pointer">delete</mat-icon>
-                      <label class="text-foreground text-[11px] font-medium">Remplazar archivo</label>
-                   </div>
-                  
+                <div class="flex flex-col items-center gap-2" (click)="isUrl = false">
+                  <mat-icon class="!text-red-500 cursor-pointer">delete</mat-icon>
+                  <label class="text-foreground text-[11px] font-medium">Remplazar archivo</label>
                 </div>
+              </div>
             </div>
             <div class="flex flex-col gap-2" *ngIf="!isUrl">
               <label class="text-foreground text-[11px] font-medium">Archivo adjunto:</label>
 
-              <!-- Dropzone: solo se muestra si NO hay archivo seleccionado -->
               <label
                 *ngIf="!selectedFile"
                 for="attachmentInput"
@@ -147,7 +72,6 @@
                 <span class="text-foreground/60 text-xs">Tamaño máx. recomendado: 25 MB</span>
               </label>
 
-              <!-- Input real (oculto) -->
               <input
                 id="attachmentInput"
                 type="file"
@@ -156,7 +80,6 @@
                 accept="image/*,video/*,.pdf,.doc,.docx"
               />
 
-              <!-- Vista del archivo (centrada) -->
               <div *ngIf="selectedFile" class="rounded-md border border-border bg-background p-4">
                 <div class="flex flex-col items-center text-center gap-2">
                   <mat-icon class="!text-foreground text-2xl">{{ fileIcon }}</mat-icon>
@@ -168,7 +91,6 @@
                     {{ (selectedFile.size / 1024 / 1024) | number:'1.0-2' }} MB • {{ selectedFile.type || fileExt }}
                   </p>
 
-                  <!-- Preview (imagen) -->
                   <img
                     *ngIf="previewUrl && isImage"
                     [src]="previewUrl"
@@ -176,7 +98,6 @@
                     class="max-h-48 rounded-md border border-border"
                   />
 
-                  <!-- Preview (video) -->
                   <video
                     *ngIf="previewUrl && isVideo"
                     [src]="previewUrl"
@@ -185,7 +106,6 @@
                     muted
                   ></video>
 
-                  <!-- Acciones -->
                   <button
                     type="button"
                     class="text-foreground text-sm underline underline-offset-2 hover:opacity-80"
@@ -196,7 +116,6 @@
                 </div>
               </div>
 
-              <!-- Errores -->
               <div class="error-messages">
                 <div class="error-message" *ngIf="attachmentCtrl?.hasError('invalidType')">
                   <span class="text-foreground">Formato no permitido. Solo imagen, video, PDF o Word.</span>
@@ -255,7 +174,6 @@
               </div>
             </div>
           </div>
-
         </form>
       </div>
     </div>
@@ -266,9 +184,7 @@
 
 <mat-dialog-actions align="end">
   <div class="flex gap-2 p-[20px]">
-    <!--[loading]="loading"-->
     <app-button [loading]="loading" (click)="save()" full impact="bold" tone="primary" shape="rounded" size="medium">Guardar</app-button>
     <app-button [disabled]="loading"  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
-
   </div>
 </mat-dialog-actions>

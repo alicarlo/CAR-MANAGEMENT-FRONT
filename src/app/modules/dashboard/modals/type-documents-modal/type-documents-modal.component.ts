@@ -8,7 +8,6 @@ import { STATUS } from 'src/app/core/constants/global';
 import { TypeDocumentsService } from 'src/app/core/services/typeDocuments/type-documents.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 
-
 @Component({
   selector: 'app-type-documents-modal',
   imports: [ButtonComponent, CommonModule, MatDialogModule, FormsModule, ReactiveFormsModule, MatIconModule],
@@ -36,8 +35,6 @@ export class TypeDocumentsModalComponent {
   ) 
   { }
   
-
-
   ngOnInit(): void {
     this.init();
   }

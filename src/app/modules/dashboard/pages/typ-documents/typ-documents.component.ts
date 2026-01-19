@@ -24,6 +24,16 @@ export class TypDocumentsComponent {
     { key: 'descriptions', type: 'text' },
     { key: 'status', type: 'translate-text' },
     { key: 'require_date', type: 'translate-boolean' },
+    { key: 'id' , type: '',
+        show: [
+        { id: 'edit', value: [2,3,4] }
+      ] 
+     },
+     { key: 'id' , type: '',
+        show: [
+        { id: 'delete', value: [2,3,4] }
+      ] 
+     },
   ]
 
   readonly actions: RowAction[] = [

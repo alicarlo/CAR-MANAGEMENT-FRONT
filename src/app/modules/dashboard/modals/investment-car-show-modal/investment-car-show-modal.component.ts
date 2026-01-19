@@ -26,15 +26,11 @@ export class InvestmentCarShowModalComponent {
     private dialog: MatDialog,                                 
     @Optional() public dialogRef: MatDialogRef<InvestmentCarShowModalComponent> | null, 
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-    // private _DocumentsService: DocumentsService,
     private _ToastrService: ToastrService,
-    // private _ShopingService: ShopingService,
     private _MatDialog: MatDialog,
     private _BillService: BillService,
     private _CarsService: CarsService
-  ) { 
-
-  }
+  ) { }
 
   ngOnInit(): void {
     this.getInvestorCars();

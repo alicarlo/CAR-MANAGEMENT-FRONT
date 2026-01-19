@@ -9,31 +9,18 @@
           <p class="text-foreground text-[11px]"><strong>Nombre:</strong> {{ data.row.full_name }}</p>
         </div>
       </div>
-      <!-- CONTENEDOR CON SCROLL -->
       <div
         class="border border-border/60 rounded-lg bg-card m-[25px]
                max-h-[310px] overflow-y-auto overflow-x-auto"
       >
-        <!-- Wrapper para forzar ancho mínimo de tabla -->
         <div class="min-w-[1400px]">
           <table class="w-full table-auto">
-            <!-- Header -->
             <thead>
               <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
                 <th class="px-3 py-2 text-left whitespace-nowrap">Clave</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Tipo de auto</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Sucursal</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Auto</th>
-                <!--
-                <th class="px-3 py-2 text-left whitespace-nowrap">Marca</th>
-                <th class="px-3 py-2 text-left whitespace-nowrap">Modelo</th>
-                <th class="px-3 py-2 text-left whitespace-nowrap">Línea</th>
-                <th class="px-3 py-2 text-left whitespace-nowrap">Color</th>
-                <th class="px-3 py-2 text-left whitespace-nowrap"># Serie</th>
-                <!--<th class="px-3 py-2 text-left whitespace-nowrap">Kilometraje</th>
-                <th class="px-3 py-2 text-left whitespace-nowrap">Cilindros</th>
-                <th class="px-3 py-2 text-left whitespace-nowrap"># de motor</th>
-                -->
                 <th class="px-3 py-2 text-left whitespace-nowrap">Fecha de llegada</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Precio de venta</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Enganche</th>
@@ -62,41 +49,7 @@
                  <td class="px-3 py-2 align-middle whitespace-nowrap">
                   {{ item.make }} {{ item.version }} {{ item.model }} {{ item.color }}
                 </td>
-             
-                <!--
-                <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.make }}
-                </td>
-
-                <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.model }}
-                </td>
-
-                <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.version }}
-                </td>
-
-                <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.color }}
-                </td>
-
-                <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.vin }}
-                </td>
-
-                <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.km }}
-                </td>
-
-                <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.cylinders }}
-                </td>
-
-                <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.engine_number }}
-                </td>
-                -->
-
+          
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
                   {{ item.arrived_at | date:'dd/MM/yyyy' }}
                 </td>

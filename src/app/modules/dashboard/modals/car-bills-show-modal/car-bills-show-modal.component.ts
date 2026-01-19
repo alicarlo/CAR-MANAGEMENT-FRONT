@@ -27,23 +27,16 @@ export class CarBillsShowModalComponent {
     private dialog: MatDialog,                                 
     @Optional() public dialogRef: MatDialogRef<CarBillsShowModalComponent> | null, 
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-    // private _DocumentsService: DocumentsService,
     private _ToastrService: ToastrService,
-    // private _ShopingService: ShopingService,
     private _MatDialog: MatDialog,
     private _BillService: BillService,
     private _CarsService: CarsService,
     private _ShopingService: ShopingService
-  ) { 
-
-  }
-
+  ) { }
 
   ngOnInit(): void {
     this.getBillsCar();
-    console.log(this.data)
   }
-
 
   getBillsCar() {
     this._BillService.getBillCar(this.data.row.id,500, 1).subscribe({

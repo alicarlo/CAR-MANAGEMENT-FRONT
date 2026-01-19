@@ -8,9 +8,9 @@ import { CarsService } from 'src/app/core/services/cars/cars.service';
 import { ToastrService } from 'ngx-toastr';
 import { CarsModalComponent } from '../../modals/cars-modal/cars-modal.component';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
-import { BillService } from 'src/app/core/services/bill/bill.service';
 import { CarBillsShowModalComponent } from '../../modals/car-bills-show-modal/car-bills-show-modal.component';
 import { CarDocumentsShowModalComponent } from '../../modals/car-documents-show-modal/car-documents-show-modal.component';
+import { ArriveCheckCarModalComponent } from '../../modals/arrive-check-car-modal/arrive-check-car-modal.component';
 
 @Component({
   selector: 'app-cars',
@@ -29,7 +29,7 @@ export class CarsComponent {
     'Fecha de llegada' ,'Precio de venta', 'Enganche' ,
     'Estatus', 'Tipo de adquisicion','Accesorios y Varios', 
     'Comentarios', 'Comentarios Carroceria', 'Comentarios Llantas',
-    'Comentarios Pintura', 'Comentarios Otros'
+    'Comentarios Pintura', 'Comentarios Otros',
   ];
 
   columns: any = [
@@ -48,7 +48,7 @@ export class CarsComponent {
 
     { key: 'sale_price', type: 'money' },
     { key: 'down_payment', type: 'money' },
-    { key: '', type: 'text' },
+    { key: 'status', type: 'translate-text' },
     { key: 'car_acquisition', type: 'text' , show: [
         { id: 'delete', value: ['compras'] },
       ] 
@@ -60,14 +60,21 @@ export class CarsComponent {
     { key: 'comments.llantas', type: 'area' },
     { key: 'comments.pintura', type: 'area' },
     { key: 'comments.otros', type: 'area' },
+    { key: 'arrive', type: '',
+      show: [
+        { id: 'checkArrive' }
+      ] 
+     }
 
   ]
 
   readonly actions: RowAction[] = [
+    { icon: 'check',  id: 'checkArrive',  label: 'Revision de llegada' },
     { icon: 'attach_money',  id: 'bill',  label: 'Visualizar Gastos' },
     { icon: 'attach_file',  id: 'documents',  label: 'Visualizar Documentos' },
     { icon: 'edit',  id: 'edit',  label: 'Editar' },
     { icon: 'delete', id: 'delete', label: 'Elimnar' },
+
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -93,7 +100,6 @@ export class CarsComponent {
     private _MatDialog: MatDialog,
     private _CarsService: CarsService,
     private _ToastrService: ToastrService,
-    private _BillService: BillService
   ) {}
 
   ngOnInit() {
@@ -101,6 +107,7 @@ export class CarsComponent {
   }
 
   onRowAction(e: RowActionEvent<any>) {
+    if (e.id === 'checkArrive')  this.openChecksModal(e.id,e.row);
     if (e.id === 'bill')  this.openBillModal(e.id,e.row);
     if (e.id === 'documents')  this.openDocumentsModal(e.id,e.row);
     if (e.id === 'edit')  this.openModal(e.id,e.row);
@@ -182,7 +189,7 @@ export class CarsComponent {
 
   getCars() {
     this.loading = false;
-    this._CarsService.getCars(this.filter,this.pageSize, this.currentPage).subscribe({
+    this._CarsService.getCarsFull(this.filter,this.pageSize, this.currentPage).subscribe({
       next: async (response: any) => {
         if(response) {
 
@@ -258,4 +265,21 @@ export class CarsComponent {
     });
   }
 
+  openChecksModal(action: string, data: any) {
+    let dataSend = {action, row: data};
+    const dialogRef = this._MatDialog.open(ArriveCheckCarModalComponent, {
+      disableClose: true,
+      data: dataSend,
+      panelClass: ['custom-dialog-container', 'dialog-60'],
+      width: '90vw',
+      height: '90vh',
+      maxWidth: '90vw'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.getCars();
+      }
+    });
+  }
 }

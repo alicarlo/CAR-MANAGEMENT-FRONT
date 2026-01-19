@@ -303,6 +303,27 @@ select {
   max-height: 90vh !important;
 }
 
+.cdk-overlay-pane.dialog-75 {
+  width: 90vw !important;
+  max-width: 90vw !important;
+  height: 75vh !important;
+  max-height: 75vh !important;
+}
+
+.cdk-overlay-pane.dialog-70 {
+  width: 90vw !important;
+  max-width: 90vw !important;
+  height: 70vh !important;
+  max-height: 70vh !important;
+}
+
+.cdk-overlay-pane.dialog-ticket{
+  width: 60vw !important;
+  max-width: 60vw !important;
+  height: 70vh !important;
+  max-height: 90vh !important;
+}
+
 .cdk-overlay-pane.dialog-60{
   width: 90vw !important;
   max-width: 90vw !important;

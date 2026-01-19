@@ -43,6 +43,16 @@ export class TypeDocumentsService {
     );
   }
 
+  getTypeDocumentFilter(pageSize?: number, currentPage?: number, filter?: string): Observable<TypeDocument> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.get<TypeDocument>(`${environment.apiUrl}/document-type/?column=name&value=${filter}&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
   public deleteTypeDocument(id: string): Observable<TypeDocument> {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),

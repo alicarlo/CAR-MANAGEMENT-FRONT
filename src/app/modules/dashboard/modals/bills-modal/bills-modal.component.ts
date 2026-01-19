@@ -5,7 +5,6 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angu
 import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { STATUS } from 'src/app/core/constants/global';
 import { ExpenseClasificationService } from 'src/app/core/services/expenseClasification/expense-clasification.service';
 import { TypeExpenseService } from 'src/app/core/services/typeExpense/type-expense.service';
 import { BillService } from 'src/app/core/services/bill/bill.service';
@@ -43,6 +42,9 @@ export class BillsModalComponent {
     ],
     'amount':[
       {type: 'required', message: 'Monto es requerido'},
+    ],
+    'bill_date': [
+      {type: 'required', message: 'Fecha de gasto requerido'},
     ]
 	}
 
@@ -79,6 +81,13 @@ export class BillsModalComponent {
     // this.getTypeExpense();
   }
 
+   openPicker(input: HTMLInputElement) {
+    (input as any).showPicker?.();
+    if (!('showPicker' in (HTMLInputElement.prototype as any))) {
+      input.focus();
+    }
+  }
+
   init() {
     this.saveForm = this._FormBuilder.group({
       option: new FormControl (null,Validators.compose([Validators.required])),
@@ -91,6 +100,7 @@ export class BillsModalComponent {
       file: new FormControl (null),
       document_type_id: new FormControl (1,Validators.compose([Validators.required])),
       id: new FormControl (''),
+      bill_date: new FormControl ('',Validators.compose([Validators.required])),
   	});
   }
 
@@ -111,7 +121,7 @@ export class BillsModalComponent {
 
   getCars() {
     this.loading = false;
-    this._CarsService.getCars('',500, 1).subscribe({
+    this._CarsService.getCarsBill('',500, 1).subscribe({
       next: async (response: any) => {
         if(response) {
           this.cars = response.items.map((r: any) => ({ ...r }));
@@ -168,12 +178,9 @@ export class BillsModalComponent {
         formData.append('document_type_id', this.saveForm.value.document_type_id);
         formData.append('descriptions', this.saveForm.value.name);
         formData.append('file', this.saveForm.value.file);
-        if (this.data.row !== null) {
-          // formData.append('id', this.saveForm.value.id);
-        }
         const token = this._AuthService.tokenValue;
         const response = await fetch(`https://automotriz-api.naatteam.com/document/${this.saveForm.value.id}`, {
-          method: 'POST',// this.data.flag ===  1 ? 'POST' : 'PATCH',
+          method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -223,25 +230,19 @@ export class BillsModalComponent {
       return acc;
     }, {} as typeof this.saveForm.value);
     
-    /*if (filledValues.car_id !== null || filledValues.car_id !== undefined) {
-      filledValues.car_id = filledValues.car_id
-    } */
     let car_id = filledValues.car_id
     filledValues = this.data.row === null ? 
       { name: filledValues.name, 
         classification_bill_id: filledValues.classification_bill_id,
         user_created: filledValues.user_created,
+        bill_date: filledValues.bill_date
       } : 
       {...filledValues, id: this.data.row.id};
 
-     // car_id: filledValues.car_id !== null || filledValues.car_id !== undefined ? [filledValues.car_id] : null
       if (car_id !== null && car_id !== undefined) {
-       
         filledValues['car_id'] = [car_id]
-   
       }
       
-
       const methodMap = {
         registerBill: this._BillService.registerBill.bind(this._BillService),
         updateBill:   this._BillService.updateBill.bind(this._BillService),
@@ -255,7 +256,6 @@ export class BillsModalComponent {
         methodMap[methodSelect](filledValues).subscribe({
         next: async (response) => {
           if(response) {
-            // return response.id
             resolve(response.id)
           }
         },
@@ -267,8 +267,6 @@ export class BillsModalComponent {
           }
 
           if (err.error === "Token expired") {
-        
-            // return;
             resolve(false)
           }
 
@@ -277,7 +275,6 @@ export class BillsModalComponent {
             for (const item of errorResponse) {
               this._ToastrService.error(item.msg, 'Error');  
             }
-            // return
             resolve(false)
           }
           this._ToastrService.error(err.error, 'Error');
@@ -297,34 +294,23 @@ export class BillsModalComponent {
     }, {} as typeof this.saveForm.value);
     
     if (this.data.row === null) {
-      console.log(documentId)
       if (documentId !== null && documentId !== '') {
         filledValues =  { 
           payment_method_id: filledValues.payment_method_id,
           document_id: documentId,
           amount: filledValues.amount,
-          bill_id: billId
+          bill_id: billId,
         }
       }else{
         filledValues =  { 
           payment_method_id: filledValues.payment_method_id,
           amount: filledValues.amount,
-          bill_id: billId
+          bill_id: billId,
         }
       }
     }else{
       filledValues = {...filledValues, id: this.data.row.id};
     }
-    /*
-    filledValues = this.data.row === null ? 
-      { 
-        payment_method_id: filledValues.payment_method_id,
-        document_id: documentId,
-        amount: filledValues.amount,
-        bill_id: billId
-       } : 
-      {...filledValues, id: this.data.row.id};
-      */
 
     const methodMap = {
       registerPayment: this._ShopingService.registerPayment.bind(this._ShopingService),

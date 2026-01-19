@@ -41,8 +41,6 @@ export class RoleModalComponent {
   ) 
   { }
   
-
-
   ngOnInit(): void {
     this.getScopes();
     this.init();

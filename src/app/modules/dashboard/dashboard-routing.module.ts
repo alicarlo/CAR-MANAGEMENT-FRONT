@@ -18,6 +18,9 @@ import { TypePaymentsComponent } from './pages/type-payments/type-payments.compo
 import { DocumentsComponent } from './pages/documents/documents.component';
 import { ArrivalReviewComponent } from './pages/arrival-review/arrival-review.component';
 import { BillsComponent } from './pages/bills/bills.component';
+import { LayawayComponent } from './pages/layaway/layaway.component';
+import { SalesComponent } from './pages/sales/sales.component';
+import { IncomesComponent } from './pages/incomes/incomes.component';
 
 
 const routes: Routes = [
@@ -42,6 +45,9 @@ const routes: Routes = [
       { path: 'documents', component: DocumentsComponent },
       { path: 'arrival-review', component: ArrivalReviewComponent },
       { path: 'bills', component: BillsComponent },
+      { path: 'layaway', component:  LayawayComponent },
+      { path: 'sales', component: SalesComponent },
+      { path: 'incomes', component:  IncomesComponent },
       { path: '**', redirectTo: 'errors/404' },
     ],
   },

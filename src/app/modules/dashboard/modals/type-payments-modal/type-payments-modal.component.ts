@@ -4,7 +4,6 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, 
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
-import { TypeExpenseService } from 'src/app/core/services/typeExpense/type-expense.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { STATUS } from 'src/app/core/constants/global';
 import { TypePaymentsService } from 'src/app/core/services/typePayments/type-payments.service';
@@ -35,7 +34,6 @@ export class TypePaymentsModalComponent {
   ) 
   { }
   
-
   ngOnInit(): void {
     this.init();
   }

@@ -13,8 +13,7 @@ export class BillService {
   private error = inject(ErrorHandlerService);
   constructor() { }
 
-
-   public getBillsInvestor(id: string, pageSize?: number, currentPage?: number): Observable<any> {
+  public getBillsInvestor(id: string, pageSize?: number, currentPage?: number): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
@@ -67,12 +66,12 @@ export class BillService {
   }
 
   public deleteBill(id: string): Observable<any> {
-      const httpOptions = {
-        headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-      };
-      return this.http.delete<any>(`${environment.apiUrl}/bill/${id}` ,{ responseType: 'text' as 'json' }).pipe(
-        retry(0),
-        catchError(this.error.handleError)
-      );
-    }
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.delete<any>(`${environment.apiUrl}/bill/${id}` ,{ responseType: 'text' as 'json' }).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
 }

@@ -59,9 +59,45 @@ export class CarsService {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
 
+    let value =  `&value=${active}`;
     let column = filter.length ? 'all' : 'status';
     let filterSearch = filter.length ? filter : active;
-    // column=${column}&value=${filterSearch}&
+    return this.http.get<Cars>(`${environment.apiUrl}/car/?page=${currentPage}&limit=${pageSize}&column=status${value}&sort_by=updated_at` ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
+  public getCarsBill(filter: string = '', pageSize?: number, currentPage?: number, active: string = 'active'): Observable<Cars> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+
+    let value =  `&value=${active}`;
+    return this.http.get<Cars>(`${environment.apiUrl}/car/?page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
+   public getCarByUserId(pageSize?: number, currentPage?: number, user_id?: string): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.get<any>(`${environment.apiUrl}/layaway/?column=client_id&value=${user_id}&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
+  public getCarsFull(filter: string = '', pageSize?: number, currentPage?: number, active: string = 'active'): Observable<Cars> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+
+    let value =  `&value=${active}`;
+    let column = filter.length ? 'all' : 'status';
+    let filterSearch = filter.length ? filter : active;
     return this.http.get<Cars>(`${environment.apiUrl}/car/?page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
       retry(0),
       catchError(this.error.handleError)

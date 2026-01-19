@@ -6,15 +6,10 @@ import { RowAction, RowActionEvent } from 'src/app/core/models/actions.model';
 import { TypeExpense } from 'src/app/core/models/typeExpense.model';
 import { TypeExpenseService } from 'src/app/core/services/typeExpense/type-expense.service';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
-import { TypeExpenseModalComponent } from '../../modals/type-expense-modal/type-expense-modal.component';
-import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
-import { ShoppingModalComponent } from '../../modals/shopping-modal/shopping-modal.component';
-import { PaymentsAddModalComponent } from '../../modals/payments-add-modal/payments-add-modal.component';
-import { PaymentsShowModalComponent } from '../../modals/payments-show-modal/payments-show-modal.component';
 import { ArrivalreviewService } from 'src/app/core/services/arrivalReview/arrivalreview.service';
 import { ArrivalReviewModalComponent } from '../../modals/arrival-review-modal/arrival-review-modal.component';
 import { CarsService } from 'src/app/core/services/cars/cars.service';
-// ArrivalReviewModalComponent
+
 
 @Component({
   selector: 'app-arrival-review',
@@ -29,11 +24,7 @@ export class ArrivalReviewComponent {
   columns: any = [
     { key: 'key', type: 'text' },
     { key: 'car', type: 'text' },
-    //{ key: 'make', type: 'text' },
     { key: 'car_type', type: 'text' },
-    // { key: 'version', type: 'text' },
-    // { key: 'model', type: 'text' },
-    // { key: 'color', type: 'text' },
     { key: 'arrived_at', type: 'dob' },
   ]
   readonly actions: RowAction[] = [
@@ -70,27 +61,17 @@ export class ArrivalReviewComponent {
   ) {}
 
   ngOnInit() {
-    // this.getArrival();
     this.getCars();
   }
   
-
   onRowAction(e: RowActionEvent<any>) {
-    /*if (e.id === 'search') this.openShowModal(e.id,e.row);
-    if (e.id === 'edit')  this.openModal(e.id,e.row);
-    if (e.id === 'delete') this.actionModal(e.id,e.row, 'Desea eliminar el registro?');
-    if (e.id === 'add')  this.openAddModal(e.id,e.row);
-    */
-
      if (e.id === 'add')  this.openModal(e.id,e.row);
   }
 
   async searchData(event: any) {
     if (!event) {
-
       return;
     }
-
     if (event.length < 3) return;
     this.query$.next((event));
   }
@@ -109,7 +90,6 @@ export class ArrivalReviewComponent {
     this.pageSize = event;
     this.getArrival();
   }
-
 
   openModal(action: string, data: any) {
     let dataSend = {action, row: data};
@@ -173,7 +153,7 @@ export class ArrivalReviewComponent {
           this.total = response.pagination.total_items;
         }
 
-        console.log(this.cars)
+
       },
       error: (err) => {
         if (err.error === "Token expired") return;

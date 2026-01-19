@@ -1,0 +1,91 @@
+<mat-dialog-content>
+  <div class="p-[20px]" >
+    <div  class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Revision de llegada</p>
+      
+      <div class="mx-[25px]">
+        <label for="sexo" class="text-foreground text-[12px] font-medium">Información del Auto:</label>
+        <div class="border border-border/60 rounded-lg bg-card p-2 flex gap-2">
+          <p class="text-foreground text-[11px]"><strong>Clave:</strong> {{ data.row.key }}</p>
+          <p class="text-foreground text-[11px]"><strong>Modelo:</strong> {{ data.row.model }}</p>
+          <p class="text-foreground text-[11px]"><strong>Marca:</strong> {{ data.row.make }}</p>
+          <p class="text-foreground text-[11px]"><strong>Linea:</strong> {{ data.row.version }}</p>
+          <p class="text-foreground text-[11px]"><strong>Color:</strong> {{ data.row.color }}</p>
+        </div>
+      </div>
+
+      <div class="mx-[25px]">
+        <label for="sexo" class="text-foreground text-[12px] font-medium">Revisado por:</label>
+        <div class="border border-border/60 rounded-lg bg-card p-2 flex gap-2">
+          <p class="text-foreground text-[11px]">{{ data.row.arrive.user.full_name }}</p>
+        </div>
+      </div>
+      
+      <div class="mx-[25px] flex flex-col gap-4 text-sm">
+        <div class="border border-border/60 rounded-lg bg-card p-4 space-y-1">
+          <p class="text-foreground font-medium">
+            Servicio:
+            <span class="font-normal">
+              {{ data.row.arrive.review?.servicio ? '✔️ Sí' : '❌ No' }}
+            </span>
+          </p>
+
+          <p
+            *ngIf="data.row.arrive.review?.servicio && data.row.arrive.review?.proximo_servicio"
+            class="text-foreground text-xs"
+          >
+            Próximo servicio:
+            <span class="font-normal">
+              {{ data.row.arrive.review?.proximo_servicio | date:'dd/MM/yyyy' }}
+            </span>
+          </p>
+        </div>
+
+        <div class="border border-border/60 rounded-lg bg-card p-4 space-y-1">
+          <p class="text-foreground font-medium">
+            Servicios adicionales:
+          </p>
+
+          <p class="text-foreground text-xs">
+            Agua:
+            <span class="font-normal">
+              {{ data.row.arrive.review?.servicio_agua ? '✔️' : '❌' }}
+            </span>
+          </p>
+
+          <p class="text-foreground text-xs">
+            Aceite:
+            <span class="font-normal">
+              {{ data.row.arrive.review?.servicio_aceite ? '✔️' : '❌' }}
+            </span>
+          </p>
+        </div>
+
+        <div class="border border-border/60 rounded-lg bg-card p-4 space-y-1">
+          <p class="text-foreground font-medium">
+            Garantía:
+            <span class="font-normal">
+              {{ data.row.arrive.review?.garantia ? '✔️ Vigente' : '❌ No aplica' }}
+            </span>
+          </p>
+
+          <p
+            *ngIf="data.row.arrive.review?.garantia && data.row.arrive.review?.expira_garantia"
+            class="text-foreground text-xs"
+          >
+            Expira:
+            <span class="font-normal">
+              {{ data.row.arrive.review?.expira_garantia | date:'dd/MM/yyyy' }}
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <div class="flex gap-2 p-[20px]">
+    <app-button  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
+  </div>
+</mat-dialog-actions>

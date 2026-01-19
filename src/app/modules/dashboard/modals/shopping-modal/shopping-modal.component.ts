@@ -12,10 +12,12 @@ import moment from 'moment';
 import { InvestorService } from 'src/app/core/services/investors/investor.service';
 import { ShopingService } from 'src/app/core/services/shoping/shoping.service';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
 
 @Component({
   selector: 'app-shopping-modal',
-  imports: [ButtonComponent, CommonModule, MatDialogModule, FormsModule, ReactiveFormsModule, MatIconModule],
+  imports: [NgxMaskDirective, NgxMaskPipe, ButtonComponent, CommonModule, MatDialogModule, FormsModule, ReactiveFormsModule, MatIconModule],
+  providers: [provideNgxMask()],
   templateUrl: './shopping-modal.component.html',
   styleUrl: './shopping-modal.component.css'
 })
@@ -67,9 +69,6 @@ export class ShoppingModalComponent {
 
   init() {
     this.saveForm = this._FormBuilder.group({
-      // name: new FormControl (this.data.row === null ? '' : this.data.row.name,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
-      // descriptions: new FormControl(this.data.row === null ? '' : this.data.row.descriptions),
-      // status: new FormControl (this.data.row === null ? '' : this.data.row.status),
       car: new FormGroup({
         make: new FormControl (this.data.row === null ? '' : this.data.row.car.make,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
         model: new FormControl (this.data.row === null ? '' : this.data.row.car.model,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
@@ -80,7 +79,7 @@ export class ShoppingModalComponent {
         arrived_at: new FormControl (this.data.row === null ? '' : this.dateFormat(this.data.row.car.arrived_at),Validators.compose([Validators.required])),
         user_id: new FormControl(this._AuthService.user()?.user_id),
       }),
-      investor_id: new FormControl (this.data.row === null ? '' : this.data.row.investor_id,Validators.compose([Validators.required])),
+      investor_id: new FormControl (this.data.row === null ? '' : this.data.row.investor_id),
       commission: new FormControl (this.data.row === null ? '' : this.data.row.commission),
       salesperson_name: new FormControl (this.data.row === null ? '' : this.data.row.salesperson_name),
       sales_place_name: new FormControl (this.data.row === null ? '' : this.data.row.sales_place_name),
@@ -93,14 +92,12 @@ export class ShoppingModalComponent {
     return moment.utc(date).format('YYYY-MM-DD');
   }
   
-
   getTypeCar() {
     this.loading = false;
     this._TypeCarsService.getTypeCar(500, 1).subscribe({
       next: async (response: any) => {
         if(response) {
           this.typeCars = response.items.map((r: any) => ({ ...r }));
-
         }
       },
       error: (err) => {

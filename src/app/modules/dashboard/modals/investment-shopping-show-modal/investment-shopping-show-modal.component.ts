@@ -27,22 +27,15 @@ export class InvestmentShoppingShowModalComponent {
     private dialog: MatDialog,                                 
     @Optional() public dialogRef: MatDialogRef<InvestmentShoppingShowModalComponent> | null, 
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-    // private _DocumentsService: DocumentsService,
     private _ToastrService: ToastrService,
-    // private _ShopingService: ShopingService,
     private _MatDialog: MatDialog,
     private _BillService: BillService,
     private _CarsService: CarsService,
     private _ShopingService: ShopingService
-  ) { 
- 
-  }
-
+  ) {}
 
   ngOnInit(): void {
-    // this. getInvestorPurchases();
     this.getInvestorBills();
-    console.log(this.data);
   }
 
 
@@ -79,5 +72,4 @@ export class InvestmentShoppingShowModalComponent {
       },
     })
   }
-
 }

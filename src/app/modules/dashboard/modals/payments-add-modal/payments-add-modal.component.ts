@@ -8,12 +8,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { STATUS } from 'src/app/core/constants/global';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
-import { BillService } from 'src/app/core/services/bill/bill.service';
 import { DocumentsService } from 'src/app/core/services/documents/documents.service';
-import { InvestorService } from 'src/app/core/services/investors/investor.service';
 import { ShopingService } from 'src/app/core/services/shoping/shoping.service';
-import { StoreService } from 'src/app/core/services/store/store.service';
-import { TypeCarsService } from 'src/app/core/services/typeCars/type-cars.service';
 import { TypeDocumentsService } from 'src/app/core/services/typeDocuments/type-documents.service';
 import { TypePaymentsService } from 'src/app/core/services/typePayments/type-payments.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
@@ -65,16 +61,15 @@ export class PaymentsAddModalComponent {
     @Optional() public dialogRef: MatDialogRef<PaymentsAddModalComponent> | null, 
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private _ToastrService: ToastrService,
-    private _TypeCarsService: TypeCarsService,
     private _TypePaymentsService: TypePaymentsService,
-    private _InvestorService: InvestorService,
     private _ShopingService: ShopingService,
     private _AuthService: AuthService,
     private _DocumentsService: DocumentsService,
     private _TypeDocumentsService: TypeDocumentsService,
-    private _BillService: BillService
   ) 
-  { }
+  { 
+    console.log(this.data)
+  }
 
   ngOnInit(): void {
     this.init();
@@ -99,7 +94,6 @@ export class PaymentsAddModalComponent {
   }
 
    init() {
-    console.log(this.data);
     if (this.data.flag  === 0) {
       this.saveForm = this._FormBuilder.group({
         payment_method_id: new FormControl (this.data.row === null ? '' : this.data.row.payment_method_id,Validators.compose([Validators.required])),
@@ -109,11 +103,11 @@ export class PaymentsAddModalComponent {
         id: new FormControl (this.data.row === null ? '' : this.data.row.id),
         document_type_id: new FormControl (this.data.row === null ? '' : 1,Validators.compose([Validators.required])),
         descriptions: new FormControl (this.data.row === null ? '' : this.data.row.bill.name,Validators.compose([Validators.required])),
-        file: new FormControl (this.data.row === null ? '' : this.data.row.document.url,Validators.compose([Validators.required])),
+        file: new FormControl (this.data.row === null ? '' : this.data.row.document.url),
         bill_id: new FormControl (this.data.row === null ? '' : this.data.row.bill.id,Validators.compose([Validators.required])),
   	  });
     }else
-    if (this.data.flag  === 1) {
+    if (this.data.flag  === 1 || this.data.flag  === 4) {
       this.saveForm = this._FormBuilder.group({
         payment_method_id: new FormControl ('',Validators.compose([Validators.required])),
         amount: new FormControl ('',Validators.compose([Validators.required])),
@@ -121,10 +115,11 @@ export class PaymentsAddModalComponent {
         document_id: new FormControl (''),
         id: new FormControl (''),
         document_type_id: new FormControl (1,Validators.compose([Validators.required])),
-        descriptions: new FormControl ('',Validators.compose([Validators.required])),
-        file: new FormControl ('',Validators.compose([Validators.required])),
+        descriptions: new FormControl (''),
+        file: new FormControl (''),
   	  });
-    }else{
+    }
+    else{
       this.saveForm = this._FormBuilder.group({
         payment_method_id: new FormControl (this.data.row === null ? '' : this.data.row.payment_method_id,Validators.compose([Validators.required])),
         amount: new FormControl (this.data.row === null ? '' : this.data.row.amount,Validators.compose([Validators.required])),
@@ -133,7 +128,7 @@ export class PaymentsAddModalComponent {
         id: new FormControl (this.data.row === null ? '' : this.data.row.id),
         document_type_id: new FormControl (1,Validators.compose([Validators.required])),
         descriptions: new FormControl (this.data.row === null ? '' : this.data.row.document.descriptions,Validators.compose([Validators.required])),
-        file: new FormControl (this.data.row === null ? '' : this.data.row.document.url,Validators.compose([Validators.required])),
+        file: new FormControl (this.data.row === null ? '' : this.data.row.document.url),
   	  });
     }
 
@@ -186,32 +181,31 @@ export class PaymentsAddModalComponent {
     let id = '';
     try {
       if (this.isUrl === false) {
-        const formData = new FormData();
-        formData.append('document_type_id', this.saveForm.value.document_type_id);
-        formData.append('descriptions', this.saveForm.value.descriptions);
-        formData.append('file', this.saveForm.value.file);
-        if (this.data.row !== null) {
-          // formData.append('id', this.saveForm.value.id);
-        }
-        const token = this._AuthService.tokenValue;
-        // ${this.saveForm.value.id}
-        const response = await fetch(`https://automotriz-api.naatteam.com/document/`, {
-          method: 'POST',// this.data.flag ===  1 ? 'POST' : 'PATCH',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        });
 
-        if (!response.ok) {
-          this.loading = false;
-          throw new Error(`Error en la solicitud: ${response.statusText}`);
-        }
+        if (this.saveForm.value.file) {
+          const formData = new FormData();
+          formData.append('document_type_id', this.saveForm.value.document_type_id);
+          formData.append('descriptions', this.saveForm.value.descriptions);
+          formData.append('file', this.saveForm.value.file);
+          const token = this._AuthService.tokenValue;
+          const response = await fetch(`https://automotriz-api.naatteam.com/document/`, {
+            method: 'POST',// this.data.flag ===  1 ? 'POST' : 'PATCH',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          });
 
-        const raw = await response.text();
-        let data: any;
-        data = JSON.parse(raw);
-        id = data.id;
+          if (!response.ok) {
+            this.loading = false;
+            throw new Error(`Error en la solicitud: ${response.statusText}`);
+          }
+
+          const raw = await response.text();
+          let data: any;
+          data = JSON.parse(raw);
+          id = data.id;
+        }
     
       }else {
         id = this.data.row.document.id  
@@ -230,26 +224,23 @@ export class PaymentsAddModalComponent {
       return acc;
     }, {} as typeof this.saveForm.value);
     
-    /*filledValues = this.data.flag === 1 ? 
-      { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, document_id: id, purchase_id: this.data.row.id } : 
-      {...filledValues, id: this.data.row.id};
-      */
-
     if (this.data.flag === 1) {
-      filledValues =  { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, document_id: id, purchase_id: this.data.row.id }
+      // TEMP filledValues =  { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, purchase_id: this.data.row.id }
+      filledValues =  { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, bill_id: this.data.row.id}
+      if (id !== '') filledValues = { ...filledValues, document_id: id };
     }else
+    if(this.data.flag === 4){
+      filledValues =  { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, purchase_id: this.data.row.id }
+      if (id !== '') filledValues = { ...filledValues, document_id: id };
+    }
+    else
     if(this.data.flag === 0) {
-      /*
-      filledValues = this.isUrl === false
-        ? { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, document_id: id, bill_id: this.saveForm.value.bill_id } 
-        : { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, bill_id: this.saveForm.value.bill_id } 
-        */
        filledValues = { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, document_id: id, bill_id: this.saveForm.value.bill_id, id: this.data.row.id };
+       if (id !== '') filledValues = { ...filledValues, document_id: id };
     }else{
       filledValues = {...filledValues, id: this.data.row.id};
     }
 
-    // this.data.flag  === 0
     const methodMap = {
       registerPayment: this._ShopingService.registerPayment.bind(this._ShopingService),
       updatePayment:   this._ShopingService.updatePayment.bind(this._ShopingService),
@@ -257,41 +248,10 @@ export class PaymentsAddModalComponent {
     
     type MethodKey = keyof typeof methodMap; 
 
-    /*
-    const methodSelect: MethodKey =
-      this.data.flag === 1 || this.data.flag === 0 ? 'registerPayment' : 'updatePayment';
-
-      */
-    const methodSelect: MethodKey = this.data.flag === 1 ? 'registerPayment' : 'updatePayment';
+    const methodSelect: MethodKey = this.data.flag === 1 || this.data.flag === 4 ? 'registerPayment' : 'updatePayment';
       methodMap[methodSelect](filledValues).subscribe({
       next: async (response) => {
         if(response) {
-          /*
-          if (this.data.flag === 0) {
-             let data = {
-              id: this.saveForm.value.bill_id,
-              car_id: this.data.row.cars
-            }
-            this._BillService.updateBill(data).subscribe({
-              next: async (response: any) => {
-                if(response) {
-                  this._ToastrService.success('Registro exitoso', 'Exito');
-
-                  this.loading = false;
-                  this.close(true);
-                  return;
-                }
-              },
-              error: (err) => {
-                if (err.error === "Token expired") return;
-                this.loading = true;
-                this._ToastrService.error(err.error, 'Error');
-              },
-            }) 
-          }
-            */
-         
-          //  updateBill
           this._ToastrService.success('Registro exitoso', 'Exito');
           this.loading = false;
           this.close(true);
@@ -320,12 +280,6 @@ export class PaymentsAddModalComponent {
       },
     })
   }
-
-  /*get isUrl(): boolean {
-    console.log(this.data.row)
-    return this.data.row !== null && !!this.data.row.document.url;
-  }
-    */
 
   get attachmentCtrl() {
     return this.saveForm.get('file');

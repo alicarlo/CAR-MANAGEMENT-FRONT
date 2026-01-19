@@ -10,27 +10,18 @@
         </div>
       </div>
       
-      <!-- CONTENEDOR CON SCROLL -->
       <div
         class="border border-border/60 rounded-lg bg-card m-[25px]
               max-h-[310px] overflow-y-auto overflow-x-auto"
       >
-        <!-- Wrapper con ancho mínimo solo en pantallas grandes -->
         <div class="min-w-full md:min-w-[900px]">
           <table class="w-full table-auto">
-            <!-- Header -->
             <thead>
               <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
   
-                
+                <th class="px-3 py-2 text-left whitespace-nowrap">Fecha</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Clave</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Auto</th>
-                <!--
-                <th class="px-3 py-2 text-left whitespace-nowrap">Marca</th>
-                <th class="px-3 py-2 text-left whitespace-nowrap">Modelo</th>
-                <th class="px-3 py-2 text-left whitespace-nowrap">Línea</th>
-                <th class="px-3 py-2 text-left whitespace-nowrap">Color</th>
-              -->
                 <th class="px-3 py-2 text-left whitespace-nowrap">Nombre del gasto</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Total</th>
 
@@ -42,7 +33,10 @@
                 *ngFor="let item of purchases"
                 class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition"
               >
-              
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.bill_date | date:'dd/MM/yyyy' }}
+                </td>
+
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
                   {{ item.cars[0].key }}
                 </td>
@@ -52,23 +46,6 @@
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
                   {{ item.cars[0].make }} {{ item.cars[0].version }} {{ item.cars[0].model }} {{ item.cars[0].color }}
                 </td>
-                <!--
-                <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.cars[0].make }}
-                </td>
-
-                <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.cars[0].model }}
-                </td>
-
-                <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.cars[0].version }}
-                </td>
-
-                <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.cars[0].color }}
-                </td>
-                -->
 
                  <td class="px-3 py-2 align-middle whitespace-nowrap">
                   {{ item.name }}

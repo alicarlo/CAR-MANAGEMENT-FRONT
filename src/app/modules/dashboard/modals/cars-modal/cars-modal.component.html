@@ -1,13 +1,10 @@
 <mat-dialog-content>
   <div class="p-[20px]">
-    <!-- New Action-->
     <div  class="flex flex-col gap-4">
       <p class="text-foreground font-semibold">Autos</p>
-
       <div>
         <form  [formGroup]="saveForm" class="flex flex-col gap-6">
           <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-
             <div class="flex flex-col gap-2">
               <label for="sexo" class="text-foreground text-[11px] font-medium">Tipo de Auto:</label>
               <div class="relative">
@@ -222,27 +219,6 @@
               />
             </div>
 
-            <!--
-            <div class="flex flex-col gap-2">
-              <label for="sexo" class="text-foreground text-[11px] font-medium">Estatus:</label>
-              <div class="relative">
-                <select 
-                  class="w-full py-2 pl-8 pr-10 rounded-md
-                        bg-background text-foreground
-                        border border-border
-                        focus:outline-none focus:ring-2 focus:ring-primary/50
-                        appearance-none [color-scheme:dark]"
-                >
-                  <option value="" disabled selected hidden>Selecciona…</option>
-
-                  <option *ngFor="let s of status" [value]="s">
-                    {{ s.value }}
-                  </option>
-                </select>
-              </div>
-            </div>
-            -->
-
             <div class="flex flex-col gap-2">
               <label for="sexo" class="text-foreground text-[11px] font-medium">Tipo de adquisicion :</label>
               <div class="relative">
@@ -271,176 +247,84 @@
               </div>
             </div>
 
-            <!--
-            
+            <div class="flex flex-col gap-2 relative">
+              <label class="text-foreground text-[11px] font-medium">
+                Inversionistas:
+              </label>
 
-          
-            <div class="flex flex-col gap-2">
-              <label for="sexo" class="text-foreground text-[11px] font-medium">Clientes:</label>
-              <div class="relative">
-                <select 
-                  formControlName="user_id"
-                  class="w-full py-2 pl-8 pr-10 rounded-md
-                        bg-background text-foreground
-                        border border-border
-                        focus:outline-none focus:ring-2 focus:ring-primary/50
-                        appearance-none [color-scheme:dark]"
-                >
-                  <option value="" disabled selected hidden>Selecciona…</option>
+              <button
+                type="button"
+                (click)="dropdownOpen = !dropdownOpen"
+                class="w-full py-2 px-3 rounded-md
+                      bg-background text-foreground text-[12px]
+                      border border-border
+                      flex items-center justify-between
+                      focus:outline-none focus:ring-2 focus:ring-primary/50 h-[34px]"
+              >
+                <span class="truncate">
+                  {{ selectedInvestorsLabel }}
+                </span>
 
-                  <option *ngFor="let s of user" [value]="s.id">
-                    {{ s.full_name }}
-                  </option>
-                </select>
-              </div>
-            </div>
-            -->
+                <span class="ml-2 flex items-center">
+                  <svg
+                    class="h-3 w-3 text-muted-foreground"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </span>
 
-            <!--Temp
-            <div class="flex flex-col gap-2">
-              <label for="sexo" class="text-foreground text-[11px] font-medium">Inversionista:</label>
-              <div class="relative">
-                <select 
-                  formControlName="investor_id"
-                  class="w-full py-2 pl-8 pr-10 rounded-md
-                        bg-background text-foreground
-                        border border-border
-                        focus:outline-none focus:ring-2 focus:ring-primary/50
-                        appearance-none [color-scheme:dark]"
-                >
-                  <option value="" disabled selected hidden>Selecciona…</option>
+              </button>
 
-                  <option *ngFor="let s of investor" [value]="s.id">
-                    {{ s.full_name }}
-                  </option>
-                </select>
-              </div>
-            </div>
-          -->
-<div class="flex flex-col gap-2 relative">
-  <label class="text-foreground text-[11px] font-medium">
-    Inversionistas:
-  </label>
+              <div
+                *ngIf="dropdownOpen"
+                class="absolute left-0 right-0 top-full mt-1
+                      z-20 rounded-md border border-border bg-background
+                      shadow-lg max-h-56 overflow-y-auto"
+              >
+                <div class="py-1">
+                  <button
+                    type="button"
+                    class="w-full text-left px-3 py-1.5 text-[11px] text-muted-foreground hover:bg-muted/40 "
+                    (click)="saveForm.patchValue({ investor_id: [] })"
+                  >
+                    Limpiar selección
+                  </button>
 
-  <!-- Botón que abre/cierra -->
-  <button
-    type="button"
-    (click)="dropdownOpen = !dropdownOpen"
-    class="w-full py-2 px-3 rounded-md
-           bg-background text-foreground text-[12px]
-           border border-border
-           flex items-center justify-between
-           focus:outline-none focus:ring-2 focus:ring-primary/50 h-[34px]"
-  >
-    <span class="truncate">
-      {{ selectedInvestorsLabel }}
-    </span>
+                  <div class="h-[1px] bg-border/60 my-1"></div>
 
-    <span class="ml-2 flex items-center">
-      <svg
-        class="h-3 w-3 text-muted-foreground"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        aria-hidden="true"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
-          clip-rule="evenodd"
-        />
-      </svg>
-    </span>
-
-  </button>
-
-  <!-- Dropdown: ahora debajo del botón -->
-  <div
-    *ngIf="dropdownOpen"
-    class="absolute left-0 right-0 top-full mt-1
-           z-20 rounded-md border border-border bg-background
-           shadow-lg max-h-56 overflow-y-auto"
-  >
-    <div class="py-1">
-      <button
-        type="button"
-        class="w-full text-left px-3 py-1.5 text-[11px] text-muted-foreground hover:bg-muted/40 "
-        (click)="saveForm.patchValue({ investor_id: [] })"
-      >
-        Limpiar selección
-      </button>
-
-      <div class="h-[1px] bg-border/60 my-1"></div>
-
-      <div *ngFor="let s of investor">
-        <button
-          type="button"
-          class="w-full flex items-center gap-2 px-3 py-1.5 text-[12px]
-                 hover:bg-muted/40 text-foreground"
-          (click)="toggleInvestor(s.id)"
-        >
-          <span
-            class="h-4 w-4 rounded border flex items-center justify-center
-                   text-[10px]"
-            [ngClass]="
-              isInvestorSelected(s.id)
-                ? 'bg-primary border-primary text-white'
-                : 'bg-transparent border-border text-transparent'
-            "
-          >
-            ✓
-          </span>
-          <span class="truncate">
-            {{ s.full_name }}
-          </span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-            
-            <!--
-            <div class="flex flex-col gap-2">
-              <label class="text-foreground text-[11px] font-medium">Inversionista:</label>
-
-              <div class="relative" (click)="$event.stopPropagation()">
-                <button type="button"
-                  (click)="open = !open"
-                  class="w-full py-1 pl-8 pr-2 rounded-md
-                    bg-background text-foreground
-                    border border-border
-                    focus:outline-none focus:ring-2 focus:ring-primary/50
-                    appearance-none [color-scheme:dark] relative text-left"
-                >
-                  <span class="truncate text-[12px]">{{ selectedLabel() }}</span>
-                  <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">▾</span>
-                </button>
-
-                <div *ngIf="open" class="fixed inset-0 z-40" (click)="open = false"></div>
-
-                <div *ngIf="open"
-                    class="absolute z-50 mt-1 w-full max-h-60 overflow-auto
-                            rounded-md bg-background border border-border shadow">
-                  <ul class="py-1">
-                    <li *ngFor="let s of investor" class="px-2 py-1 hover:bg-muted/30">
-                      <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox"
-                              class="accent-primary"
-                              [checked]="isChecked(s.id)"
-                              (change)="toggleScope(s.id)">
-                        <span class="text-foreground text-[12px]">{{ s.full_name }}</span>
-                      </label>
-                    </li>
-                  </ul>
-                  <div class="p-2 border-t border-border flex justify-end">
-                    <app-button (click)="open = false" impact="bold" tone="primary" shape="rounded" size="small">Aceptar</app-button>
+                  <div *ngFor="let s of investor">
+                    <button
+                      type="button"
+                      class="w-full flex items-center gap-2 px-3 py-1.5 text-[12px]
+                            hover:bg-muted/40 text-foreground"
+                      (click)="toggleInvestor(s.id)"
+                    >
+                      <span
+                        class="h-4 w-4 rounded border flex items-center justify-center
+                              text-[10px]"
+                        [ngClass]="
+                          isInvestorSelected(s.id)
+                            ? 'bg-primary border-primary text-white'
+                            : 'bg-transparent border-border text-transparent'
+                        "
+                      >
+                        ✓
+                      </span>
+                      <span class="truncate">
+                        {{ s.full_name }}
+                      </span>
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
-            -->
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
@@ -457,84 +341,80 @@
           </div>
 
           <div formGroupName="comments" class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              <div class="flex flex-col gap-2">
-                <label class="text-foreground text-[11px] font-medium">Comentarios:</label>
-                <textarea
-                  class="
-                    py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
-                    border-border bg-background text-foreground
-                    scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
-                  "
-                  placeholder="Comentarios"
-                  formControlName="generales">
-                </textarea>
-              </div>
-
-              <div class="flex flex-col gap-2">
-                <label class="text-foreground text-[11px] font-medium">Comentarios Carroceria:</label>
-                <textarea
-                  class="
-                    py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
-                    border-border bg-background text-foreground
-                    scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
-                  "
-                  placeholder="Comentarios Carroceria"
-                  formControlName="carroceria">
-                </textarea>
-              </div>
-
-              <div class="flex flex-col gap-2">
-                <label class="text-foreground text-[11px] font-medium">Comentarios Llantas:</label>
-                <textarea
-                  class="
-                    py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
-                    border-border bg-background text-foreground
-                    scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
-                  "
-                  placeholder="Comentarios Llantas"
-                  formControlName="llantas">
-                </textarea>
-              </div>
-
-              <div class="flex flex-col gap-2">
-                <label class="text-foreground text-[11px] font-medium">Comentarios Pintura:</label>
-                <textarea
-                  class="
-                    py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
-                    border-border bg-background text-foreground
-                    scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
-                  "
-                  placeholder="Comentarios Pintura"
-                  formControlName="pintura">
-                </textarea>
-              </div>
-
-              <div class="flex flex-col gap-2">
-                <label class="text-foreground text-[11px] font-medium">Comentarios Otros:</label>
-                <textarea
-                  class="
-                    py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
-                    border-border bg-background text-foreground
-                    scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
-                  "
-                  placeholder="Comentarios Otros"
-                  formControlName="otros">
-                </textarea>
-              </div>
+            <div class="flex flex-col gap-2">
+              <label class="text-foreground text-[11px] font-medium">Comentarios:</label>
+              <textarea
+                class="
+                  py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
+                  border-border bg-background text-foreground
+                  scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
+                "
+                placeholder="Comentarios"
+                formControlName="generales">
+              </textarea>
             </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-foreground text-[11px] font-medium">Comentarios Carroceria:</label>
+              <textarea
+                class="
+                  py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
+                  border-border bg-background text-foreground
+                  scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
+                "
+                placeholder="Comentarios Carroceria"
+                formControlName="carroceria">
+              </textarea>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-foreground text-[11px] font-medium">Comentarios Llantas:</label>
+              <textarea
+                class="
+                  py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
+                  border-border bg-background text-foreground
+                  scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
+                "
+                placeholder="Comentarios Llantas"
+                formControlName="llantas">
+              </textarea>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-foreground text-[11px] font-medium">Comentarios Pintura:</label>
+              <textarea
+                class="
+                  py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
+                  border-border bg-background text-foreground
+                  scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
+                "
+                placeholder="Comentarios Pintura"
+                formControlName="pintura">
+              </textarea>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-foreground text-[11px] font-medium">Comentarios Otros:</label>
+              <textarea
+                class="
+                  py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
+                  border-border bg-background text-foreground
+                  scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
+                "
+                placeholder="Comentarios Otros"
+                formControlName="otros">
+              </textarea>
+            </div>
+          </div>
         </form>
       </div>
     </div>
   </div>
-  
 </mat-dialog-content>
-
 
 <mat-dialog-actions align="end">
   <div class="flex gap-2 p-[20px]">
-    <!--[loading]="loading"-->
     <app-button [loading]="loading" (click)="save()" full impact="bold" tone="primary" shape="rounded" size="medium">Guardar</app-button>
     <app-button [disabled]="loading"  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
-
   </div>
 </mat-dialog-actions>

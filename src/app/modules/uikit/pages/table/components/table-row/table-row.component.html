@@ -7,19 +7,46 @@
       type="checkbox" />
   </td>
 
-  <!-- celdas dinámicas: imprime TODOS los valores del objeto -->
   <ng-container *ngFor="let val of  dataFilterColumns; trackBy: trackByCol">
     <td [ngClass]="val.class" [ngSwitch]="val.type">
 
-       <ng-container *ngSwitchCase="'translate-text'">
+      <ng-container *ngSwitchCase="'status'">
+        <span *ngIf="getValue(val.key) === 'pendiente_aprobacion'">
+          Pendiente aprobacion
+        </span>
+
+      </ng-container>
+      <ng-container *ngSwitchCase="'translate-text'">
         <span *ngIf="getValue(val.key) === 'active'">
           Activo
         </span>
 
-         <span *ngIf="getValue(val.key) === 'inactive'">
+        <span *ngIf="getValue(val.key) === 'inactive'">
           Inactivo
         </span>
-       </ng-container>
+
+        <span *ngIf="getValue(val.key) !== 'active' && getValue(val.key) !== 'inactive' && getValue(val.key) !== 'layaway' && getValue(val.key) !== 'sale'">
+          {{ getValue(val.key) | capitalize }}
+        </span>
+        
+         <span *ngIf="getValue(val.key) === 'layaway'">
+          Apartado
+        </span>
+
+        <span *ngIf="getValue(val.key) === 'sale' ">
+          Venta
+        </span>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="'sex'">  
+        <span *ngIf="getValue(val.key) === 'male'">
+          Masculino
+        </span>
+
+        <span *ngIf="getValue(val.key) === 'female'">
+          Femenino
+        </span>
+      </ng-container>
 
       <ng-container *ngSwitchCase="'translate-boolean'">
         <ng-container *ngIf="getValue(val.key) as v">

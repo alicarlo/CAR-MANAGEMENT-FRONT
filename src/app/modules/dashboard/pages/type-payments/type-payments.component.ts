@@ -3,7 +3,6 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 import { RowAction, RowActionEvent } from 'src/app/core/models/actions.model';
-import { TypeExpense } from 'src/app/core/models/typeExpense.model';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
 import { TypePaymentsService } from 'src/app/core/services/typePayments/type-payments.service';

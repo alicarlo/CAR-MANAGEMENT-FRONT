@@ -25,7 +25,6 @@ export class InvestmentModalComponent {
       {type: 'minlength', message: 'Minimo 3 caracteres'},
 		],
 	}
-
   constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 
