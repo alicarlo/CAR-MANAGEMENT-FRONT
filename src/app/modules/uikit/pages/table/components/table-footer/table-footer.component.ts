@@ -45,8 +45,29 @@ export class TableFooterComponent {
   @Output() currentPageChild = new EventEmitter<{}>();
 
 
+  /*
   get pages(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+  */
+
+  get visiblePages(): number[] {
+    const total = this.totalPages;
+    const current = this.currentPageSelect;
+    const delta = 2; // páginas a cada lado
+
+    if (total <= 1) return [];
+
+    const start = Math.max(1, current - delta);
+    const end = Math.min(total, current + delta);
+
+    const pages: number[] = [];
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    return pages;
   }
  
   get showItems() {

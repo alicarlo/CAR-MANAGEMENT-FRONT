@@ -188,7 +188,9 @@ export class ShoppingComponent {
             car_type: r.car.car_type.name, 
             investor: r.investor.full_name,
             key: r.car.key,
-            arrived_at: r.car.arrived_at,  }));
+            arrived_at: r.car.arrived_at,  
+            // cost: r.payments? (r.payments || []).reduce((acc: number, inc: any) => acc + (Number(inc.amount) || 0), 0) : 0
+          }));
 
           this.total = response.pagination.total_items;
           setTimeout(() => {

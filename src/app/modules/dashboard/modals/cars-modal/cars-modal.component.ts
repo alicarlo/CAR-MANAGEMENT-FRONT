@@ -7,7 +7,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angu
 import { MatIconModule } from '@angular/material/icon';
 import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
-import { CHECKS_FIELDS, CHECKS_INIT, STATUS } from 'src/app/core/constants/cars';
+import { CHECKS_FIELDS, CHECKS_INIT, CHECKS_INIT_FULL, STATUS } from 'src/app/core/constants/cars';
 import { Checks } from 'src/app/core/models/cars.model';
 import { Clients } from 'src/app/core/models/clients.model';
 import { CreateClientError } from 'src/app/core/models/error';
@@ -129,6 +129,8 @@ export class CarsModalComponent {
 
   init() {
     this.saveForm = this._FormBuilder.group({
+
+      cost: new FormControl(this.data.row === null ? null : this.data.row.cost, Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
       make: new FormControl (this.data.row === null ? '' : this.data.row.make,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
       model: new FormControl (this.data.row === null ? '' : this.data.row.model,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
       version: new FormControl(this.data.row === null ? '' : this.data.row.version),
@@ -153,7 +155,7 @@ export class CarsModalComponent {
         { nonNullable: true }
       ),
       checks: new FormControl<Checks>(
-        this.data?.row?.checks ? { ...CHECKS_INIT, ...this.data.row.checks } : CHECKS_INIT,
+        this.data?.row?.checks ? { ...CHECKS_INIT, ...this.data.row.checks } : CHECKS_INIT_FULL,
         { nonNullable: true }
       ),
       comments: new FormGroup({
@@ -164,6 +166,12 @@ export class CarsModalComponent {
         otros:   new FormControl(this.data.row === null || this.data.row.comments === null ? '' : this.data.row.comments.otros),
       })
     });
+
+    if (this.data.row !== null && this.data.row.purchases.length > 0) {
+      this.saveForm.get('cost')?.disable();
+      let amount = (this.data.row.purchases || []).reduce((acc: number, inc: any) => acc + (Number(inc.total) || 0), 0);
+      this.saveForm.get('cost')?.setValue(amount);
+    }
   }
 
   save() {

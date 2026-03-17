@@ -1,0 +1,64 @@
+<div class="mb-4 flex justify-between" >
+  <div class="inline-block">
+    <h3 class="text-foreground font-semibold">Cobranza</h3>
+    <div class="text-muted-foreground space-x-1 text-xs font-medium">
+      <a href="" class="hover:text-primary">Todos los items:</a>
+      <span class="text-foreground">{{ total }}</span>
+    </div>
+  </div>
+
+    <div class="inline-block space-x-4">
+      <!--
+    <button 
+      class="bg-primary text-primary-foreground flex-none rounded-md px-4 py-2.5 text-xs font-semibold"
+      (click)="openModal('new', null)"
+    >
+      Nuevo
+    </button>
+  -->
+  </div>
+</div>
+
+
+<!--
+  [select]="true"
+  [labelName]="'Cliente'"
+  [selectValueDefault]="false"
+  [selectValue]="'full_name'"
+  [selectData]="clientData"
+  [selectPlaceholder]="'Seleccione un cliente'"
+  [selectId]="'id'"
+-->
+
+<app-table
+  [select]="true"
+  [labelName]="'Cliente'"
+  [selectValueDefault]="false"
+  [selectValue]="'full_name'"
+  [selectData]="clientData"
+  [selectPlaceholder]="'Seleccione un cliente'"
+  [selectId]="'id'"
+  
+  [searchable]="true"
+  [size]="'lg'"
+  [actions]="actions"
+  [data]="collections"
+  [headers]="collectionsHeader"
+  [loading]="loading"
+  [error]="error"
+  [hasNext]="hasNext"
+  [hasPrev]="hasPrev"
+  [total]="total"
+  [totalPages]="totalPages"
+  [pages]="pages"
+  [anchorsNext]="anchorsNext"
+  [currentPage]="currentPage"
+  [dataFilterColumns]="columns"
+  (pageSizeSelectReturn)=pageSizeSelectReturn($event)
+  (currentPageReturn)=currentPageReturn($event)
+  (changePageNextPrevReturn)=changePageNextPrev($event)
+  (searchData)=searchData($event)
+  (action)="onRowAction($event)"
+  (selectOptionReturn)="selectOptionReturn($event)"
+></app-table>
+

@@ -1,7 +1,11 @@
 <mat-dialog-content>
   <div class="p-[20px]" >
     <div  class="flex flex-col gap-4">
-      <p class="text-foreground font-semibold">Revision de llegada</p>
+      <div class="flex justify-between items-center">
+        <p class="text-foreground font-semibold">Revision de llegada</p>
+        <app-button *ngIf="!isArriveEmpty()" (click)="editModal()" full impact="bold" tone="primary" shape="rounded" size="small">Editar</app-button>
+      </div>
+      
       
       <div class="mx-[25px]">
         <label for="sexo" class="text-foreground text-[12px] font-medium">Información del Auto:</label>
@@ -14,14 +18,18 @@
         </div>
       </div>
 
-      <div class="mx-[25px]">
+      <div *ngIf="data.row.arrive && (data.row.arrive | keyvalue).length === 0" class="h-[150px] w-full flex justify-center items-center">
+        <p class="text-foreground text-[12px] font-medium">No tiene revision de llegada</p>
+      </div>
+
+      <div class="mx-[25px]" *ngIf="data.row.arrive && (data.row.arrive | keyvalue).length > 0">
         <label for="sexo" class="text-foreground text-[12px] font-medium">Revisado por:</label>
         <div class="border border-border/60 rounded-lg bg-card p-2 flex gap-2">
           <p class="text-foreground text-[11px]">{{ data.row.arrive.user.full_name }}</p>
         </div>
       </div>
       
-      <div class="mx-[25px] flex flex-col gap-4 text-sm">
+      <div class="mx-[25px] flex flex-col gap-4 text-sm" *ngIf="data.row.arrive && (data.row.arrive | keyvalue).length > 0">
         <div class="border border-border/60 rounded-lg bg-card p-4 space-y-1">
           <p class="text-foreground font-medium">
             Servicio:

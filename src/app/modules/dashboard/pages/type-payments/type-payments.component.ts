@@ -18,10 +18,11 @@ import { TypePaymentsModalComponent } from '../../modals/type-payments-modal/typ
 export class TypePaymentsComponent {
   typePaymentsSelected: TypePayments | undefined;
   typePayments: TypePayments[] = [];
-  typePaymentsHeader: string[] = ['Nombre','Descripcion', 'Estatus'];
+  typePaymentsHeader: string[] = ['Nombre','Descripcion', 'Saldo' , 'Estatus'];
   columns: any = [
     { key: 'name', type: 'text' },
     { key: 'descriptions', type: 'text' },
+    { key: 'total', type: 'money' },
     { key: 'status', type: 'translate-text' },
   ]
 

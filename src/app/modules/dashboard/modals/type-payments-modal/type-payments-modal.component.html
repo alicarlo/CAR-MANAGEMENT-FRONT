@@ -31,6 +31,17 @@
                 formControlName="descriptions" 
               />
             </div>
+            
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Saldo:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Saldo"
+                type="number"
+                formControlName="total" 
+              />
+            </div>
+
 
             <div class="flex flex-col gap-2" *ngIf="data.row">
               <label for="sexo" class="text-foreground text-[11px] font-medium">Estatus:</label>

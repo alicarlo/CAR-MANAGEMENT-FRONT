@@ -22,7 +22,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class PaymentsShowModalComponent {
   loadingModal: boolean = false;
   payments: any[] = [];
-
+  totalPayments: any = 0;
   constructor(
     private dialog: MatDialog,                                 
     @Optional() public dialogRef: MatDialogRef<PaymentsShowModalComponent> | null, 
@@ -46,6 +46,8 @@ export class PaymentsShowModalComponent {
       next: async (response: any) => {
         if(response) {
           this.payments = response.items.map((r: any) => ({ ...r}));
+
+          this.totalPayments = response.items.reduce((sum: any, item: any) => sum + item.amount, 0);
           this.loadingModal = true;
         }
       },
@@ -63,6 +65,7 @@ export class PaymentsShowModalComponent {
       next: async (response: any) => {
         if(response) {
           this.payments = response.items.map((r: any) => ({ ...r}));
+          this.totalPayments = response.items.reduce((sum: any, item: any) => sum + item.amount, 0);
           this.loadingModal = true;
 
         }
@@ -134,7 +137,7 @@ export class PaymentsShowModalComponent {
   }
 
   openAddModal(action: string, data: any) {
-    let dataSend = {action, row: data, flag: this.data.flag};
+    let dataSend = {action, row: {...data, car: this.data.row.car} , flag: this.data.flag};
     const dialogRef = this._MatDialog.open(PaymentsAddModalComponent, {
       disableClose: true,
       data: dataSend,

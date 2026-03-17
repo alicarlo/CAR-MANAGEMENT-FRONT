@@ -1,24 +1,142 @@
 <div class="flex flex-wrap items-center justify-between gap-2 py-3 px-5">
   <h3 class="text-muted-foreground text-sm font-medium"></h3>
-  <div class="flex flex-wrap gap-2">
-    <div class="flex">
-      <label class="text-muted-foreground relative">
-        <div class="absolute left-2.5 top-2.5">
-          <svg-icon src="./assets/icons/heroicons/outline/magnifying-glass.svg" [svgClass]="'h-4 w-4'"> </svg-icon>
+
+  <div class="flex flex-wrap items-start gap-3">
+
+    <div class="flex flex-col" *ngIf="select === true">
+      <span class="text-xs text-muted-foreground mb-1">
+        {{ labelName }}
+      </span>
+
+      <!-- 🔽 MODO SEARCH -->
+      <ng-container *ngIf="searchable; else normalSelect">
+        <div class="relative w-full min-w-[180px]">
+          <button
+            [ngClass]="triggerClasses"
+            type="button"
+            class="w-full pl-3 pr-8 rounded-md bg-background text-foreground
+                   border border-border text-left flex items-center justify-between
+                   box-border"
+            (click)="toggleDropdown()"
+          >
+            <span class="truncate">
+              {{ currentSelectLabel || selectPlaceholder }}
+            </span>
+            <span class="text-xs opacity-70">▼</span>
+          </button>
+
+          <div
+            *ngIf="dropdownOpen"
+            class="absolute z-30 mt-1 w-full rounded-md bg-background border border-border shadow-lg"
+          >
+            <div class="p-2 border-b border-border">
+              <input
+                type="text"
+                placeholder="Buscar..."
+                class="w-full h-[34px] px-2 rounded-md border border-border text-[12px] box-border bg-background text-foreground"
+                [formControl]="filterControl"
+              />
+            </div>
+
+            <div class="max-h-60 overflow-y-auto">
+              <button
+                [ngClass]="optionClasses"
+                type="button"
+                class="w-full text-left hover:bg-card text-foreground box-border"
+                *ngFor="let s of filteredData"
+                (click)="selectOptionClick(s)"
+              >
+                {{ s[selectValue] }}
+              </button>
+
+              <div
+                *ngIf="filteredData.length === 0"
+                class="px-3 py-2 text-xs text-muted-foreground"
+              >
+                Sin resultados
+              </div>
+            </div>
+          </div>
         </div>
+      </ng-container>
+
+      <!-- 🔽 MODO NORMAL -->
+      <ng-template #normalSelect>
+        <select
+          [ngClass]="triggerClasses"
+          class="w-full pl-3 pr-8 rounded-md bg-background text-foreground border border-border box-border min-w-[180px]"
+          [(ngModel)]="currentSelect"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="onSelectChange($any($event))"
+        >
+          <option value="" disabled>
+            {{ selectPlaceholder }}
+          </option>
+
+          <option *ngFor="let s of _selectData" [value]="s[selectId]">
+            {{ s[selectValue] }}
+          </option>
+        </select>
+      </ng-template>
+    </div>
+
+    <div class="flex flex-col">
+      <span class="text-xs text-transparent mb-1">.</span>
+
+      <label class="text-muted-foreground relative block min-w-[180px]">
+        <div class="absolute left-2.5 top-1/2 -translate-y-1/2">
+          <svg-icon
+            src="./assets/icons/heroicons/outline/magnifying-glass.svg"
+            [svgClass]="'h-4 w-4'">
+          </svg-icon>
+        </div>
+
         <input
           name="search"
-          class="py-2 pl-8 pr-2"
+          [ngClass]="triggerClasses"
+          class="w-full pl-8 pr-8 rounded-md border border-border bg-background text-foreground box-border"
           placeholder="Busqueda"
           type="text"
-          value=""
           [(ngModel)]="search"
-          (input)="onSearchChange($event)" />
+          (input)="onSearchChange($event)"
+        />
 
-          <div *ngIf="search" class="absolute right-2.5 top-2.5 cursor-pointer" (click)="clearSearch()">
-            <svg-icon src="./assets/icons/heroicons/outline/close.svg" [svgClass]="'h-4 w-4'"> </svg-icon>
-          </div>
+        <div
+          *ngIf="search"
+          class="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer"
+          (click)="clearSearch()"
+        >
+          <svg-icon
+            src="./assets/icons/heroicons/outline/close.svg"
+            [svgClass]="'h-4 w-4'">
+          </svg-icon>
+        </div>
       </label>
     </div>
+
   </div>
 </div>
+ <!--
+    <div class="flex flex-col" *ngIf="select === true">
+      <span class="text-xs text-muted-foreground mb-1">
+        {{ labelName }}
+      </span>
+
+      <select
+        class="h-9 px-[35px] rounded-md
+               bg-background text-foreground
+               border border-border"
+        [(ngModel)]="currentSelect"
+        [ngModelOptions]="{ standalone: true }"
+        (ngModelChange)="onSelectChange($any($event))"
+      >
+        <option value="" disabled hidden>
+          {{ selectPlaceholder }}
+        </option>
+
+        <option *ngFor="let s of _selectData" [value]="s[selectId]">
+          {{ s[selectValue] | titlecase }}
+        </option>
+      </select>
+    </div>
+    -->

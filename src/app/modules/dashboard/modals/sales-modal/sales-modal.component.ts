@@ -17,7 +17,8 @@ import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { SalesService } from 'src/app/core/services/sales/sales.service';
 import { IncomeService } from 'src/app/core/services/income/income.service';
 import { TypePaymentsService } from 'src/app/core/services/typePayments/type-payments.service';
-
+import { environment } from 'src/environments/environment';
+import { a } from 'node_modules/@angular/material/icon-registry.d-BVwP8t9_';
 
 interface AttachmentItem {
   id: string;
@@ -109,6 +110,11 @@ export class SalesModalComponent {
   previewUrls: string[] = [];
   typeDocument: any[] = [];
 
+
+  carFilterControl = new FormControl('');
+  filteredCars: any[] = [];
+  carsDropdownOpen = false;
+  selectedCarLabel = '';
   constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 
@@ -125,6 +131,14 @@ export class SalesModalComponent {
 
   ngOnInit(): void {
     this.init();
+    this.carFilterControl.valueChanges.subscribe(term => {
+      const value = (term || '').toString().toLowerCase().trim();
+
+      this.filteredCars = this.cars.filter(car => {
+        const text = `${car.key} ${car.make} ${car.model} ${car.plate || ''}`.toLowerCase();
+        return text.includes(value);
+      });
+    });
     this.getClients();
     this.getTypePayments();
     this.getTypeDocument();
@@ -155,14 +169,12 @@ export class SalesModalComponent {
       guarantee_time: new FormControl (0),
   	});
 
-    
     this.saveForm.get('sales_type')?.valueChanges.subscribe((value: any) => {
       this.saveForm.get('client_id')?.enable();
     });
 
     this.saveForm.get('client_id')?.valueChanges.subscribe((value: any) => {
       if (value  === null) return;
-
       if (this.saveForm.get('sales_type')?.value === 'apartado') {
         this.getCarByUserId();
       }else{
@@ -172,62 +184,68 @@ export class SalesModalComponent {
 
     this.saveForm.get('car_id')?.valueChanges.subscribe((value: any) => {
       if (value  === '') return;
-
       this.carsSelected = this.cars.find((r: any) => r.id === value);
       this.saveForm.get('sale_price')?.setValue(this.carsSelected.sale_price);
       this.saveForm.get('sale_price_contado')?.setValue(this.carsSelected.sale_price);
 
       if (this.saveForm.get('sales_type')?.value === 'apartado') {
-        this.saveForm.get('sale_price')?.disable();
-        this.saveForm.get('desired_advance')?.setValue(this.carsSelected.amount_down_payment);
+        if (this.saveForm.get('liquidate')?.value === false) {;
+          this.saveForm.get('sale_price')?.disable();
+        }else{
+          this.saveForm.get('sale_price')?.disable();
+          this.saveForm.get('sale_price_contado')?.enable();
+        }
+        this.saveForm.get('desired_advance')?.setValue(this.carsSelected.amount_layaway);
+        
+      }else{
+        this.saveForm.get('desired_advance')?.setValue(this.carsSelected.down_payment);
       }
     });
 
-    
     this.saveForm.get('liquidate')?.valueChanges.subscribe((value: any) => {
-       if (this.saveForm.get('sales_type')?.value === 'normal') {
+      if (this.saveForm.get('sales_type')?.value === 'normal') {
+      if (value) {
+        this.saveForm.get('sale_price')?.enable(); 
+      }else{
+        
+        this.saveForm.get('qty_months')?.setValue('');
+        this.saveForm.get('desired_advance')?.setValue(null);
+        this.saveForm.get('desired_advance')?.disable();
+      }
+      // apartado 
+      }else{
         if (value) {
           this.saveForm.get('qty_months')?.setValue('');
           this.saveForm.get('desired_advance')?.setValue(null);
           this.saveForm.get('desired_advance')?.disable();
-          this.saveForm.get('sale_price_contado')?.disable();
         }else{
           this.saveForm.get('desired_advance')?.enable();
-          this.saveForm.get('sale_price_contado')?.enable();
+          this.saveForm.get('sale_price_contado')?.enable();  
         }
-       }else{
-        if (value) {
-          this.saveForm.get('qty_months')?.setValue('');
-          this.saveForm.get('desired_advance')?.setValue(null);
-          this.saveForm.get('desired_advance')?.disable();
-        }else{
-          this.saveForm.get('desired_advance')?.enable();
-          this.saveForm.get('sale_price_contado')?.enable();
-        }
-       }
+      }
 
-       this.maxFiles = value ? 1 : 3
+      this.maxFiles = value ? 1 : 3
      
-       if (value) { 
-        this.saveForm.get('guarantee')?.setValue('cliente');
-        this.saveForm.get('guarantee')?.disable();
-        this.saveForm.get('payment_days')?.disable();
-       }else{
-        this.saveForm.get('guarantee')?.enable();
-        this.saveForm.get('payment_days')?.enable();
-       }
-       this.removeAllFiles();
+      if (value) { 
+      this.saveForm.get('guarantee')?.setValue('cliente');
+      this.saveForm.get('guarantee')?.disable();
+      this.saveForm.get('payment_days')?.disable();
+      }else{
+      this.saveForm.get('guarantee')?.enable();
+      this.saveForm.get('payment_days')?.enable();
+      }
+      this.removeAllFiles();
     });
 
     this.saveForm.get('qty_months')?.valueChanges.subscribe((value: any) => {
-       this.generateMonthlyPayments(value);
+      this.generateMonthlyPayments(value);
     });
 
     this.saveForm.get('guarantee')?.valueChanges.subscribe((value: any) => {
-       if (value  === '') return;
-       if (value === 'cliente') {
-        this.saveForm.get('guarantee_name')?.setValue(this.clients.find((c: any) => c.id === this.saveForm.value.client_id)?.full_name);
-       }
+      if (value  === '') return;
+      if (value === 'cliente') {
+      this.saveForm.get('guarantee_name')?.setValue(this.clients.find((c: any) => c.id === this.saveForm.value.client_id)?.full_name);
+      }
     });
 
     this.saveForm.get('payment_days')?.valueChanges.subscribe((value: any) => {
@@ -241,12 +259,29 @@ export class SalesModalComponent {
     this.saveForm.get('init_day')?.valueChanges.subscribe((value: any) => {
       if (value) { 
         this.monthlyPayments = [];
-        // this.saveForm.get('qty_months')?.setValue(value);
         setTimeout(() => {
           this.generateMonthlyPayments(this.saveForm.value.qty_months);  
         },500)
        }
     });
+  }
+
+  toggleCarsDropdown() {
+    this.carsDropdownOpen = !this.carsDropdownOpen;
+    if (this.carsDropdownOpen) {
+      this.carFilterControl.setValue('');
+      this.filteredCars = [...this.cars];
+    }
+  }
+
+  closeCarsDropdown() {
+    this.carsDropdownOpen = false;
+  }
+
+  selectCar(car: any) {
+    this.selectedCarLabel = `${car.make} - ${car.model}`;
+    this.saveForm.patchValue({ car_id: car.id });
+    this.closeCarsDropdown();
   }
 
   openPicker(input: HTMLInputElement) {
@@ -273,7 +308,6 @@ export class SalesModalComponent {
 
   generateMonthlyPayments(qty: number) {
     const result: any[] = [];
-
     let now = new Date();
     const initDay = this.saveForm.value.init_day;
 
@@ -291,7 +325,6 @@ export class SalesModalComponent {
 
     for (let i = 0; i < qty; i++) {
       const date = new Date(startYear, startMonthIndex + i, 1);
-
       const monthName = date.toLocaleString('default', { month: 'long' });
       const month = date.getMonth() + 1; 
       const year = date.getFullYear();
@@ -310,6 +343,8 @@ export class SalesModalComponent {
     this.monthlyPayments = result;
   }
 
+  
+
   syncManualAmounts() {
     this.monthlyPayments = this.monthlyPayments.map((p: any, i: number) => {
       let parsedAmount: any = parseFloat(p.amount);
@@ -322,10 +357,26 @@ export class SalesModalComponent {
   }
 
   generatePayments() {
-    const totalAmount = parseFloat(this.saveForm.get('sale_price')?.value || 0);
-    const amountPaid = parseFloat(this.saveForm.get('desired_advance')?.value || 0);
+    let totalAmount;
+    let amountPaid
+    if (this.saveForm.value.sales_type === 'apartado') {
+      if (this.saveForm.get('desired_advance')?.value >= this.carsSelected.total) {
+        totalAmount = this.carsSelected.amount_sale;
+        amountPaid =  parseFloat(this.saveForm.get('desired_advance')?.value || 0);
+      }else{
+         this._ToastrService.error('Anticipo deseado debe de ser igual o mas que el enganche');
+        return;
+      }
+    }else{
+      totalAmount = parseFloat(this.saveForm.get('sale_price')?.value || 0);
+      amountPaid =  parseFloat(this.saveForm.get('desired_advance')?.value || 0);
+      let amountCheck =  totalAmount - amountPaid;
+      if (amountCheck <= 0) {
+        this._ToastrService.error('El Anticipio deseado debe ser menor al precio de venta, si va a liquidar seleccione la opcion liquidar');
+        return;
+      }
+    }
     const qty = parseInt(this.saveForm.get('qty_months')?.value || 0);
-
     if (!totalAmount || !amountPaid || !qty || qty <= 0) {
       this._ToastrService.error('Verifica los valores de venta, anticipo y meses');
       return;
@@ -333,7 +384,6 @@ export class SalesModalComponent {
 
     const amountToDistribute = totalAmount - amountPaid;
     const now = new Date();
-
     const newMonthlyPayments: any = Array.from({ length: qty }).map((_, i) => {
       const date = new Date(now.getFullYear(), now.getMonth() + 1 + i, 1);
       return {
@@ -372,15 +422,12 @@ export class SalesModalComponent {
 
     const remainingSlots = qty - manualIndexes.size;
     const amountPerSlot = remainingSlots > 0 ? parseFloat((remaining / remainingSlots).toFixed(2)) : 0;
-
     for (let i = 0; i < qty; i++) {
       if (!manualIndexes.has(i)) {
         newMonthlyPayments[i].amount = amountPerSlot;
       }
     }
-
     this.monthlyPayments = newMonthlyPayments;
-
     const totalFinal = this.monthlyPayments.reduce((acc: any, p: { amount: any; }) => acc + (p.amount || 0), 0);
   }
 
@@ -398,19 +445,23 @@ export class SalesModalComponent {
     })
   }
 
-
   getCarByUserId() {
     this._CarsService.getCarByUserId(200, 1, this.saveForm.get('client_id')?.value).subscribe({
       next: async (response: any) => {
         if(response) {
-          this.cars = response.items.map((r: any) => ({
-            ...r.car,
-            amount_down_payment: r.amount_down_payment,
-            amount_layaway: r.amount_layaway,
-            amount_sale: r.amount_sale,
-            total: (r.incomes || []).reduce((acc: number, inc: any) => acc + (Number(inc.amount) || 0), 0),
-          }));
-
+          this.cars = response.items
+            .map((r: any) => ({
+              ...r.car,
+              amount_down_payment: r.amount_down_payment,
+              amount_layaway: r.amount_layaway,
+              amount_sale: r.amount_sale,
+              total: (r.incomes || []).reduce(
+                (acc: number, inc: any) => acc + (Number(inc.amount) || 0),
+                0
+              ),
+            }))
+            .filter((car: any) => car.status !== 'venta_realizada');
+          this.filteredCars = [...this.cars];
           this.saveForm.get('car_id')?.enable();
 
         }
@@ -427,9 +478,8 @@ export class SalesModalComponent {
       next: async (response: any) => {
         if(response) {
           this.cars = response.items;
-
+          this.filteredCars = [...this.cars];
           this.saveForm.get('car_id')?.enable();
-
         }
       },
       error: (err) => {
@@ -491,6 +541,7 @@ export class SalesModalComponent {
       );
       return;
     }
+    
 
     if(this.saveForm.value.guarantee_flag === true) {
       if(this.saveForm.value.guarantee_time === 0 || this.saveForm.value.guarantee_time === null || this.saveForm.value.guarantee_time === undefined) {
@@ -528,7 +579,6 @@ export class SalesModalComponent {
           break; 
         }
       }
-
     }
 
     const day =
@@ -569,8 +619,8 @@ export class SalesModalComponent {
       client_id: this.saveForm.value.client_id,
       date_delivery: dateTime,
       hour_delivery:  moment(time, 'HH:mm').hour(),
-      installment: this.monthlyPayments.length,
-      installment_data: monthlyPaymentsAux,
+      installments: this.monthlyPayments.length,
+      installments_data: monthlyPaymentsAux,
       contract: {
           car_sector: this.saveForm.value.car_sector,
           percentage_gasoline: this.saveForm.value.percentage_gasoline,
@@ -583,21 +633,48 @@ export class SalesModalComponent {
           payment_day: day
       },
       sales_type: this.saveForm.value.liquidate === true ? 'contado' : 'credito',
-      amount_sale: this.saveForm.get('sale_price')?.value,//this.saveForm.value.sale_price,
+      amount_sale: 
+        this.saveForm.value.sales_type === 'apartado' ? this.carsSelected.amount_sale 
+        : this.saveForm.value.liquidate == false ? this.saveForm.get('sale_price')?.value 
+        : this.saveForm.get('sale_price_contado')?.value,
       cash_prices: this.saveForm.get('sale_price_contado')?.value,
-      amount_down_payment: this.saveForm.value.liquidate === true ? this.saveForm.get('sale_price')?.value : this.saveForm.get('desired_advance')?.value,// si es de contado mando sale_price , si es apartado se mandan anticipo deseado
       guarantee: this.saveForm.get('guarantee_flag')?.value,
       guarantee_time: this.saveForm.get('guarantee_time')?.value
-    
     }
 
     this._SalesService.registerSale(saleData).subscribe({
       next: async (response) => {
         if(response) {
           let amount = this.saveForm.get('sale_price')?.value;
-          if (this.saveForm.value.sales_type == 'apartado') {
-            amount = this.saveForm.get('desired_advance')?.value - this.carsSelected.total
+          if (this.saveForm.value.sales_type === 'apartado') {
+            if (this.saveForm.get('liquidate')?.value === true) {
+              amount = this.carsSelected.amount_sale - this.carsSelected.amount_down_payment
+            } else {
+              amount =   this.saveForm.get('desired_advance')?.value - this.carsSelected.total
+              if (amount === 0) {
+                this.attachments[0].description = `Cliente: ${this.attachments[0].description}`
+                 if (this.maxFiles > 1) {
+                   this.attachments[1].description = `Aval 1: ${this.attachments[1].description}`
+                    this.attachments[2].description = `Aval 2: ${this.attachments[2].description}`
+                 }
+                for (const item of this.attachments) {
+                  await this.uploadSaleDouments(item);  
+                }
+                
+                this._ToastrService.success('Registro exitoso', 'Exito');
+                this.loading = false;
+                this.close(true);
+                return;
+              }
+            }
+          }else{
+            if (this.saveForm.get('liquidate')?.value === true) {
+              amount = this.saveForm.get('sale_price_contado')?.value
+            }else{
+              amount = this.saveForm.get('desired_advance')?.value
+            }
           }
+
           let dataIncome: any = {
             user_id: this._AuthService.user()?.user_id,
             sale_id: response.id,
@@ -615,7 +692,6 @@ export class SalesModalComponent {
           this._IncomeService.registerIncome(dataIncome).subscribe({
             next: async (response) => {
               if(response) {
-      
                 this.attachments[0].description = `Cliente: ${this.attachments[0].description}`
                  if (this.maxFiles > 1) {
                    this.attachments[1].description = `Aval 1: ${this.attachments[1].description}`
@@ -624,8 +700,6 @@ export class SalesModalComponent {
                 for (const item of this.attachments) {
                   await this.uploadSaleDouments(item);  
                 }
-                
-
                 this._ToastrService.success('Registro exitoso', 'Exito');
                 this.loading = false;
                 this.close(true);
@@ -658,7 +732,7 @@ export class SalesModalComponent {
         formData.append('file', dataFile.file);
 
         const token = this._AuthService.tokenValue;
-        const response = await fetch(`https://automotriz-api.naatteam.com/document/`, {
+        const response = await fetch(`${environment.apiUrl}/document/`, {
           method: this.data.row == null ? 'POST' : 'PATCH',
           headers: {
             Authorization: `Bearer ${token}`,

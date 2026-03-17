@@ -41,4 +41,14 @@ export class SalesService {
       catchError(this.error.handleError)
     );
   }
+
+  public getSalesClient(pageSize?: number, currentPage?: number, id?: string): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.get<any>(`${environment.apiUrl}/sale/client/${id}?column=sales_type&value=credito&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
 }

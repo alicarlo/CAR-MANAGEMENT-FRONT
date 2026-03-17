@@ -1,0 +1,93 @@
+<mat-dialog-content>
+  <div class="p-[20px]" *ngIf="loadingModal">
+    <div  class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Historial</p>
+      <label class="text-foreground text-[12px] font-medium">Información del Auto:</label>
+      <div class="border border-border/60 rounded-lg bg-card p-2 flex flex-wrap gap-2">
+          <p class="text-foreground text-[11px]"><strong>Clave:</strong> {{ data.row.key }}</p>
+          <p class="text-foreground text-[11px]"><strong>Modelo:</strong> {{ data.row.model }}</p>
+          <p class="text-foreground text-[11px]"><strong>Marca:</strong> {{ data.row.make }}</p>
+          <p class="text-foreground text-[11px]"><strong>Linea:</strong> {{ data.row.version }}</p>
+          <p class="text-foreground text-[11px]"><strong>Color:</strong> {{ data.row.color }}</p>
+      </div>
+
+      <label class="text-foreground text-[12px] font-medium">Totales:</label>
+      <div class="border border-border/60 rounded-lg bg-card p-2 flex flex-wrap gap-2">
+          <p class="text-foreground text-[11px]"><strong>% de modificación:</strong> {{ globalStats.percent }}%</p>
+          <p class="text-foreground text-[11px]"><strong>Precio anterior:</strong> ${{ globalStats.before }}</p>
+          <p class="text-foreground text-[11px]"><strong>Precio nuevo:</strong> ${{ globalStats.newPrice }}</p>
+      </div>
+
+      <div
+        class="border border-border/60 rounded-lg bg-card 
+              max-h-[310px] overflow-y-auto overflow-x-auto"
+      >
+        <table class="w-full table-fixed">
+          <thead>
+            <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
+              <th class="px-3 py-2 text-left">Usuario</th>
+              <th class="px-3 py-2 text-left">% de modificación</th>
+              <th class="px-3 py-2 text-left">Precio anterior</th>
+              <th class="px-3 py-2 text-left">Precio nuevo</th>
+              <th class="px-3 py-2 text-left">Fecha de modificación</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/40" *ngIf="!history">
+            <div class="text-foreground text-[12px] leading-tight"></div>
+          </tbody>
+          <tbody class="divide-y divide-border/40" *ngIf="!!history">
+
+            <tr
+              *ngFor="let item of history"
+              class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition"
+            >
+              <td class="px-3 py-2 align-center">
+                <div class="min-w-0 whitespace-normal break-words [hyphens:auto] text-left">
+                  {{ item.user.full_name }}
+                </div>
+              </td>
+
+              
+               <td class="px-3 py-2 align-middle">
+                <div class="min-w-0 whitespace-normal break-words [hyphens:auto] text-left">
+                  {{ item.percentageChange }}%
+                </div>
+              </td>
+
+              <td class="px-3 py-2 align-middle text-left">
+                {{ item.change.before_price | currency:'MXN':'symbol':'1.2-2':'en-US' }}
+              </td>
+
+               <td class="px-3 py-2 align-middle">
+                <div class="min-w-0 whitespace-normal break-words [hyphens:auto] text-left">
+                  {{ item.change.new_price | currency:'MXN':'symbol':'1.2-2':'en-US' }}
+                </div>
+              </td>
+
+              <td class="px-3 py-2 align-middle">
+                <div class="min-w-0 whitespace-normal break-words [hyphens:auto] text-left">
+                  {{ item.created_at | date:'dd/MM/yyyy' }}
+                </div>
+              </td>
+
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="text-foreground text-[15px]  w-full flex justify-center items-center" *ngIf="history.length === 0">
+        No hay cambios
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loadingModal" class="h-full flex justify-center items-center">
+    <app-loading></app-loading>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <div class="flex gap-2 p-[20px]">
+    <app-button  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
+  </div>
+</mat-dialog-actions>

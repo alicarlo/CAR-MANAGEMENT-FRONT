@@ -1,15 +1,15 @@
 <mat-dialog-content>
   <div class="p-[20px]">
     <div  class="flex flex-col gap-4">
-      <p class="text-foreground font-semibold">Gastos2</p>
+      <p class="text-foreground font-semibold">Gastos</p>
 
       <div class="w-full space-y-2">
-        <p class="text-foreground text-[11px] font-medium">
+        <p *ngIf="data.row === null" class="text-foreground text-[11px] font-medium">
           Elige una opcion:
         </p>
 
         <form [formGroup]="saveForm" class="flex flex-col gap-6 w-full">
-          <div class="flex flex-wrap gap-4">
+          <div *ngIf="data.row === null" class="flex flex-wrap gap-4">
             <label class="flex items-center gap-2 cursor-pointer text-foreground text-[11px]">
               <input
                 type="radio"
@@ -30,7 +30,7 @@
               <span>Agregar gasto Oficinas</span>
             </label>
           </div>
-          <div class="error-messages">
+          <div  class="error-messages">
             <ng-container *ngFor="let error of error_messages.option">
               <div class="error-message" *ngIf="saveForm.get('option').hasError(error.type) && (saveForm.get('option').dirty || saveForm.get('option').touched)">
                 {{error.message}}
@@ -66,6 +66,7 @@
             </div>
 
           <div class="flex flex-col gap-2" *ngIf="saveForm.get('option').value === 'auto' ">
+            <!--
             <label for="sexo" class="text-foreground text-[11px] font-medium">Auto:</label>
             <div class="relative">
               <select 
@@ -82,6 +83,64 @@
                   {{ s.key}} -  {{ s.make }} {{ s.version}} {{ s.model }} {{ s.color }}
                 </option>
               </select>
+            </div>
+            -->
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Auto:</label>
+              <div class="relative">
+                <button
+                  type="button"
+                  class="w-full py-2 pl-8 pr-10 rounded-md bg-background text-foreground
+                        border border-border text-left
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        flex items-center justify-between"
+                  (click)="toggleCarsDropdown()"
+                >
+                  <span class="truncate text-[13px]">
+                    {{ selectedCarLabel || 'Selecciona…' }}
+                  </span>
+                  <span class="absolute right-3 text-xs opacity-70">▼</span>
+                </button>
+
+                <div
+                  *ngIf="carsDropdownOpen"
+                  class="absolute z-30 mt-1 w-full rounded-md bg-background border border-border shadow-lg"
+                >
+                  <div class="p-2 border-b border-border">
+                    <input
+                      type="text"
+                      placeholder="Filtrar autos…"
+                      class="w-full py-1.5 px-3 rounded-md
+                            bg-background text-foreground
+                            border border-border text-[11px]
+                            focus:outline-none focus:ring-1 focus:ring-primary/50
+                            box-border"
+                      [formControl]="carFilterControl"
+                      (keydown.escape)="closeCarsDropdown()"
+                    />
+                  </div>
+
+                  <div class="max-h-60 overflow-y-auto">
+                    <button
+                      type="button"
+                      class="w-full text-left px-3 py-2 text-[13px] text-foreground
+                            hover:bg-card flex items-center gap-2"
+                      *ngFor="let s of filteredCars"
+                      (click)="selectCar(s)"
+                    >
+                      {{ s.key}} -  {{ s.make }} {{ s.version}} {{ s.model }} {{ s.color }}
+                    </button>
+
+                    <div
+                      *ngIf="filteredCars.length === 0"
+                      class="px-3 py-2 text-[11px] text-muted-foreground"
+                    >
+                      Sin resultados
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -113,7 +172,7 @@
             </div>
           </div>
 
-          <div class="flex flex-col gap-2">
+          <div *ngIf="data.row === null" class="flex flex-col gap-2">
             <label for="sexo" class="text-foreground text-[11px] font-medium">Tipo de Pago:</label>
             <div class="relative">
               <select 
@@ -145,7 +204,16 @@
             <p class="text-foreground text-[11px] font-medium">Monto:</p>
             <input
               class="py-2 pl-8 pr-2"
+              [class.cursor-not-allowed]="saveForm.get('amount')?.disabled"
+              [disabled]="saveForm.get('amount')?.disabled"
+              [class.cursor-not-allowed]="saveForm.get('amount')?.disabled"
+              [class.cursor-not-allowed]="saveForm.get('amount')?.disabled"
+              [class.opacity-90]="saveForm.get('amount')?.disabled"
+              [class.bg-muted]="saveForm.get('amount')?.disabled"
+              [class.text-muted-foreground]="saveForm.get('amount')?.disabled"
+              [class.border-muted]="saveForm.get('amount')?.disabled"
               placeholder="Monto"
+              min="1"
               type="number"
               formControlName="amount" 
             />
@@ -172,7 +240,7 @@
           </div>
 
 
-          <div class="flex flex-col gap-2">
+          <div  class="flex flex-col gap-2" *ngIf="data.row === null">
             <label class="text-foreground text-[11px] font-medium">Archivo adjunto:</label>
 
               <label

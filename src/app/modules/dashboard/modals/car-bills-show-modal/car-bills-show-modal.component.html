@@ -3,14 +3,42 @@
     <div class="flex flex-col gap-4">
       <p class="text-foreground font-semibold">Gastos</p>
       <div class="mx-[25px]">
-        <label for="sexo" class="text-foreground text-[12px] font-medium">Información del Auto:</label>
-        <div class="border border-border/60 rounded-lg bg-card p-2 flex gap-2">
-          <p class="text-foreground text-[11px]"><strong>Clave:</strong> {{ data.row.key }}</p>
-          <p class="text-foreground text-[11px]"><strong>Modelo:</strong> {{ data.row.model }}</p>
-          <p class="text-foreground text-[11px]"><strong>Marca:</strong> {{ data.row.make }}</p>
-          <p class="text-foreground text-[11px]"><strong>Linea:</strong> {{ data.row.version }}</p>
-          <p class="text-foreground text-[11px]"><strong>Color:</strong> {{ data.row.color }}</p>
+        <label class="text-foreground text-[12px] font-medium">
+          Información del Auto:
+        </label>
+
+        <div class="border border-border/60 rounded-lg bg-card p-2 flex flex-wrap gap-2">
+
+          <p class="text-foreground text-[11px]">
+            <strong>Clave:</strong> {{ data.row.key }}
+          </p>
+
+          <p class="text-foreground text-[11px]">
+            <strong>Modelo:</strong> {{ data.row.model }}
+          </p>
+
+          <p class="text-foreground text-[11px]">
+            <strong>Marca:</strong> {{ data.row.make }}
+          </p>
+
+          <p class="text-foreground text-[11px]">
+            <strong>Línea:</strong> {{ data.row.version }}
+          </p>
+
+          <p class="text-foreground text-[11px]">
+            <strong>Color:</strong> {{ data.row.color }}
+          </p>
+
+          <p *ngIf="data.row.cost" class="text-foreground text-[11px]">
+            <strong>Costo:</strong> ${{ data.row.cost }}
+          </p>
+
         </div>
+      </div>
+
+      
+      <div *ngIf="totalBills > 0" class="ml-[25px]">
+        <p class="text-foreground font-semibold text-[12px]">Total de gastos:{{ totalBills | currency }}</p>
       </div>
       
       <div
@@ -29,7 +57,10 @@
             <thead>
               <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
                 <th class="px-3 py-2 text-left whitespace-nowrap">Fecha</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Clasificacion de gasto</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Concepto</th>
+                <!--<th class="px-3 py-2 text-left whitespace-nowrap">Tipo de gasto</th>-->
+                
                 <th class="px-3 py-2 text-left whitespace-nowrap">Total</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Estatus</th>
   
@@ -46,8 +77,16 @@
                 </td>
 
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.classification_bill.name }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
                   {{ item.name }}
                 </td>
+
+                
+                
+
 
                 <td class="px-3 py-2 align-middle text-left">
                   {{ item.total | currency:'MXN':'symbol':'1.2-2':'en-US' }}

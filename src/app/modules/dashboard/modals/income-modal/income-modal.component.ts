@@ -12,6 +12,7 @@ import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { TypePaymentsService } from 'src/app/core/services/typePayments/type-payments.service';
 import { IncomeService } from 'src/app/core/services/income/income.service';
 import moment from 'moment';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-income-modal',
@@ -144,9 +145,6 @@ export class IncomeModalComponent {
 
     const methodSelect: MethodKey =
       this.data.flag !== 0 ? 'registerIncome' : 'updateIncome';
-
-      console.log(methodSelect)
-      
     
       let documentId = '';
       if (this.saveForm.value.file !== null) {
@@ -159,7 +157,7 @@ export class IncomeModalComponent {
           formData.append('file', this.saveForm.value.file);
 
           const token = this._AuthService.tokenValue;
-          const response = await fetch(`https://automotriz-api.naatteam.com/document/`, {
+          const response = await fetch(`${environment.apiUrl}/document/`, {
             method: 'POST',
             headers: {
               Authorization: `Bearer ${token}`,

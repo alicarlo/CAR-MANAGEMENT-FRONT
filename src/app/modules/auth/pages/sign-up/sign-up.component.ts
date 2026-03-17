@@ -19,12 +19,18 @@ export class SignUpComponent implements OnInit {
   error_messages = {
 		'full_name':[
 				{type: 'required', message: 'Nombre completo es requerido'},
+        {type: 'minlength', message: 'Minimo 3 caracteres'},
+        {type: 'maxlength', message: 'Maximo 60 caracteres'},
 		],
 		'email':[
 			{type: 'required', message: 'Correo es requerido'},
+      {type: 'email', message: 'Correo no valido'},
+      {type: 'minlength', message: 'Minimo 3 caracteres'},
+      {type: 'maxlength', message: 'Maximo 60 caracteres'},
 		],
 		'password':[
 			{type: 'required', message: 'Contrasena es requerido'},
+      {type: 'minlength', message: 'Minimo 3 caracteres'},
 		]
 	}
   loading: boolean = false;
@@ -42,7 +48,7 @@ export class SignUpComponent implements OnInit {
   initForm() {
     this.saveForm = this._FormBuilder.group({
       full_name:  new FormControl ('',Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
-			email:  new FormControl ('',Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(20)])),
+			email:  new FormControl ('',Validators.compose([Validators.required,Validators.email, Validators.minLength(3),Validators.maxLength(60)])),
       password:  new FormControl ('',Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(20)])),
       address_street_1:  new FormControl (''),
       address_street_2: new FormControl (''),

@@ -21,6 +21,7 @@ import { BillsComponent } from './pages/bills/bills.component';
 import { LayawayComponent } from './pages/layaway/layaway.component';
 import { SalesComponent } from './pages/sales/sales.component';
 import { IncomesComponent } from './pages/incomes/incomes.component';
+import { CollectionsComponent } from './pages/collections/collections.component';
 
 
 const routes: Routes = [
@@ -48,6 +49,7 @@ const routes: Routes = [
       { path: 'layaway', component:  LayawayComponent },
       { path: 'sales', component: SalesComponent },
       { path: 'incomes', component:  IncomesComponent },
+      { path: 'collections', component: CollectionsComponent },
       { path: '**', redirectTo: 'errors/404' },
     ],
   },

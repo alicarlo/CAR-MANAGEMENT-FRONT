@@ -26,6 +26,7 @@ import { TicketPrintModalComponent } from '../ticket-print-modal/ticket-print-mo
 export class LayawayShowModalComponent {
   loadingModal: boolean = false;
   income: any[] = [];
+  totalLayaway: number = 0;
   constructor(
     private dialog: MatDialog,                                 
     @Optional() public dialogRef: MatDialogRef<LayawayShowModalComponent> | null, 
@@ -36,7 +37,8 @@ export class LayawayShowModalComponent {
     private _MatDialog: MatDialog,
     private _LaywayService: LaywayService,
     private _IncomeService: IncomeService
-  ) { }
+  ) { 
+  }
 
   ngOnInit(): void {
     this.getIncomes();
@@ -58,6 +60,7 @@ export class LayawayShowModalComponent {
               dateIncome: r.date_income
             })
           );
+          this.totalLayaway = response.items.reduce((sum: any, item: any) => sum + item.amount, 0);
           this.loadingModal = true;
         }
       },

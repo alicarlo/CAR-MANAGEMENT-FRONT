@@ -149,6 +149,7 @@
                 class="py-2 pl-8 pr-2"
                 placeholder="Cilindros"
                 type="number"
+                min="1"
                 formControlName="cylinders" 
               />
             </div>
@@ -189,6 +190,28 @@
                   </div>
                 </ng-container>
               </div>
+            </div>
+
+             <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Costo:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Costo"
+                formControlName="cost" 
+                type="text"
+                inputmode="numeric" 
+                mask="separator"
+                thousandSeparator=","   
+                [dropSpecialCharacters]="true"
+                [class.cursor-not-allowed]="saveForm.get('cost')?.disabled"
+                [disabled]="saveForm.get('cost')?.disabled"
+                [class.cursor-not-allowed]="saveForm.get('cost')?.disabled"
+                [class.cursor-not-allowed]="saveForm.get('cost')?.disabled"
+                [class.opacity-90]="saveForm.get('cost')?.disabled"
+                [class.bg-muted]="saveForm.get('cost')?.disabled"
+                [class.text-muted-foreground]="saveForm.get('cost')?.disabled"
+                [class.border-muted]="saveForm.get('cost')?.disabled"
+              />
             </div>
 
             <div class="flex flex-col gap-2">

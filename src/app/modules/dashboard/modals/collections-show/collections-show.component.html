@@ -1,7 +1,7 @@
 <mat-dialog-content>
   <div class="p-[20px]" *ngIf="loadingModal">
     <div  class="flex flex-col gap-4">
-      <p class="text-foreground font-semibold">Abonos</p>
+      <p class="text-foreground font-semibold">Cobranza</p>
        <label class="text-foreground text-[12px] font-medium">Información del Auto:</label>
       <div class="border border-border/60 rounded-lg bg-card p-2 flex flex-wrap gap-2">
           <p class="text-foreground text-[11px]"><strong>Clave:</strong> {{ data.row.car.key }}</p>
@@ -12,8 +12,8 @@
       </div>
 
 
-      <div *ngIf="totalLayaway > 0" >
-        <p class="text-foreground font-semibold text-[12px]">Total de abonos:{{ totalLayaway | currency }}</p>
+      <div *ngIf="data.row.installmentsSize > 0" >
+        <p class="text-foreground font-semibold text-[12px]">Total de parcialidades:{{ totalInstallmentsAmount | currency }}</p>
       </div>
       <div
         class="border border-border/60 rounded-lg bg-card 
@@ -22,34 +22,24 @@
         <table class="w-full table-fixed">
           <thead>
             <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
-              <th class="px-3 py-2 text-left"># Abono</th>
-              <th class="px-3 py-2 text-left">Fecha de Abono</th>
-              <th class="px-3 py-2 text-left">Importe Abono</th>
-              <th class="px-3 py-2 text-left">Cliente</th>
-              <th class="px-3 py-2 text-left">Auto</th>
-              <th class="px-3 py-2 text-left">Vendedor</th>
+              <th class="px-3 py-2 text-left"># De pago</th>
+              <th class="px-3 py-2 text-left">Monto pendiente</th>
+              <th class="px-3 py-2 text-left">Fecha de pago</th>
               <th class="px-3 py-2 text-left">Acciones</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-border/40" *ngIf="!income">
+          <tbody class="divide-y divide-border/40" *ngIf="data.row.installmentsSize === 0">
             <div class="text-foreground text-[12px] leading-tight"></div>
           </tbody>
-          <tbody class="divide-y divide-border/40" *ngIf="!!income">
+          <tbody class="divide-y divide-border/40" *ngIf="data.row.installmentsSize > 0">
 
             <tr
-              *ngFor="let item of income"
+              *ngFor="let item of data.row.installments_data; let i = index"
               class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition"
             >
               <td class="px-3 py-2 align-center">
                 <div class="min-w-0 whitespace-normal break-words [hyphens:auto] text-left">
-                  {{ item.idIncome }}
-                </div>
-              </td>
-
-              
-               <td class="px-3 py-2 align-middle">
-                <div class="min-w-0 whitespace-normal break-words [hyphens:auto] text-left">
-                  {{ item.dateIncome | date:'dd/MM/yyyy' }}
+                  {{ i+1 }}
                 </div>
               </td>
 
@@ -57,64 +47,40 @@
                 {{ item.amount | currency:'MXN':'symbol':'1.2-2':'en-US' }}
               </td>
 
-               <td class="px-3 py-2 align-middle">
-                <div class="min-w-0 whitespace-normal break-words [hyphens:auto] text-left">
-                  {{ item.client }}
-                </div>
-              </td>
-
+              
               <td class="px-3 py-2 align-middle">
                 <div class="min-w-0 whitespace-normal break-words [hyphens:auto] text-left">
-                  {{ item.car }}
-                </div>
-              </td>
-
-               <td class="px-3 py-2 align-middle">
-                <div class="min-w-0 whitespace-normal break-words [hyphens:auto] text-left">
-                  {{ item.seller }}
+                  {{ item.paid_at | date:'dd/MM/yyyy' }}
                 </div>
               </td>
 
               <td class="px-2 py-1 align-middle">
                 <div class="flex items-center justify-start gap-1">
                   <button 
-                    (click)="openTicketModal(item)"
+           
                     mat-icon-button aria-label="Descargar"
-                    matTooltip="Descargar Ticket"
+                    matTooltip="Registrar Pago"
                     matTooltipPosition="above"
                     matTooltipClass="bg-background text-foreground"        
                   >
-                    <mat-icon class="!text-foreground/80 text-[18px] leading-none">confirmation_number</mat-icon>
+                    <mat-icon class="!text-foreground/80 text-[18px] leading-none">save</mat-icon>
                   </button>
     
                   <button mat-icon-button aria-label="Editar" 
-                    (click)="openAddModal('edit', item)"
-                    matTooltip="Editar Abono"
+                 
+                    matTooltip="Dar prorroga"
                     matTooltipPosition="above"
                     matTooltipClass="bg-background text-foreground" 
                   >
                     <mat-icon class="!text-foreground/80 text-[18px] leading-none">edit</mat-icon>
                   </button>
                   <button mat-icon-button color="warn" aria-label="Eliminar"
-                    (click)="actionModal('edit', item, 'Desea  elimnar el registro?')"
-                    matTooltip="Eliminar Abono"
+                 
+                    matTooltip="Abonar"
                     matTooltipPosition="above"
                     matTooltipClass="bg-background text-foreground" 
                           >
-                    <mat-icon class="!text-foreground/80 text-[18px] leading-none">delete</mat-icon>
-                  </button>
-
-
-                  <button 
-                    *ngIf="item.document && objectKeys(item.document).length > 0"
-                     mat-icon-button 
-                    aria-label="Descargar"
-                    matTooltip="Descargar Archivo"
-                    matTooltipPosition="above"
-                    matTooltipClass="bg-background text-foreground"        
-                    (click)="actionModalFile(1,'delete', item, 'Desea descargar el archivo?')"
-                  >
-                    <mat-icon class="!text-foreground/80 text-[18px] leading-none">attach_file</mat-icon>
+                    <mat-icon class="!text-foreground/80 text-[18px] leading-none">attach_money</mat-icon>
                   </button>
                 </div>
               </td>
@@ -124,8 +90,8 @@
         </table>
       </div>
 
-      <div class="text-foreground text-[15px]  w-full flex justify-center items-center" *ngIf="income.length === 0">
-        No hay abonos
+      <div class="text-foreground text-[15px]  w-full flex justify-center items-center" *ngIf="data.row.installmentsSize === 0">
+        No hay datos
       </div>
     </div>
   </div>

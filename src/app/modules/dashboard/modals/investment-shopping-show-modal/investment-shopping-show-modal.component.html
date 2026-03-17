@@ -7,6 +7,7 @@
         <label for="sexo" class="text-foreground text-[12px] font-medium">Información del Inversionista:</label>
         <div class="border border-border/60 rounded-lg bg-card p-2 flex gap-2">
           <p class="text-foreground text-[11px]"><strong>Nombre:</strong> {{ data.row.full_name }}</p>
+          <p *ngIf="totalCars" class="text-foreground text-[11px]"><strong>Total gastos:</strong> {{ totalCars | currency }}</p>
         </div>
       </div>
       
@@ -23,6 +24,8 @@
                 <th class="px-3 py-2 text-left whitespace-nowrap">Clave</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Auto</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Nombre del gasto</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Clasificacion de gasto</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Tipo de gasto</th>
                 <th class="px-3 py-2 text-left whitespace-nowrap">Total</th>
 
               </tr>
@@ -51,9 +54,18 @@
                   {{ item.name }}
                 </td>
 
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.classification_bill.name }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.classification_bill.bill_type.name }}
+                </td>
+
                  <td class="px-3 py-2 align-middle whitespace-nowrap">
                   {{ item.total | currency:'MXN':'symbol':'1.2-2':'en-US' }}
                 </td>
+
               </tr>
             </tbody>
           </table>

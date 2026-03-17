@@ -16,6 +16,7 @@ import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { TypePaymentsService } from 'src/app/core/services/typePayments/type-payments.service';
 import { LaywayService } from 'src/app/core/services/layway/layway.service';
 import { IncomeService } from 'src/app/core/services/income/income.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-layaway-modal',
@@ -73,6 +74,11 @@ selectedFile: File | null = null;
 previewUrl: string | null = null;
 fileIcon: string = 'insert_drive_file';
 fileExt: string = '';
+
+  carFilterControl = new FormControl('');
+  filteredCars: any[] = [];
+  carsDropdownOpen = false;
+  selectedCarLabel = '';
 constructor(
   private _FormBuilder: FormBuilder,                                               
   private dialog: MatDialog,                                 
@@ -91,6 +97,14 @@ constructor(
 
  ngOnInit(): void {
     this.init();
+    this.carFilterControl.valueChanges.subscribe(term => {
+        const value = (term || '').toString().toLowerCase().trim();
+
+        this.filteredCars = this.cars.filter(car => {
+          const text = `${car.key} ${car.make} ${car.model} ${car.plate || ''}`.toLowerCase();
+          return text.includes(value);
+        });
+      });
    this.getClients();
    this.getCars();
    this.getTypePayments();
@@ -119,6 +133,24 @@ constructor(
       let find = this.cars.find(x => String(x.id) === String(value));
       this.saveForm.get('sale_price')?.setValue(find.sale_price);
     });
+  }
+
+  toggleCarsDropdown() {
+    this.carsDropdownOpen = !this.carsDropdownOpen;
+    if (this.carsDropdownOpen) {
+      this.carFilterControl.setValue('');
+      this.filteredCars = [...this.cars];
+    }
+  }
+
+  closeCarsDropdown() {
+    this.carsDropdownOpen = false;
+  }
+
+  selectCar(car: any) {
+    this.selectedCarLabel = `${car.make} - ${car.model}`;
+    this.saveForm.patchValue({ car_id: car.id });
+    this.closeCarsDropdown();
   }
 
   openPicker(input: HTMLInputElement) {
@@ -165,6 +197,7 @@ constructor(
       next: async (response: any) => {
         if(response) {
           this.cars = response.items.map((r: any) => ({ ...r }));
+          this.filteredCars = [...this.cars];
         }
       },
       error: (err) => {
@@ -227,7 +260,7 @@ constructor(
               formData.append('descriptions', 'Abono de apartado');
               formData.append('file', this.saveForm.value.file);
               const token = this._AuthService.tokenValue;
-              const response = await fetch(`https://automotriz-api.naatteam.com/document/`, {
+              const response = await fetch(`${environment.apiUrl}/document/`, {
                 method: 'POST',// this.data.flag ===  1 ? 'POST' : 'PATCH',
                 headers: {
                   Authorization: `Bearer ${token}`,

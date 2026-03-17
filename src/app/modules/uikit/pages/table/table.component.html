@@ -19,12 +19,24 @@
 </div>
 
 <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
-  <app-table-action ></app-table-action>
+  <app-table-action 
+    [labelName]="labelName" 
+    [select]="select"
+    [selectValueDefault]="_selectValueDefault"
+    [selectData]="_selectData"
+    [selectValue]="selectValue"
+    [selectId]="selectId"
+    [selectPlaceholder]="selectPlaceholder"
+    [searchable]="searchable"
+    [size]="size"
+    (selectOption)=selectOption($event) 
+  ></app-table-action>
   <div
     *ngIf="loading === true && error === false"
     class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted grow overflow-x-auto px-5">
     <table
-      class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
+      class="text-muted-foreground table table-auto w-max border-collapse text-left align-middle leading-5"
+      ><!--class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5"-->
       <thead class="border-muted/20 text-muted-foreground border text-xs">
         <tr app-table-header [columns]="headers"  (onCheck)="toggleUsers($event)"></tr>
       </thead>
@@ -49,8 +61,16 @@
   </div>
 
   <div *ngIf="loading === false" class="w-full h-[315px] flex items-center justify-center">
+    <app-loading *ngIf="select === false"></app-loading>
+    <div *ngIf="select === true">
+      <div *ngIf="!selectOptionFilter">
+         <p class="text-foreground">Seleccione un filtro</p>
+      </div>
 
-    <app-loading></app-loading>
+      <div *ngIf="!!selectOptionFilter">
+         <app-loading ></app-loading>
+      </div>
+    </div>
      
   </div>
 

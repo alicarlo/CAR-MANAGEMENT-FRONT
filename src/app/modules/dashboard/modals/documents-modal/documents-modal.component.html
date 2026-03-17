@@ -33,10 +33,13 @@
             </div>
 
             <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Autos:</label>
               <div class="relative">
                 <button
                   type="button"
-                  class="w-full py-2 pl-8 pr-10 rounded-md bg-background text-foreground
+                  class="  
+                       !h-[32px]
+                        w-full py-2 pl-8 pr-10 rounded-md bg-background text-foreground
                         border border-border text-left
                         focus:outline-none focus:ring-2 focus:ring-primary/50
                         flex items-center justify-between"
@@ -56,7 +59,8 @@
                     <input
                       type="text"
                       placeholder="Filtrar autos…"
-                      class="w-full py-1.5 px-3 rounded-md
+                      class="
+                            w-full py-1.5 px-3 rounded-md
                             bg-background text-foreground
                             border border-border text-[11px]
                             focus:outline-none focus:ring-1 focus:ring-primary/50
@@ -69,7 +73,7 @@
                   <div class="max-h-60 overflow-y-auto">
                     <button
                       type="button"
-                      class="w-full text-left px-3 py-2 text-[13px] text-white
+                      class="w-full text-left px-3 py-2 text-[13px] text-foreground
                             hover:bg-card flex items-center gap-2"
                       *ngFor="let s of filteredCars"
                       (click)="selectCar(s)"

@@ -68,6 +68,20 @@ export class CarsService {
     );
   }
 
+   public getCarsWithOutFilter(filter: string = '', pageSize?: number, currentPage?: number, active: string = 'active'): Observable<Cars> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+
+    let value =  `&value=${active}`;
+    let column = filter.length ? 'all' : 'status';
+    let filterSearch = filter.length ? filter : active;
+    return this.http.get<Cars>(`${environment.apiUrl}/car/?page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
   public getCarsBill(filter: string = '', pageSize?: number, currentPage?: number, active: string = 'active'): Observable<Cars> {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),

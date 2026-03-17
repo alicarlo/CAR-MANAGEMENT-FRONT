@@ -1,7 +1,7 @@
 <mat-dialog-content>
   <div class="p-[20px]">
     <div  class="flex flex-col gap-4">
-      <p class="text-foreground font-semibold">Pagos2</p>
+      <p class="text-foreground font-semibold">Pagos</p>
 
       <label for="sexo" class="text-foreground text-[12px] font-medium">Información del Auto:</label>
       <div class="border border-border/60 rounded-lg bg-card p-2 flex gap-2">
@@ -142,6 +142,7 @@
                 class="py-2 pl-8 pr-2"
                 placeholder="Monto"
                 type="number"
+                min="1"
                 formControlName="amount" 
               />
               <div class="error-messages">

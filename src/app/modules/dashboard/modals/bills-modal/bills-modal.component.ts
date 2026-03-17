@@ -13,6 +13,8 @@ import { UsersService } from 'src/app/core/services/users/users.service';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { TypePaymentsService } from 'src/app/core/services/typePayments/type-payments.service';
 import { ShopingService } from 'src/app/core/services/shoping/shoping.service';
+import { environment } from 'src/environments/environment';
+import moment from 'moment';
 
 
 @Component({
@@ -55,6 +57,11 @@ export class BillsModalComponent {
   previewUrl: string | null = null;
   fileIcon: string = 'insert_drive_file';
   fileExt: string = '';
+
+  filteredCars: any[] = [];
+  carsDropdownOpen = false;
+  carFilterControl = new FormControl('');
+  selectedCarLabel = '';
   constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 
@@ -74,6 +81,14 @@ export class BillsModalComponent {
 
   ngOnInit(): void {
     this.init();
+    this.carFilterControl.valueChanges.subscribe(term => {
+        const value = (term || '').toString().toLowerCase().trim();
+
+        this.filteredCars = this.cars.filter(car => {
+          const text = `${car.key} ${car.make} ${car.model} ${car.plate || ''}`.toLowerCase();
+          return text.includes(value);
+        });
+      });
     this.getClassification();
     this.getCars();
     this.getUsers();
@@ -90,26 +105,61 @@ export class BillsModalComponent {
 
   init() {
     this.saveForm = this._FormBuilder.group({
-      option: new FormControl (null,Validators.compose([Validators.required])),
-      classification_bill_id: new FormControl ('',Validators.compose([Validators.required])),
-      car_id: new FormControl (''),
-      name: new FormControl (''),
+      option: new FormControl (null,this.data?.row !== null ? [] : [Validators.required]),
+      classification_bill_id: new FormControl (this.data.row === null ? '' : this.data.row.classification_bill_id,Validators.compose([Validators.required])),
+      // car_id: new FormControl (this.data.row === null ? '' : this.data.row.cars.length === 0 ? '' : this.data.row.cars[0].id ),
+      car_id: new FormControl (''), 
+      name: new FormControl (this.data.row === null ? '' : this.data.row.name),
       user_created: new FormControl (this._AuthService.user()?.user_id),
-      payment_method_id: new FormControl ('', Validators.compose([Validators.required])),
-      amount: new FormControl ('', Validators.compose([Validators.required])),
+      payment_method_id: new FormControl ('', this.data?.row !== null ? [] : [Validators.required]),
+      amount: new FormControl(
+        {
+          value: this.data?.row === null ? '' : this.data.row.total,
+          disabled: this.data?.row !== null
+        },
+        Validators.compose([Validators.required])
+      ),
       file: new FormControl (null),
-      document_type_id: new FormControl (1,Validators.compose([Validators.required])),
-      id: new FormControl (''),
-      bill_date: new FormControl ('',Validators.compose([Validators.required])),
+      document_type_id: new FormControl (this.data.row === null ? 1 : '',this.data?.row !== null ? [] : [Validators.required]),
+      id: new FormControl (this.data.row === null ? '' : this.data.row.id),
+      bill_date: new FormControl (this.data.row === null ? '' : moment.utc(this.data.row.bill_date).format('YYYY-MM-DD'), Validators.compose([Validators.required])),
   	});
+
+    if (this.data.row !== null) {
+      // this.carFilterControl.setValue(this.data.row.cars[0].id);
+      if (this.data.row.cars.length !== 0) {
+        //this.selectedCarLabel = `${this.data.row.cars[0].make} - ${this.data.row.cars[0].model}`;
+        // this.saveForm.patchValue({ car_id: this.data.row.cars[0].id});  
+      }
+      
+    }
   }
 
+  toggleCarsDropdown() {
+    this.carsDropdownOpen = !this.carsDropdownOpen;
+    if (this.carsDropdownOpen) {
+      this.carFilterControl.setValue('');
+      this.filteredCars = [...this.cars];
+    }
+  }
+
+  closeCarsDropdown() {
+    this.carsDropdownOpen = false;
+  }
+
+  selectCar(car: any) {
+    this.selectedCarLabel = `${car.make} - ${car.model}`;
+    this.saveForm.patchValue({ car_id: car.id });
+    this.closeCarsDropdown();
+  }
 
   getClassification() {
     this._ExpenseClasificationService.getExpenseClasification(500, 1).subscribe({
       next: async (response: any) => {
         if(response) {
-          this.classification = response.items.map((r: any) => ({ ...r }));
+          this.classification = response.items
+            .map((r: any) => ({ ...r }))
+            .sort((a: any, b: any) => a.name.localeCompare(b.name));
         }
       },
       error: (err) => {
@@ -125,6 +175,7 @@ export class BillsModalComponent {
       next: async (response: any) => {
         if(response) {
           this.cars = response.items.map((r: any) => ({ ...r }));
+          this.filteredCars = [...this.cars];
         }
       },
       error: (err) => {
@@ -171,36 +222,39 @@ export class BillsModalComponent {
     }
     this.loading = true;
     let documentId = '';
-    if (this.saveForm.value.file !== null) {
-      
-      try {
-        const formData = new FormData();
-        formData.append('document_type_id', this.saveForm.value.document_type_id);
-        formData.append('descriptions', this.saveForm.value.name);
-        formData.append('file', this.saveForm.value.file);
-        const token = this._AuthService.tokenValue;
-        const response = await fetch(`https://automotriz-api.naatteam.com/document/${this.saveForm.value.id}`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        });
 
-        if (!response.ok) {
+    if (this.data.row === null) {
+      if (this.saveForm.value.file !== null) {
+        try {
+          const formData = new FormData();
+          formData.append('document_type_id', this.saveForm.value.document_type_id);
+          formData.append('descriptions', this.saveForm.value.name);
+          formData.append('file', this.saveForm.value.file);
+          const token = this._AuthService.tokenValue;
+          const response = await fetch(`${environment.apiUrl}/document/${this.saveForm.value.id}`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          });
+
+          if (!response.ok) {
+            this.loading = false;
+            throw new Error(`Error en la solicitud: ${response.statusText}`);
+          }
+
+          const raw = await response.text();
+          let data: any;
+          data = JSON.parse(raw);
+          documentId = data.id;
+        } catch (err: any) {
           this.loading = false;
-          throw new Error(`Error en la solicitud: ${response.statusText}`);
+          this._ToastrService.error(err.message, 'Error');
         }
-
-        const raw = await response.text();
-        let data: any;
-        data = JSON.parse(raw);
-        documentId = data.id;
-      } catch (err: any) {
-        this.loading = false;
-        this._ToastrService.error(err.message, 'Error');
-      }
+      }  
     }
+    
 
     const billId: string | boolean | unknown =  await this.addBill();
     if (billId === false) {
@@ -209,9 +263,13 @@ export class BillsModalComponent {
       return;
     }
 
-    await this.addPayment(billId, documentId);
+    if (this.data.row === null) {
+      await this.addPayment(billId, documentId);  
+    }
+    
     this.loading = false;
-    this._ToastrService.success('Gasto registrado correctamente', 'Éxito');
+    let msg = this.data.row === null ? 'Gasto registrado correctamente' : 'Gasto actualizado correctamente';
+    this._ToastrService.success(msg, 'Éxito');
     this.close(true);
   }
 
@@ -242,7 +300,7 @@ export class BillsModalComponent {
       if (car_id !== null && car_id !== undefined) {
         filledValues['car_id'] = [car_id]
       }
-      
+
       const methodMap = {
         registerBill: this._BillService.registerBill.bind(this._BillService),
         updateBill:   this._BillService.updateBill.bind(this._BillService),

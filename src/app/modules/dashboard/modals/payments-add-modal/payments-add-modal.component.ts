@@ -13,7 +13,7 @@ import { ShopingService } from 'src/app/core/services/shoping/shoping.service';
 import { TypeDocumentsService } from 'src/app/core/services/typeDocuments/type-documents.service';
 import { TypePaymentsService } from 'src/app/core/services/typePayments/type-payments.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-payments-add-modal',
@@ -29,7 +29,7 @@ export class PaymentsAddModalComponent {
   typeDocument: any = [];
   error_messages={
 		'payment_method_id':[
-      {type: 'required', message: 'Metodo es requerido'},
+      {type: 'required', message: 'Tipo de pago es requerido'},
 		],
 		'amount':[
 			{type: 'required', message: 'Monto es requerido'},
@@ -68,7 +68,6 @@ export class PaymentsAddModalComponent {
     private _TypeDocumentsService: TypeDocumentsService,
   ) 
   { 
-    console.log(this.data)
   }
 
   ngOnInit(): void {
@@ -127,7 +126,7 @@ export class PaymentsAddModalComponent {
         document_id: new FormControl (this.data.row === null ? '' : this.data.row.document_id),
         id: new FormControl (this.data.row === null ? '' : this.data.row.id),
         document_type_id: new FormControl (1,Validators.compose([Validators.required])),
-        descriptions: new FormControl (this.data.row === null ? '' : this.data.row.document.descriptions,Validators.compose([Validators.required])),
+        descriptions: new FormControl (this.data.row === null ? '' : this.data.row.document.descriptions), // Validators.compose([Validators.required])
         file: new FormControl (this.data.row === null ? '' : this.data.row.document.url),
   	  });
     }
@@ -185,10 +184,11 @@ export class PaymentsAddModalComponent {
         if (this.saveForm.value.file) {
           const formData = new FormData();
           formData.append('document_type_id', this.saveForm.value.document_type_id);
+          // formData.append('descriptions', this.saveForm.value.descriptions);
           formData.append('descriptions', this.saveForm.value.descriptions);
           formData.append('file', this.saveForm.value.file);
           const token = this._AuthService.tokenValue;
-          const response = await fetch(`https://automotriz-api.naatteam.com/document/`, {
+          const response = await fetch(`${environment.apiUrl}/document/`, {
             method: 'POST',// this.data.flag ===  1 ? 'POST' : 'PATCH',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -215,7 +215,6 @@ export class PaymentsAddModalComponent {
       this._ToastrService.error(err.message, 'Error');
     }
 
-
     let filledValues = Object.keys(this.saveForm.value).reduce((acc, key) => {
       const val = this.saveForm.value[key as keyof typeof this.saveForm.value];
       if (val !== null && val !== '' && val !== undefined) {
@@ -238,7 +237,8 @@ export class PaymentsAddModalComponent {
        filledValues = { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, document_id: id, bill_id: this.saveForm.value.bill_id, id: this.data.row.id };
        if (id !== '') filledValues = { ...filledValues, document_id: id };
     }else{
-      filledValues = {...filledValues, id: this.data.row.id};
+
+      filledValues = {...filledValues, id: this.data.row.id, document_id: id};
     }
 
     const methodMap = {

@@ -42,6 +42,7 @@ export class TypePaymentsModalComponent {
     this.saveForm = this._FormBuilder.group({
       name: new FormControl (this.data.row === null ? '' : this.data.row.name,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
       descriptions: new FormControl(this.data.row === null ? '' : this.data.row.descriptions),
+      total: new FormControl(this.data.row === null ? '' : this.data.row.total),
       status: new FormControl (this.data.row === null ? '' : this.data.row.status),
   	});
   }

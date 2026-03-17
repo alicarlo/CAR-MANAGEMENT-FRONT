@@ -70,7 +70,12 @@ export class Menu {
           icon: 'assets/icons/heroicons/outline/income.svg',
           label: 'Ingresos', 
           route: '/layout/dashboard/incomes' 
-        }
+        },
+        {
+          icon: 'assets/icons/heroicons/outline/folder-plus.svg',
+          label: 'Cobranza', 
+          route: '/layout/dashboard/collections' 
+        },
       ],
     }
   ];

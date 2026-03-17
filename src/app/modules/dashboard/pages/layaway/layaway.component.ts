@@ -33,7 +33,7 @@ export class LayawayComponent {
     { key: 'userName', type: 'text' },
     { key: 'date_layaway', type: 'dob' },
     { key: 'amount_sale', type: 'money' },
-    { key: 'amount_down_payment', type: 'money' },
+    { key: 'amount_layaway', type: 'money' },
     { key: 'total', type: 'money' },
     { key: 'date_commitment', type: 'dob' },
   ]

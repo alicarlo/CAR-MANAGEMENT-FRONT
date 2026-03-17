@@ -8,11 +8,19 @@
   </td>
 
   <ng-container *ngFor="let val of  dataFilterColumns; trackBy: trackByCol">
-    <td [ngClass]="val.class" [ngSwitch]="val.type">
+    <td [ngClass]="val.class" [ngSwitch]="val.type" class="max-w-[250px] break-words whitespace-normal">
 
       <ng-container *ngSwitchCase="'status'">
         <span *ngIf="getValue(val.key) === 'pendiente_aprobacion'">
           Pendiente aprobacion
+        </span>
+
+        <span *ngIf="getValue(val.key) === 'cancelado'">
+          Cancelado
+        </span>
+
+        <span *ngIf="getValue(val.key) === 'aprobado'">
+          Aprobado
         </span>
 
       </ng-container>
@@ -63,7 +71,7 @@
        </ng-container>
 
        <ng-container *ngSwitchCase="'dob'">
-        {{ getValue(val.key) | date:'dd/MM/yyyy'  }} 
+        {{ getValue(val.key) | date:'dd/MM/yyyy':'UTC'  }} 
        </ng-container>
 
        <ng-container *ngSwitchCase="'phone'">

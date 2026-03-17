@@ -36,6 +36,42 @@ export const CHECKS_INIT: Checks = {
   filtro_aire: false,
 };
 
+export const CHECKS_INIT_FULL: Checks = {
+  unidad_luces: true,
+  cuarto_luces: true,
+  antena: true,
+  espejos_laterales: true,
+  cristales: true,
+  emblemas: true,
+  llantas: true,
+  tapones_gasolina: true,
+  carroceria_sin_golpes: true,
+  claxon: true,
+  instrumentos_tablero: true,
+  aire_acondicionado: true,
+  limpiadores: true,
+  radio_estereo: true,
+  encendedor: true,
+  espejo_retrovisor: true,
+  ceniceros: true,
+  botones_interiores: true,
+  manijas_interiores: true,
+  tapetes: true,
+  vestiduras: true,
+  gato: true,
+  maneral_gato: true,
+  llave_ruedas: true,
+  herramientas: true,
+  traing_seguridad: true,
+  llanta_refaccion: true,
+  extinguidor: true,
+  tapon_aceite: true,
+  tapon_radiador: true,
+  filtro_aceite: true,
+  bateria: true,
+  filtro_aire: true,
+};
+
 type CheckKey = keyof Checks;
 
 export const CHECKS_FIELDS: Array<{ key: CheckKey; label: string }> = [

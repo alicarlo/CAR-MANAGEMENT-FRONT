@@ -1,7 +1,7 @@
 <mat-dialog-content>
   <div class="p-[20px]">
     <div  class="flex flex-col gap-4">
-      <p class="text-foreground font-semibold">Apartado1</p>
+      <p class="text-foreground font-semibold">Apartado</p>
       <div>
         <form  [formGroup]="saveForm" class="flex flex-col gap-6">
 
@@ -39,6 +39,7 @@
               </div>
             </div>
 
+            <!--
             <div class="flex flex-col gap-2">
               <label for="sexo" class="text-foreground text-[11px] font-medium">Auto:</label>
               <div class="relative">
@@ -56,6 +57,72 @@
                     {{ s.key}} -  {{ s.make }} {{ s.version}} {{ s.model }} {{ s.color }}
                   </option>
                 </select>
+              </div>
+              <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.car_id">
+                  <div class="error-message" *ngIf="saveForm.get('car_id').hasError(error.type) && (saveForm.get('car_id').dirty || saveForm.get('car_id').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+            -->
+
+            <div class="flex flex-col gap-2">
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Autos:</label>
+              <div class="relative">
+                <button
+                  type="button"
+                  class=" !h-[32px] w-full py-2 pl-8 pr-10 rounded-md bg-background text-foreground
+                        border border-border text-left
+                        focus:outline-none focus:ring-2 focus:ring-primary/50
+                        flex items-center justify-between"
+                  (click)="toggleCarsDropdown()"
+                >
+                  <span class="truncate text-[13px]">
+                    {{ selectedCarLabel || 'Selecciona…' }}
+                  </span>
+                  <span class="absolute right-3 text-xs opacity-70">▼</span>
+                </button>
+
+                <div
+                  *ngIf="carsDropdownOpen"
+                  class="absolute z-30 mt-1 w-full rounded-md bg-background border border-border shadow-lg"
+                >
+                  <div class="p-2 border-b border-border">
+                    <input
+                      type="text"
+                      placeholder="Filtrar autos…"
+                      class="
+                            w-full py-1.5 px-3 rounded-md
+                            bg-background text-foreground
+                            border border-border text-[11px]
+                            focus:outline-none focus:ring-1 focus:ring-primary/50
+                            box-border"
+                      [formControl]="carFilterControl"
+                      (keydown.escape)="closeCarsDropdown()"
+                    />
+                  </div>
+
+                  <div class="max-h-60 overflow-y-auto">
+                    <button
+                      type="button"
+                      class="w-full text-left px-3 py-2 text-[13px] text-foreground
+                            hover:bg-card flex items-center gap-2"
+                      *ngFor="let s of filteredCars"
+                      (click)="selectCar(s)"
+                    >
+                      {{ s.key}} -  {{ s.make }} {{ s.version}} {{ s.model }} {{ s.color }}
+                    </button>
+
+                    <div
+                      *ngIf="filteredCars.length === 0"
+                      class="px-3 py-2 text-[11px] text-muted-foreground"
+                    >
+                      Sin resultados
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="error-messages">
                 <ng-container *ngFor="let error of error_messages.car_id">

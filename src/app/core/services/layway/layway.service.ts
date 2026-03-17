@@ -81,4 +81,14 @@ export class LaywayService {
       }
     );
   }
+
+  public getCarHistory(id: string, pageSize?: number, currentPage?: number): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.get<any>(`${environment.apiUrl}/history_car/?column=car_id&value=${id}&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
 }

@@ -68,28 +68,63 @@
               </div>
             </div>
 
-
             <div class="flex flex-col gap-2">
-              <label for="sexo" class="text-foreground text-[11px] font-medium">Auto:</label>
+              <label for="sexo" class="text-foreground text-[11px] font-medium">Autos:</label>
               <div class="relative">
-                <select 
-                  formControlName="car_id"
-                  [class.cursor-not-allowed]="saveForm.get('client_id')?.disabled"
-                  class="w-full py-2 pl-8 pr-10 rounded-md
-                        bg-background text-foreground
-                        border border-border
+                <button
+                  type="button"
+                  class="  
+                       !h-[32px]
+                        w-full py-2 pl-8 pr-10 rounded-md bg-background text-foreground
+                        border border-border text-left
                         focus:outline-none focus:ring-2 focus:ring-primary/50
-                        appearance-none [color-scheme:dark]"
+                        flex items-center justify-between"
+                  (click)="toggleCarsDropdown()"
                 >
-                   <option value="" disabled hidden *ngIf="cars?.length">Selecciona…</option>
-                    <option value="" disabled *ngIf="!cars?.length">
-                      No hay autos para mostrar
-                    </option>
+                  <span class="truncate text-[13px]">
+                    {{ selectedCarLabel || 'Selecciona…' }}
+                  </span>
+                  <span class="absolute right-3 text-xs opacity-70">▼</span>
+                </button>
 
-                  <option *ngFor="let s of cars" [value]="s.id">
-                    {{ s.key}} -  {{ s.make }} {{ s.version}} {{ s.model }} {{ s.color }}
-                  </option>
-                </select>
+                <div
+                  *ngIf="carsDropdownOpen"
+                  class="absolute z-30 mt-1 w-full rounded-md bg-background border border-border shadow-lg"
+                >
+                  <div class="p-2 border-b border-border">
+                    <input
+                      type="text"
+                      placeholder="Filtrar autos…"
+                      class="
+                            w-full py-1.5 px-3 rounded-md
+                            bg-background text-foreground
+                            border border-border text-[11px]
+                            focus:outline-none focus:ring-1 focus:ring-primary/50
+                            box-border"
+                      [formControl]="carFilterControl"
+                      (keydown.escape)="closeCarsDropdown()"
+                    />
+                  </div>
+
+                  <div class="max-h-60 overflow-y-auto">
+                    <button
+                      type="button"
+                      class="w-full text-left px-3 py-2 text-[13px] text-foreground
+                            hover:bg-card flex items-center gap-2"
+                      *ngFor="let s of filteredCars"
+                      (click)="selectCar(s)"
+                    >
+                      {{ s.key}} -  {{ s.make }} {{ s.version}} {{ s.model }} {{ s.color }}
+                    </button>
+
+                    <div
+                      *ngIf="filteredCars.length === 0"
+                      class="px-3 py-2 text-[11px] text-muted-foreground"
+                    >
+                      Sin resultados
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="error-messages">
                 <ng-container *ngFor="let error of error_messages.car_id">
@@ -359,6 +394,7 @@
                 placeholder="Mensualidad sin intereses"
                 formControlName="qty_months" 
                 type="number"
+                min="0"
                 [class.cursor-not-allowed]="saveForm.get('qty_months')?.disabled"
                 [disabled]="saveForm.get('qty_months')?.disabled"
                 [class.cursor-not-allowed]="saveForm.get('qty_months')?.disabled"
@@ -394,6 +430,7 @@
                   class="py-2 pl-8 pr-2 rounded-md border border-border bg-background text-foreground"
                   placeholder="Monto del pago"
                   type="number"
+                  min="0"
                   [(ngModel)]="payment.amount"
                   name="amount-{{i}}"
                   [ngModelOptions]="{ standalone: true }"
@@ -404,7 +441,6 @@
                 />
               </div>
           </div>
-
 
           <label *ngIf="carsSelected" class="text-foreground text-[16px] font-medium">Metodo de Pago:</label>
           <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" *ngIf="carsSelected">
@@ -699,6 +735,7 @@
                 placeholder="Cantidad de dias de garantia"
                 formControlName="guarantee_time" 
                 type="number"
+                min="0"
               />
             </div>
           </div>

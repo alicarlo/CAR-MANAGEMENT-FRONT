@@ -35,6 +35,8 @@ export class BillsComponent {
     { icon: 'search',  id: 'search',  label: 'Visualizar Pagos' },
     { icon: 'add',  id: 'add',  label: 'Agregar Pagos' },
     { icon: 'delete', id: 'delete', label: 'Eliminar Gasto' },
+    { icon: 'edit',  id: 'edit',  label: 'Editar' },
+    
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -73,6 +75,13 @@ export class BillsComponent {
   }
 
   openShowModal(action: string, data: any) {
+    data['car'] = {
+      key: data.cars.length > 0 ? data.cars[0].key : '-',
+          make: data.cars.length > 0 ? data.cars[0].make : '-', 
+          line: data.cars.length > 0 ? data.cars[0].version : '-', 
+          model: data.cars.length > 0 ? data.cars[0].model : '-', 
+          color: data.cars.length > 0 ? data.cars[0].color : '-',
+    }
     let dataSend = {action, row: data, flag: 0};
     const dialogRef = this._MatDialog.open(PaymentsShowModalComponent, {
       disableClose: true,
@@ -207,6 +216,7 @@ export class BillsComponent {
           this.currentPage = response.pagination.current_page;
           this.hasNext = response.pagination.has_next;
           this.hasPrev = response.pagination.has_prev;
+
           this.bills = response.items.map((r: any) => ({ 
             ...r,
             key: r.cars.length > 0 ? r.cars[0].key : '-',

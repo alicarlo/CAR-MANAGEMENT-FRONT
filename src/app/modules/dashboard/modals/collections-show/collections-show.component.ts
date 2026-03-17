@@ -4,40 +4,38 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angu
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ToastrService } from 'ngx-toastr';
-import { c } from 'node_modules/@angular/material/icon-module.d-COXCrhrh';
-import { BillService } from 'src/app/core/services/bill/bill.service';
-import { CarsService } from 'src/app/core/services/cars/cars.service';
-import { ShopingService } from 'src/app/core/services/shoping/shoping.service';
 import { LoadingComponent } from 'src/app/modules/uikit/pages/loading/loading.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 
 @Component({
-  selector: 'app-arrive-check-car-modal',
-  imports: [
+  selector: 'app-collections-show',
+   imports: [
     LoadingComponent,
     ButtonComponent, CommonModule, MatDialogModule,MatIconModule, MatTooltipModule
   ],
-  templateUrl: './arrive-check-car-modal.component.html',
-  styleUrl: './arrive-check-car-modal.component.css'
+  templateUrl: './collections-show.component.html',
+  styleUrl: './collections-show.component.css'
 })
-export class ArriveCheckCarModalComponent {
-
+export class CollectionsShowComponent {
+  loadingModal: boolean = false;
+  income: any[] = [];
   constructor(
     private dialog: MatDialog,                                 
-    @Optional() public dialogRef: MatDialogRef<ArriveCheckCarModalComponent> | null, 
+    @Optional() public dialogRef: MatDialogRef<CollectionsShowComponent> | null, 
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private _ToastrService: ToastrService,
     private _MatDialog: MatDialog,
-    private _BillService: BillService,
-    private _CarsService: CarsService,
-    private _ShopingService: ShopingService
-  ) { }
 
-  isArriveEmpty(): boolean {
-    return !this.data?.row?.arrive || Object.keys(this.data.row.arrive).length === 0;
+  ) { 
+    setInterval(() => {
+      this.loadingModal = true;
+    },500)
   }
 
-  editModal() {
-    this.dialogRef?.close(2);
+  get totalInstallmentsAmount(): number {
+    return (this.data.row.installments_data || []).reduce(
+      (acc: number, item: any) => acc + (Number(item.amount) || 0),
+      0
+    );
   }
 }

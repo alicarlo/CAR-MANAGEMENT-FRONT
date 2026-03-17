@@ -31,6 +31,26 @@ import { LoadingComponent } from '../loading/loading.component';
 })
 export class TableComponent {  
   flag : boolean = false;
+  @Input() size: 'sm' | 'md' | 'lg' | 'auto' = 'md';
+  @Input() selectId: string | undefined | any = null;
+  @Input() select: boolean | undefined | any =  false;
+  @Input() labelName: string = '';
+  _selectData: any[] = []; 
+  @Input() selectPlaceholder: string = 'Seleccionar'
+  @Input() set selectData(v: any[]) {
+    this._selectData = v ?? [];
+    this.cdr.markForCheck();  
+  }
+
+  _selectValueDefault: any; 
+   @Input() set selectValueDefault(v: any) {
+    this._selectValueDefault = v ?? null;
+    this.cdr.markForCheck();  
+  }
+  
+  @Input() selectValue!: string;
+  @Input() searchable: boolean = false;
+
   @Input() actions: RowAction[] = [];
   @Output() action = new EventEmitter<RowActionEvent>();
   @Input() hasNext: boolean = false;
@@ -69,10 +89,13 @@ export class TableComponent {
   @Output() changePageNextPrevReturn = new EventEmitter<{}>();
   @Output() searchData = new EventEmitter<string>(true);
   
+   @Output() selectOptionReturn = new EventEmitter<{}>();
+
   private first = true;
   private last = '__init__';
   activateSearch: boolean = true;
   dataSignal = signal<any[]>([]);
+  selectOptionFilter: any = null;
   constructor(private http: HttpClient, private filterService: TableFilterService, private cdr: ChangeDetectorRef) {}
 
   // Emiter checkbox in table header
@@ -101,6 +124,10 @@ export class TableComponent {
     return this.dataSignal()
   });
 
+  async selectOption(event: any) {
+    this.selectOptionFilter = event;
+    this.selectOptionReturn.emit(event);
+  }
 
   async pageSizeSelect(event: any) {
     this.pageSizeSelectReturn.emit(event);

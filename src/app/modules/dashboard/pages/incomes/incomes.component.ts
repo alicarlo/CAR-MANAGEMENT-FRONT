@@ -16,6 +16,7 @@ import { SalesService } from 'src/app/core/services/sales/sales.service';
 import moment from 'moment';
 import { IncomeService } from 'src/app/core/services/income/income.service';
 import { IncomeAdditionalComponent } from '../../modals/income-additional/income-additional.component';
+import { HistoryIncomeModalComponent } from '../../modals/history-income-modal/history-income-modal.component';
 
 @Component({
   selector: 'app-incomes',
@@ -62,10 +63,26 @@ export class IncomesComponent {
         { id: 'url', value: [2] },
       ] 
      },
+     { key: 'statusReview', type: '',
+      show: [
+        { id: 'delete', value: [2] },
+      ] 
+     },
+    { key: 'statusReview', type: '',
+      show: [
+        { id: 'approve', value: [2] },
+      ] 
+     }
   ]
+
+
+
   readonly actions: RowAction[] = [
+    { icon: 'delete',  id: 'delete',  label: 'Cancelar registro' },
+    { icon: 'check_circle',  id: 'approve',  label: 'Aprobar registro' },
     { icon: 'add',  id: 'status',  label: 'Agregar documento' },
     { icon: 'attach_file',  id: 'url',  label: 'Descargar el archivo' },
+    
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -86,6 +103,7 @@ export class IncomesComponent {
   private query$ = new Subject<string>();
 
   pages: number = 0;
+  ref: any;
   constructor(
     private _MatDialog: MatDialog,
     private _ToastrService: ToastrService,
@@ -102,14 +120,21 @@ export class IncomesComponent {
     this._IncomeService.getIncomesWithOutFilter(this.pageSize, this.currentPage).subscribe({
       next: async (response: any) => {
         if(response) {
-        
+          /*
+          color = flag === 1
+      ? '!text-blue-500'
+      : flag === 2
+        ? '!text-red-500'
+        : '!text-green-500';
+
+          */
           this.totalPages = response.pagination.total_pages;
           this.currentPage = response.pagination.current_page;
           this.hasNext = response.pagination.has_next;
           this.hasPrev = response.pagination.has_prev;
           this.inconmes = response.items.map((r: any) => (
             { 
-            statusReview: r.status === 'pendiente_aprobacion' ? 1 : 2,
+            statusReview: r.status === 'pendiente_aprobacion' ? 1 : r.status === 'cancelado' || r.status === 'aprobado' ? 2 : 3,
             userData: r.user.full_name,
             typeIncome: r.sale.sales_type,
             paymenthMethod: r.payment_method.name,
@@ -120,6 +145,7 @@ export class IncomesComponent {
              ...r
           }));
           
+    
           this.total = response.pagination.total_items;
           setTimeout(() => {
             this.loading = true;  
@@ -137,17 +163,29 @@ export class IncomesComponent {
   }
 
   onRowAction(e: RowActionEvent<any>) {
-    if (e.id === 'url') this.actionModalFile(1,'delete', e.row, 'Desea eliminar el registro?');
+    if (e.id === 'delete') this.actionModalFile(2,'delete', e.row, 'Desea cancelar el registro?');
+    if (e.id === 'approve') this.actionModalFile(3,'approve', e.row, 'Desea aprobar el registro?');
+    if (e.id === 'url') this.actionModalFile(1,'delete', e.row, 'Desea descargar el archivo?');
     if (e.id === 'status')  this.openAddIncomeModal(e.id,e.row);
   }
 
   actionModalFile(flag: number,action: string, data: any, msg: string, color: string = '!text-blue-500', icon = 'cloud_download') {
-    console.log(data)
-    color = flag === 1 ? '!text-blue-500' : '!text-red-500';  
-    icon = flag === 1 ? 'cloud_download' : 'delete';
+    // color = flag === 1 ? '!text-blue-500' : '!text-red-500';  
+    color = flag === 1
+      ? '!text-blue-500'
+      : flag === 2
+        ? '!text-red-500'
+        : '!text-green-500';
+    // icon = flag === 1 ? 'cloud_download' : 'delete';
+
+    icon = flag === 1
+      ? 'cloud_download'
+      : flag === 2
+        ? 'delete'
+        : 'check';
     let dataSend = {action, row: data, msg, color, icon};
 
-    const ref: any = this._MatDialog.open(ActionMessageComponent, {
+    this.ref = this._MatDialog.open(ActionMessageComponent, {
       data: dataSend,
       disableClose: true,
       panelClass: ['custom-dialog-container', 'dialog-40'],
@@ -157,15 +195,20 @@ export class IncomesComponent {
     });
     
 
-    ref.componentInstance.accept.subscribe(async () => {
+    this.ref.componentInstance.accept.subscribe(async () => {
 
-      ref.componentInstance.loading = true;
+      this.ref.componentInstance.loading = true;
       try {
         if (flag === 1) await this.downloadDirect(data.document.url, data.document.name);
-        ref.componentInstance.loading = false;
-        ref.close(true);
+        if (flag === 2 || flag === 3) await this.cancelIncome(data, flag);
+        this.getIncomes();
+        this.ref.componentInstance.loading = false;
+        this.ref.close(true);
+        
       } catch {
-        ref.componentInstance.loading = false;
+        if (this.ref.componentInstance) {
+          this.ref.componentInstance.loading = false;
+        }
       }
     });
   }
@@ -192,6 +235,8 @@ export class IncomesComponent {
       }
     });
   }
+  
+  
 
   openAddModal(action: string, data: any) {
     let dataSend = {action, row: data, flag: 1};
@@ -234,6 +279,31 @@ export class IncomesComponent {
     });
   }
 
+ async actionModalSecondValidation(action: string, data: any, msg: string, color: string = '!text-red-500', icon = 'delete') {
+   return new Promise((resolve, reject) => {
+    let dataSend = {action, row: data, msg, color, icon};
+      const ref: any = this._MatDialog.open(ActionMessageComponent, {
+        data: dataSend,
+        disableClose: true,
+        panelClass: ['custom-dialog-container', 'dialog-40'],
+        width: '40vw',
+        height: '40vh',
+        maxWidth: '40vw'
+      });
+
+      ref.componentInstance.accept.subscribe(async (data: any) => {
+        ref.componentInstance.loading = true;
+        try {
+          ref.componentInstance.loading = false;
+          ref.close(true);
+          resolve(true)
+        } catch {
+          resolve(false)
+        }
+      });
+    })
+  }
+
   async deleteSale(id: string) {
     return new Promise((resolve, reject) => {
       this._SalesService.deleteSale(id).subscribe({
@@ -248,6 +318,35 @@ export class IncomesComponent {
         // this._ToastrService.error(err.error, 'Error');
       },
     })
+    })
+  }
+
+  async cancelIncome(data: any, flag: number) {
+    return new Promise(async (resolve, reject) => {
+      if (flag === 3 && data.document && Object.keys(data.document).length === 0) {
+        this.ref.componentInstance.loading = false;
+        this.ref.close(true);
+        const result = await this.actionModalSecondValidation('cancel', data, '¿El registro no cuenta con documento quiere continuar con la aprobacion?', '!text-red-500', 'cancel');
+      }
+
+
+      let dataSend = {
+        id: data.id,
+        status: flag === 2 ? 'cancelado' : 'aprobado'
+      }
+      this._IncomeService.updateIncome(dataSend).subscribe({
+        next: async (response: any) => {
+          if(response) {
+            let msg = flag === 2 ? 'Cancelado' : 'Aprobado';
+            this._ToastrService.success(`${msg} con exito`, 'Exito');
+            resolve(true);
+          }
+        },
+        error: (err) => {
+          reject(err);
+          // this._ToastrService.error(err.error, 'Error');
+        },
+      })
     })
   }
 

@@ -15,6 +15,7 @@ import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { CarsService } from 'src/app/core/services/cars/cars.service';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-documents-modal',
@@ -77,7 +78,7 @@ export class DocumentsModalComponent {
         const value = (term || '').toString().toLowerCase().trim();
 
         this.filteredCars = this.cars.filter(car => {
-          const text = `${car.make} ${car.model} ${car.plate || ''}`.toLowerCase();
+          const text = `${car.key} ${car.make} ${car.model} ${car.plate || ''}`.toLowerCase();
           return text.includes(value);
         });
       });
@@ -113,7 +114,7 @@ export class DocumentsModalComponent {
   }
 
   getCars() {
-    this._CarsService.getCars('',500, 1).subscribe({
+    this._CarsService.getCarsWithOutFilter('',500, 1).subscribe({
       next: async (response: any) => {
         if(response) {
           this.cars = response.items.map((r: any) => ({ ...r }));
@@ -141,6 +142,7 @@ export class DocumentsModalComponent {
       },
     }) 
   }
+  
 
   async save() {
     if (this.saveForm.invalid) {
@@ -157,7 +159,7 @@ export class DocumentsModalComponent {
       formData.append('file', this.saveForm.value.file);
 
       const token = this._AuthService.tokenValue;
-      const response = await fetch(`https://automotriz-api.naatteam.com/document/${this.saveForm.value.id}`, {
+      const response = await fetch(`${environment.apiUrl}/document/${this.saveForm.value.id}`, {
         method: this.data.row == null ? 'POST' : 'PATCH',
         headers: {
           Authorization: `Bearer ${token}`,

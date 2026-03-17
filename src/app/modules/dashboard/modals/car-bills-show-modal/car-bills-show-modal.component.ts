@@ -22,7 +22,7 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
 export class CarBillsShowModalComponent {
   loadingModal: boolean = false;
   bills: any[] = [];
-
+  totalBills: number = 0;
   constructor(
     private dialog: MatDialog,                                 
     @Optional() public dialogRef: MatDialogRef<CarBillsShowModalComponent> | null, 
@@ -43,6 +43,7 @@ export class CarBillsShowModalComponent {
       next: async (response: any) => {
         if(response) {
           this.bills = response.items.map((r: any) => ({ ...r}));
+          this.totalBills = response.items.reduce((sum: any, item: any) => sum + item.total, 0);
           this.loadingModal = true;
         }
         this.loadingModal = true;

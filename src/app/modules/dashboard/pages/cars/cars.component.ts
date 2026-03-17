@@ -11,6 +11,8 @@ import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-messa
 import { CarBillsShowModalComponent } from '../../modals/car-bills-show-modal/car-bills-show-modal.component';
 import { CarDocumentsShowModalComponent } from '../../modals/car-documents-show-modal/car-documents-show-modal.component';
 import { ArriveCheckCarModalComponent } from '../../modals/arrive-check-car-modal/arrive-check-car-modal.component';
+import { HistoryIncomeModalComponent } from '../../modals/history-income-modal/history-income-modal.component';
+import { ArrivalReviewModalComponent } from '../../modals/arrival-review-modal/arrival-review-modal.component';
 
 @Component({
   selector: 'app-cars',
@@ -23,33 +25,36 @@ export class CarsComponent {
   cars: Cars[] = [];
   carsHeader: string[] = [
     'Clave',
-    'Tipo de auto','Sucursal', 'Marca',
-    'Modelo','Linea', 'Color', '# Serie', 
-    'Kilometraje', 'Cilindros', '# de motor', 
-    'Fecha de llegada' ,'Precio de venta', 'Enganche' ,
-    'Estatus', 'Tipo de adquisicion','Accesorios y Varios', 
+    /*'Tipo de auto'*/'Sucursal', /*'Marca',
+    'Modelo','Linea', 'Color',*/'Auto', /*'# Serie', 
+    'Kilometraje', 'Cilindros', '# de motor', */
+    'Fecha de llegada' ,'Precio de venta', 'Costo' ,/*'Enganche' ,*/
+    'Estatus',/* 'Tipo de adquisicion','Accesorios y Varios', 
     'Comentarios', 'Comentarios Carroceria', 'Comentarios Llantas',
     'Comentarios Pintura', 'Comentarios Otros',
+    */
   ];
 
   columns: any = [
     { key: 'key', type: 'text' },
-    { key: 'car_type.name', type: 'text' },
+    // { key: 'car_type.name', type: 'text' },
     { key: 'store.name', type: 'text' },
-    { key: 'make', type: 'text' },
-    { key: 'model', type: 'text' },
-    { key: 'version', type: 'text' },
-    { key: 'color', type: 'text' },
-    { key: 'vin', type: 'text' },
-    { key: 'km', type: 'comas' },
-    { key: 'cylinders', type: 'text' },
-    { key: 'engine_number', type: 'text' },
+    { key: 'carData', type: 'text' },
+    // { key: 'make', type: 'text' },
+    // { key: 'model', type: 'text' },
+    // { key: 'version', type: 'text' },
+    // { key: 'color', type: 'text' },
+    // { key: 'vin', type: 'text' },
+    // { key: 'km', type: 'comas' },
+    // { key: 'cylinders', type: 'text' },
+    // { key: 'engine_number', type: 'text' },
     { key: 'arrived_at', type: 'dob' },
-
     { key: 'sale_price', type: 'money' },
-    { key: 'down_payment', type: 'money' },
+    { key: 'costShow', type: 'money' },
+    // { key: 'sale_price', type: 'money' },
+    // { key: 'down_payment', type: 'money' },
     { key: 'status', type: 'translate-text' },
-    { key: 'car_acquisition', type: 'text' , show: [
+    /*{ key: 'car_acquisition', type: 'text' , show: [
         { id: 'delete', value: ['compras'] },
       ] 
     },
@@ -65,10 +70,12 @@ export class CarsComponent {
         { id: 'checkArrive' }
       ] 
      }
+      */
 
   ]
 
   readonly actions: RowAction[] = [
+    { icon: 'history',  id: 'history',  label: 'Historial' },
     { icon: 'check',  id: 'checkArrive',  label: 'Revision de llegada' },
     { icon: 'attach_money',  id: 'bill',  label: 'Visualizar Gastos' },
     { icon: 'attach_file',  id: 'documents',  label: 'Visualizar Documentos' },
@@ -107,6 +114,7 @@ export class CarsComponent {
   }
 
   onRowAction(e: RowActionEvent<any>) {
+    if (e.id === 'history') this.openHistoryIncomeModal(e.id,e.row);
     if (e.id === 'checkArrive')  this.openChecksModal(e.id,e.row);
     if (e.id === 'bill')  this.openBillModal(e.id,e.row);
     if (e.id === 'documents')  this.openDocumentsModal(e.id,e.row);
@@ -187,6 +195,22 @@ export class CarsComponent {
     this.getCars();
   }
 
+  openHistoryIncomeModal(action: string, data: any) {
+      let dataSend = {action, row: data, flag: 1};
+      const dialogRef = this._MatDialog.open(HistoryIncomeModalComponent, {
+        disableClose: true,
+        data: dataSend,
+        panelClass: ['custom-dialog-container', 'dialog-60'],
+        width: '90vw',
+        height: '90vh',
+        maxWidth: '90vw'
+      });
+  
+      dialogRef.afterClosed().subscribe(result => {
+
+      });
+    }
+
   getCars() {
     this.loading = false;
     this._CarsService.getCarsFull(this.filter,this.pageSize, this.currentPage).subscribe({
@@ -197,7 +221,10 @@ export class CarsComponent {
           this.currentPage = response.pagination.current_page;
           this.hasNext = response.pagination.has_next;
           this.hasPrev = response.pagination.has_prev;
-          this.cars = response.items.map((r: any) => ({ ...r }));
+          this.cars = response.items.map((r: any) => ({ ...r,
+            carData:  `${r.make } ${r.version} ${r.model } ${r.color }`,
+            costShow: r.purchases.length > 0 ? (r.purchases || []).reduce((acc: number, inc: any) => acc + (Number(inc.total) || 0), 0) : r.cost
+           }));
           this.total = response.pagination.total_items;
           setTimeout(() => {
             this.loading = true;  
@@ -277,7 +304,27 @@ export class CarsComponent {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
+      if (result === 2) {
+        this.editArriveModal('edit', data);
+        // this.getCars();
+      }
+    });
+  }
+
+  editArriveModal(action: string = 'edit', data: any) {
+    let dataSend = {action, row: data};
+    const dialogRef = this._MatDialog.open(ArrivalReviewModalComponent, {
+      disableClose: true,
+      data: dataSend,
+      panelClass: ['custom-dialog-container', 'dialog-checks' ],
+      width: '50vw',
+      maxWidth: '90vw',
+      height: 'auto',
+      maxHeight: '90vh',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
         this.getCars();
       }
     });

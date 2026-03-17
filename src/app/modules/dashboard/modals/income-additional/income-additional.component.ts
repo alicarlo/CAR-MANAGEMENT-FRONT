@@ -12,6 +12,7 @@ import { CarsService } from 'src/app/core/services/cars/cars.service';
 import { UsersService } from 'src/app/core/services/users/users.service';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { IncomeService } from 'src/app/core/services/income/income.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-income-additional',
@@ -98,7 +99,7 @@ export class IncomeAdditionalComponent {
         formData.append('descriptions', 'Cobros adicionales');
         formData.append('file', this.saveForm.value.file);
         const token = this._AuthService.tokenValue;
-        const response = await fetch(`https://automotriz-api.naatteam.com/document/${this.saveForm.value.id}`, {
+        const response = await fetch(`${environment.apiUrl}/document/${this.saveForm.value.id}`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,

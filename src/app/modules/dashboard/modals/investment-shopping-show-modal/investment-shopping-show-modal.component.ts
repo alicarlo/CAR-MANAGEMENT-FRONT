@@ -22,7 +22,7 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
 export class InvestmentShoppingShowModalComponent {
   loadingModal: boolean = false;
   purchases: any[] = [];
-
+  totalCars: any = null;
   constructor(
     private dialog: MatDialog,                                 
     @Optional() public dialogRef: MatDialogRef<InvestmentShoppingShowModalComponent> | null, 
@@ -44,7 +44,9 @@ export class InvestmentShoppingShowModalComponent {
     this._ShopingService.getInvestorPurchase(this.data.row.id,500, 1).subscribe({
       next: async (response: any) => {
         if(response) {
+
           this.purchases = response.items.map((r: any) => ({ ...r}));
+         
           this.loadingModal = true;
         }
       },
@@ -62,6 +64,7 @@ export class InvestmentShoppingShowModalComponent {
       next: async (response: any) => {
         if(response) {
           this.purchases = response.items.map((r: any) => ({ ...r}));
+          this.totalCars = response.items.reduce((sum: any, item: any) => sum + item.total, 0);
           this.loadingModal = true;
         }
       },

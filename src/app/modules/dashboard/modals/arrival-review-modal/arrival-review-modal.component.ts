@@ -57,59 +57,60 @@ export class ArrivalReviewModalComponent {
 
   init() {
     this.saveForm = this._FormBuilder.group({
-      car_id: new FormControl (this.data.row === null ? '' : this.data.row.id,Validators.compose([Validators.required])),
+      id_arrival: new FormControl (this.data.row === 'add' ? '' : this.data.row.arrive.id),
+      car_id: new FormControl (this.data.row.id,Validators.compose([Validators.required])),
       user_review: new FormControl (this._AuthService.user()?.user_id),
       review: new FormGroup({
         servicio: new FormControl(
           {
-            value: this.data.row?.review?.servicio ?? false,
+            value: this.data.row?.arrive?.review?.servicio ?? false,
             disabled: false
           }
         ),
         proximo_servicio: new FormControl(
           {
-            value: this.data.row?.review?.proximo_servicio ?? null,
+            value: this.data.row?.arrive?.review?.proximo_servicio ?  moment.utc(this.data.row?.arrive?.review.proximo_servicio).format('YYYY-MM-DD') : null,
             disabled: false
           }
         ),
         servicio_agua: new FormControl(
           {
-            value: this.data.row?.review?.servicio_agua ?? false,
+            value: this.data.row?.arrive?.review?.servicio_agua ?? false,
             disabled: false 
           }
         ),
         proximo_servicio_agua: new FormControl(
           {
-            value: this.data.row?.review?.proximo_servicio_agua ?? null,
+            value: this.data.row?.arrive?.review?.proximo_servicio_agua ?? null,
             disabled: false
           }
         ),
         servicio_aceite: new FormControl(
           {
-            value: this.data.row?.review?.servicio_aceite ?? false,
+            value: this.data.row?.arrive?.review?.servicio_aceite ?? false,
             disabled: false
           }
         ),
         proximo_servicio_aceite: new FormControl(
           {
-            value: this.data.row?.review?.proximo_servicio_aceite ?? null,
+            value: this.data.row?.arrive?.review?.proximo_servicio_aceite ?? null,
             disabled: false
           }
         ),
         garantia: new FormControl(
           {
-            value: this.data.row?.review?.garantia ?? false,
+            value: this.data.row?.arrive?.review?.garantia ?? false,
             disabled: false
           }
         ),
         expira_garantia: new FormControl(
           {
-            value: this.data.row?.review?.expira_garantia ?? null,
+            value: this.data.row?.arrive?.review?.expira_garantia ?? null,
             disabled: false
           }
         ),
       }),
-      status: new FormControl (this.data.row === null ? '' : this.data.row.status),
+      status: new FormControl (this.data.row === 'add' ? this.data.row.status : this.data.row.arrive.status),
   	});
   }
 
@@ -189,7 +190,7 @@ export class ArrivalReviewModalComponent {
 
     const methodSelect: MethodKey =
       this.data.action === 'add' ? 'registerArrival' : 'updateArrival';
-    
+
       methodMap[methodSelect](filledValues).subscribe({
       next: async (response) => {
         if(response) {

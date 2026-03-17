@@ -51,17 +51,17 @@ export class TableRowComponent {
   }
 
   getValue(col: string): any {
-  if (!col || this.data == null) return null;
-    
-  const value = col.split('.').reduce<any>((acc, k) => {
-    if (acc == null) return undefined;
+    if (!col || this.data == null) return null;
+      
+    const value = col.split('.').reduce<any>((acc, k) => {
+      if (acc == null) return undefined;
 
-    if (typeof acc !== 'object') return undefined;
-    return (acc as any)[k];
-  }, this.data);
+      if (typeof acc !== 'object') return undefined;
+      return (acc as any)[k];
+    }, this.data);
 
-  return value ?? null;
-}
+    return value ?? null;
+  }
 
 isFiniteNumber(val: any): val is number {
   return typeof val === 'number' && isFinite(val);
