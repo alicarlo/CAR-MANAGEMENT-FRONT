@@ -23,6 +23,7 @@ export class PaymentsShowModalComponent {
   loadingModal: boolean = false;
   payments: any[] = [];
   totalPayments: any = 0;
+  localRow: any = null;
   constructor(
     private dialog: MatDialog,                                 
     @Optional() public dialogRef: MatDialogRef<PaymentsShowModalComponent> | null, 
@@ -33,6 +34,7 @@ export class PaymentsShowModalComponent {
   ) {}
 
   ngOnInit(): void {
+    this.localRow = structuredClone(this.data.row);
      if (this.data.flag === 0) {
       this.getPaymentsBills();
     } else {
@@ -42,7 +44,7 @@ export class PaymentsShowModalComponent {
 
   getPayments() {
     this.loadingModal = false;
-    this._ShopingService.getPayment(500, 1, this.data.row.id).subscribe({
+    this._ShopingService.getPayment(500, 1, this.localRow.id).subscribe({
       next: async (response: any) => {
         if(response) {
           this.payments = response.items.map((r: any) => ({ ...r}));
@@ -61,7 +63,7 @@ export class PaymentsShowModalComponent {
 
   getPaymentsBills() {
     this.loadingModal = false;
-    this._ShopingService.getPaymentBill(500, 1, this.data.row.id).subscribe({
+    this._ShopingService.getPaymentBill(500, 1, this.localRow.id).subscribe({
       next: async (response: any) => {
         if(response) {
           this.payments = response.items.map((r: any) => ({ ...r}));
@@ -137,7 +139,7 @@ export class PaymentsShowModalComponent {
   }
 
   openAddModal(action: string, data: any) {
-    let dataSend = {action, row: {...data, car: this.data.row.car} , flag: this.data.flag};
+    let dataSend = {action, row: {...data, car: this.localRow.carData} , flag: this.data.flag};
     const dialogRef = this._MatDialog.open(PaymentsAddModalComponent, {
       disableClose: true,
       data: dataSend,

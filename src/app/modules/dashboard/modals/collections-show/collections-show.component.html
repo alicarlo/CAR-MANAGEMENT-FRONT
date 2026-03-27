@@ -2,7 +2,7 @@
   <div class="p-[20px]" *ngIf="loadingModal">
     <div  class="flex flex-col gap-4">
       <p class="text-foreground font-semibold">Cobranza</p>
-       <label class="text-foreground text-[12px] font-medium">Información del Auto:</label>
+      <label class="text-foreground text-[12px] font-medium">Información del Auto:</label>
       <div class="border border-border/60 rounded-lg bg-card p-2 flex flex-wrap gap-2">
           <p class="text-foreground text-[11px]"><strong>Clave:</strong> {{ data.row.car.key }}</p>
           <p class="text-foreground text-[11px]"><strong>Modelo:</strong> {{ data.row.car.model }}</p>
@@ -23,7 +23,9 @@
           <thead>
             <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
               <th class="px-3 py-2 text-left"># De pago</th>
-              <th class="px-3 py-2 text-left">Monto pendiente</th>
+              <th class="px-3 py-2 text-left">Monto</th>
+              <th class="px-3 py-2 text-left">Monto pagado</th>
+              <th class="px-3 py-2 text-left">Estatus</th>
               <th class="px-3 py-2 text-left">Fecha de pago</th>
               <th class="px-3 py-2 text-left">Acciones</th>
             </tr>
@@ -44,20 +46,39 @@
               </td>
 
               <td class="px-3 py-2 align-middle text-left">
-                {{ item.amount | currency:'MXN':'symbol':'1.2-2':'en-US' }}
+                <span>
+                  {{ item.amount | currency:'MXN':'symbol':'1.2-2':'en-US' }}
+                </span>
               </td>
 
-              
+              <td class="px-3 py-2 align-middle text-left">
+                <span *ngIf="item.incomes.length === 0">
+                  {{ 0 | currency:'MXN':'symbol':'1.2-2':'en-US' }}
+                </span>
+
+                <span *ngIf="item.incomes.length !== 0">
+                  {{ incomeAmount(item) | currency:'MXN':'symbol':'1.2-2':'en-US' }} 
+                </span>
+              </td>
+
+              <td class="px-3 py-2 align-center">
+                <div class="min-w-0 whitespace-normal break-words [hyphens:auto] text-left">
+                  <span *ngIf="item.paid  === null || item.paid === false" >No Pagado</span> 
+                  <span *ngIf="item.paid  === true">Pagado</span>
+                </div>
+              </td>
+
+
               <td class="px-3 py-2 align-middle">
                 <div class="min-w-0 whitespace-normal break-words [hyphens:auto] text-left">
-                  {{ item.paid_at | date:'dd/MM/yyyy' }}
+                  {{ item.paid_at | date:'dd/MM/yyyy':'UTC' }}
                 </div>
               </td>
 
               <td class="px-2 py-1 align-middle">
-                <div class="flex items-center justify-start gap-1">
+                <div *ngIf="item.paid !== true"  class="flex items-center justify-start gap-1">
                   <button 
-           
+                    (click)="openShowModal(item, 4)"
                     mat-icon-button aria-label="Descargar"
                     matTooltip="Registrar Pago"
                     matTooltipPosition="above"
@@ -67,7 +88,7 @@
                   </button>
     
                   <button mat-icon-button aria-label="Editar" 
-                 
+                    (click)="openExtensionModal(item)"
                     matTooltip="Dar prorroga"
                     matTooltipPosition="above"
                     matTooltipClass="bg-background text-foreground" 
@@ -75,7 +96,7 @@
                     <mat-icon class="!text-foreground/80 text-[18px] leading-none">edit</mat-icon>
                   </button>
                   <button mat-icon-button color="warn" aria-label="Eliminar"
-                 
+                    (click)="openShowModal(item, 5)"
                     matTooltip="Abonar"
                     matTooltipPosition="above"
                     matTooltipClass="bg-background text-foreground" 

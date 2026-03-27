@@ -35,7 +35,7 @@ interface AttachmentItem {
     ButtonComponent, CommonModule, MatDialogModule,MatIconModule, MatTooltipModule,
     FormsModule, ReactiveFormsModule,
   ],
-   providers: [provideNgxMask()],
+  providers: [provideNgxMask()],
   templateUrl: './sales-modal.component.html',
   styleUrl: './sales-modal.component.css'
 })
@@ -64,6 +64,9 @@ export class SalesModalComponent {
     'sale_price': [
       {type: 'required', message: 'Precio es requerido'},
     ],
+    'sale_price_contado': [
+      {type: 'required', message: 'Precio es requerido'},
+    ],
     'car_sector':[
       {type: 'required', message: 'Tipo de auto es requerida'},
     ],
@@ -87,6 +90,9 @@ export class SalesModalComponent {
     ],
     'payment_method_id': [
       {type: 'required', message: 'Metodo de pago es requerido'},
+    ],
+    'desired_advance': [
+      {type: 'required', message: 'Anticipo deseado es requerido'},
     ]
   }
 
@@ -149,7 +155,16 @@ export class SalesModalComponent {
       sales_type: new FormControl ("",Validators.compose([Validators.required])),
       client_id: new FormControl ({ value: this.data.row === null ? null : this.data.row.client_id, disabled: true },Validators.compose([Validators.required])),
       car_id: new FormControl ({ value: this.data.row === null ? '' : this.data.row.car_id, disabled: true},Validators.compose([Validators.required])),
-      sale_price: new FormControl (this.data.row === null ? '' : this.data.row.sale_price,Validators.compose([Validators.required])),
+      sale_price: new FormControl(
+        this.data.row === null
+          ? ''
+          : this.data.row.sale_price === null
+            ? (this.data.row.purchases?.length
+                ? this.data.row.purchases[0].total
+                : '')
+            : this.data.row.sale_price,
+        Validators.required
+      ),
       sale_price_contado: new FormControl (null,Validators.compose([Validators.required])),
       qty_months: new FormControl ({value: '', disabled: true}),
       desired_advance: new FormControl (null,Validators.compose([Validators.required])),
@@ -185,11 +200,27 @@ export class SalesModalComponent {
     this.saveForm.get('car_id')?.valueChanges.subscribe((value: any) => {
       if (value  === '') return;
       this.carsSelected = this.cars.find((r: any) => r.id === value);
-      this.saveForm.get('sale_price')?.setValue(this.carsSelected.sale_price);
-      this.saveForm.get('sale_price_contado')?.setValue(this.carsSelected.sale_price);
+      if (this.carsSelected === undefined) return;  
+      // this.saveForm.get('sale_price')?.setValue(this.carsSelected.sale_price === null ? this.carsSelected.purchases.length ?  this.carsSelected.purchases[0].total : this.carsSelected.sale_price);
+      // this.saveForm.get('sale_price_contado')?.setValue(this.carsSelected.sale_price);
+      this.saveForm.get('sale_price')?.setValue(
+        this.carsSelected.sale_price === null
+          ? (this.carsSelected.purchases?.length
+              ? this.carsSelected.purchases[0].total
+              : null)
+          : this.carsSelected.sale_price
+      );
+
+      this.saveForm.get('sale_price_contado')?.setValue(
+        this.carsSelected.sale_price === null
+          ? (this.carsSelected.purchases?.length
+              ? this.carsSelected.purchases[0].total
+              : null)
+          : this.carsSelected.sale_price
+      );
 
       if (this.saveForm.get('sales_type')?.value === 'apartado') {
-        if (this.saveForm.get('liquidate')?.value === false) {;
+        if (this.saveForm.get('liquidate')?.value === false) {
           this.saveForm.get('sale_price')?.disable();
         }else{
           this.saveForm.get('sale_price')?.disable();
@@ -204,13 +235,23 @@ export class SalesModalComponent {
 
     this.saveForm.get('liquidate')?.valueChanges.subscribe((value: any) => {
       if (this.saveForm.get('sales_type')?.value === 'normal') {
+ 
       if (value) {
         this.saveForm.get('sale_price')?.enable(); 
-      }else{
-        
-        this.saveForm.get('qty_months')?.setValue('');
-        this.saveForm.get('desired_advance')?.setValue(null);
+        this.saveForm.get('payment_days')?.clearValidators();
+        this.saveForm.get('payment_days')?.updateValueAndValidity();
+
+        // this.saveForm.get('desired_advance')?.setValue(null);
         this.saveForm.get('desired_advance')?.disable();
+        
+      }else{
+        this.saveForm.get('qty_months')?.setValue('');
+        // this.saveForm.get('desired_advance')?.setValue(null);
+        this.saveForm.get('desired_advance')?.enable();
+
+        this.saveForm.get('payment_days')?.setValidators([Validators.required]);
+        this.saveForm.get('payment_days')?.updateValueAndValidity();
+        this.saveForm.get('payment_days')?.setErrors(null); 
       }
       // apartado 
       }else{
@@ -508,7 +549,7 @@ export class SalesModalComponent {
     this.dialogRef?.close(flag);
   }
 
-  save() {
+  async save() {
     if (this.saveForm.invalid) {
       this.saveForm.markAllAsTouched(); 
       return;
@@ -553,6 +594,7 @@ export class SalesModalComponent {
       }
     }
     
+
     this.saveForm.value.guarantee_time = 0;
     this.loading = true;
     const date = this.saveForm.value.date_delivery; 
@@ -648,7 +690,7 @@ export class SalesModalComponent {
           let amount = this.saveForm.get('sale_price')?.value;
           if (this.saveForm.value.sales_type === 'apartado') {
             if (this.saveForm.get('liquidate')?.value === true) {
-              amount = this.carsSelected.amount_sale - this.carsSelected.amount_down_payment
+              amount = this.carsSelected.amount_sale - this.carsSelected.total
             } else {
               amount =   this.saveForm.get('desired_advance')?.value - this.carsSelected.total
               if (amount === 0) {

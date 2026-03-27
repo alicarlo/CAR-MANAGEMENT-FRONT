@@ -284,8 +284,8 @@
                 decimalMarker="."
               />
                <div class="error-messages">
-                <ng-container *ngFor="let error of error_messages.sale_price">
-                  <div class="error-message" *ngIf="saveForm.get('sale_price').hasError(error.type) && (saveForm.get('sale_price').dirty || saveForm.get('sale_price').touched)">
+                <ng-container *ngFor="let error of error_messages.sale_price_contado">
+                  <div class="error-message" *ngIf="saveForm.get('sale_price_contado').hasError(error.type) && (saveForm.get('sale_price_contado').dirty || saveForm.get('sale_price_contado').touched)">
                     {{error.message}}
                   </div>
                 </ng-container>
@@ -336,6 +336,13 @@
                 mask="separator.2"          
                 decimalMarker="."
               />
+               <div class="error-messages">
+                <ng-container *ngFor="let error of error_messages.desired_advance">
+                  <div class="error-message" *ngIf="saveForm.get('desired_advance').hasError(error.type) && (saveForm.get('desired_advance').dirty || saveForm.get('desired_advance').touched)">
+                    {{error.message}}
+                  </div>
+                </ng-container>
+              </div>
             </div>
 
             <div class="flex flex-col gap-2" *ngIf="saveForm.get('liquidate')?.value === false">

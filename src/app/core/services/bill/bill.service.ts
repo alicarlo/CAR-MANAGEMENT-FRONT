@@ -35,11 +35,13 @@ export class BillService {
   }
 
 
-  public getBills(pageSize?: number, currentPage?: number): Observable<any> {
+  public getBills(pageSize?: number, currentPage?: number, filter?: string): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
-    return this.http.get<any>(`${environment.apiUrl}/bill/?column=status&value=active&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+    let filterSend = ''
+    filterSend = filter === '' ? 'column=status&value=active' : `column=name&value=${filter}`
+    return this.http.get<any>(`${environment.apiUrl}/bill/?${filterSend}&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
       retry(0),
       catchError(this.error.handleError)
     );

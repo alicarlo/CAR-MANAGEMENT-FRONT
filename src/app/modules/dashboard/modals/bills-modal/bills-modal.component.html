@@ -144,6 +144,7 @@
             </div>
           </div>
 
+          <!--
           <div class="flex flex-col gap-2">
             <label for="sexo" class="text-foreground text-[11px] font-medium">Clasificacion de Gasto:</label>
             <div class="relative">
@@ -163,7 +164,71 @@
               </select>
             </div>
 
-              <div class="error-messages">
+            <div class="error-messages">
+              <ng-container *ngFor="let error of error_messages.classification_bill_id">
+                <div class="error-message" *ngIf="saveForm.get('classification_bill_id').hasError(error.type) && (saveForm.get('classification_bill_id').dirty || saveForm.get('classification_bill_id').touched)">
+                  {{error.message}}
+                </div>
+              </ng-container>
+            </div>
+          </div>
+          -->
+          <div class="flex flex-col gap-2">
+            <label for="sexo" class="text-foreground text-[11px] font-medium">Clasificacion de Gasto:</label>
+            <div class="relative">
+              <button
+                type="button"
+                class="w-full py-2 pl-8 pr-10 rounded-md bg-background text-foreground
+                      border border-border text-left
+                      focus:outline-none focus:ring-2 focus:ring-primary/50
+                      flex items-center justify-between"
+                (click)="toggleClassificationDropdown()"
+              >
+                <span class="truncate text-[13px]">
+                  {{ selectedClassificationLabel || 'Selecciona…' }}
+                </span>
+                <span class="absolute right-3 text-xs opacity-70">▼</span>
+              </button>
+
+              <div
+                *ngIf="classificationDropdownOpen"
+                class="absolute z-30 mt-1 w-full rounded-md bg-background border border-border shadow-lg"
+              >
+                <div class="p-2 border-b border-border">
+                  <input
+                    type="text"
+                    placeholder="Filtrar clasificacion…"
+                    class="w-full py-1.5 px-3 rounded-md
+                          bg-background text-foreground
+                          border border-border text-[11px]
+                          focus:outline-none focus:ring-1 focus:ring-primary/50
+                          box-border"
+                    [formControl]="classificationFilterControl"
+                    (keydown.escape)="closeClassificationDropdown()"
+                  />
+                </div>
+
+                <div class="max-h-60 overflow-y-auto">
+                  <button
+                    type="button"
+                    class="w-full text-left px-3 py-2 text-[13px] text-foreground
+                          hover:bg-card flex items-center gap-2"
+                    *ngFor="let s of filteredClassification"
+                    (click)="selectClassification(s)"
+                  >
+                    {{ s.name}}
+                  </button>
+
+                  <div
+                    *ngIf="filteredClassification.length === 0"
+                    class="px-3 py-2 text-[11px] text-muted-foreground"
+                  >
+                    Sin resultados
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="error-messages">
               <ng-container *ngFor="let error of error_messages.classification_bill_id">
                 <div class="error-message" *ngIf="saveForm.get('classification_bill_id').hasError(error.type) && (saveForm.get('classification_bill_id').dirty || saveForm.get('classification_bill_id').touched)">
                   {{error.message}}
@@ -213,8 +278,10 @@
               [class.text-muted-foreground]="saveForm.get('amount')?.disabled"
               [class.border-muted]="saveForm.get('amount')?.disabled"
               placeholder="Monto"
-              min="1"
-              type="number"
+              type="text"
+              inputmode="numeric" 
+              mask="separator.2"          
+              decimalMarker="."
               formControlName="amount" 
             />
             <div class="error-messages">

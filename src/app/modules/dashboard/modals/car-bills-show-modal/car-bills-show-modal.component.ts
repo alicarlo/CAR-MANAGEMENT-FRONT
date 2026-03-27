@@ -46,12 +46,19 @@ export class CarBillsShowModalComponent {
           this.totalBills = response.items.reduce((sum: any, item: any) => sum + item.total, 0);
           this.loadingModal = true;
         }
-        this.loadingModal = true;
+        setTimeout(() => {
+          this.loadingModal = true;  
+        },600)
+        
       },
       error: (err) => {
         if (err.error === "Token expired") return;
         this._ToastrService.error(err.error, 'Error');
       },
     })
+  }
+  
+  get sum() {
+    return this.totalBills + this.data.row.cost
   }
 }

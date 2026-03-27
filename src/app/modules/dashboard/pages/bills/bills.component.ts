@@ -1,7 +1,7 @@
 import { Component, model } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
-import { Subject } from 'rxjs';
+import { debounceTime, Observable, of, Subject, switchMap } from 'rxjs';
 import { RowAction, RowActionEvent } from 'src/app/core/models/actions.model';
 import { TypeExpense } from 'src/app/core/models/typeExpense.model';
 import { TypeExpenseService } from 'src/app/core/services/typeExpense/type-expense.service';
@@ -29,7 +29,7 @@ export class BillsComponent {
     { key: 'name', type: 'text' },
     { key: 'total', type: 'money' },
     { key: 'key', type: 'text' },
-    { key: 'car', type: 'text' },
+    { key: 'carDataCol', type: 'text' },
   ]
   readonly actions: RowAction[] = [
     { icon: 'search',  id: 'search',  label: 'Visualizar Pagos' },
@@ -57,11 +57,28 @@ export class BillsComponent {
   private query$ = new Subject<string>();
 
   pages: number = 0;
+  filter: string = '';  
   constructor(
     private _MatDialog: MatDialog,
     private _ToastrService: ToastrService,
     private _BillService: BillService
-  ) {}
+  ) {
+    this.query$
+      .pipe(
+        debounceTime(300),
+        // distinctUntilChanged(),
+        switchMap(q => {
+          if (!q || q.length < 2) {
+            this.getBills();
+            return of(null);
+          }
+          
+          this.filter = q
+          return this.getBills();
+        })
+      )
+      .subscribe();
+  }
 
   ngOnInit() {
     this.getBills();
@@ -75,7 +92,7 @@ export class BillsComponent {
   }
 
   openShowModal(action: string, data: any) {
-    data['car'] = {
+    data['carData'] = {
       key: data.cars.length > 0 ? data.cars[0].key : '-',
           make: data.cars.length > 0 ? data.cars[0].make : '-', 
           line: data.cars.length > 0 ? data.cars[0].version : '-', 
@@ -206,9 +223,9 @@ export class BillsComponent {
     });
   }
 
-  getBills() {
+  async getBills() {
     this.loading = false;
-    this._BillService.getBills(this.pageSize, this.currentPage).subscribe({
+    this._BillService.getBills(this.pageSize, this.currentPage, this.filter).subscribe({
       next: async (response: any) => {
         if(response) {
   
@@ -219,11 +236,11 @@ export class BillsComponent {
 
           this.bills = response.items.map((r: any) => ({ 
             ...r,
-            key: r.cars.length > 0 ? r.cars[0].key : '-',
-            make: r.cars.length > 0 ? r.cars[0].make : '-', 
-            line: r.cars.length > 0 ? r.cars[0].version : '-', 
-            model: r.cars.length > 0 ? r.cars[0].model : '-', 
-            car:  r.cars.length > 0 ?  `${r.cars[0].make } ${r.cars[0].version} ${r.cars[0].model } ${r.cars[0].color }` : '-'
+            key: r.cars !== undefined && r.cars.length > 0 ? r.cars[0].key : '-',
+            make: r.cars !== undefined && r.cars.length > 0 ? r.cars[0].make : '-', 
+            line: r.cars !== undefined && r.cars.length > 0 ? r.cars[0].version : '-', 
+            model: r.cars !== undefined && r.cars.length > 0 ? r.cars[0].model : '-', 
+            carDataCol:  r.cars !== undefined && r.cars.length > 0 ?  `${r.cars[0].make } ${r.cars[0].version} ${r.cars[0].model } ${r.cars[0].color }` : '-'
           }));
           this.total = response.pagination.total_items;
 

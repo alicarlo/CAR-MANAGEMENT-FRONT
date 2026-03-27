@@ -15,11 +15,13 @@ import { TypePaymentsService } from 'src/app/core/services/typePayments/type-pay
 import { ShopingService } from 'src/app/core/services/shoping/shoping.service';
 import { environment } from 'src/environments/environment';
 import moment from 'moment';
+import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
 
 
 @Component({
   selector: 'app-bills-modal',
-  imports: [ButtonComponent, CommonModule, MatDialogModule, FormsModule, ReactiveFormsModule, MatIconModule],
+  imports: [NgxMaskDirective, NgxMaskPipe,ButtonComponent, CommonModule, MatDialogModule, FormsModule, ReactiveFormsModule, MatIconModule],
+  providers: [provideNgxMask()],
   templateUrl: './bills-modal.component.html',
   styleUrl: './bills-modal.component.css'
 })
@@ -62,6 +64,11 @@ export class BillsModalComponent {
   carsDropdownOpen = false;
   carFilterControl = new FormControl('');
   selectedCarLabel = '';
+
+  filteredClassification: any[] = [];
+  classificationDropdownOpen = false;
+  classificationFilterControl = new FormControl('');
+  selectedClassificationLabel = '';
   constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 
@@ -82,13 +89,23 @@ export class BillsModalComponent {
   ngOnInit(): void {
     this.init();
     this.carFilterControl.valueChanges.subscribe(term => {
-        const value = (term || '').toString().toLowerCase().trim();
+      const value = (term || '').toString().toLowerCase().trim();
 
-        this.filteredCars = this.cars.filter(car => {
-          const text = `${car.key} ${car.make} ${car.model} ${car.plate || ''}`.toLowerCase();
-          return text.includes(value);
-        });
+      this.filteredCars = this.cars.filter(car => {
+        const text = `${car.key} ${car.make} ${car.model} ${car.plate || ''}`.toLowerCase();
+        return text.includes(value);
       });
+    });
+
+
+    this.classificationFilterControl.valueChanges.subscribe(term => {
+      const value = (term || '').toString().toLowerCase().trim();
+
+      this.filteredClassification = this.classification.filter(classification => {
+        const text = `${classification.name}`.toLowerCase();
+        return text.includes(value);
+      });
+    });
     this.getClassification();
     this.getCars();
     this.getUsers();
@@ -153,6 +170,24 @@ export class BillsModalComponent {
     this.closeCarsDropdown();
   }
 
+  toggleClassificationDropdown() {
+    this.classificationDropdownOpen = !this.classificationDropdownOpen;
+    if (this.classificationDropdownOpen) {
+      this.classificationFilterControl.setValue('');
+      this.filteredClassification = [...this.classification];
+    }
+  }
+
+  closeClassificationDropdown() {
+    this.classificationDropdownOpen = false;
+  }
+
+  selectClassification(clasification: any) {
+    this.selectedClassificationLabel = `${clasification.name}`;
+    this.saveForm.patchValue({ classification_bill_id: clasification.id });
+    this.closeClassificationDropdown();
+  }
+
   getClassification() {
     this._ExpenseClasificationService.getExpenseClasification(500, 1).subscribe({
       next: async (response: any) => {
@@ -160,6 +195,15 @@ export class BillsModalComponent {
           this.classification = response.items
             .map((r: any) => ({ ...r }))
             .sort((a: any, b: any) => a.name.localeCompare(b.name));
+
+          this.filteredClassification = [...this.classification];
+          if (this.data.row.classification_bill_id) {
+            const clasification = this.classification.find(c => c.id === this.data.row.classification_bill_id);
+            if (clasification) {
+              this.selectedClassificationLabel = `${clasification.name}`;
+            }
+          }
+            
         }
       },
       error: (err) => {

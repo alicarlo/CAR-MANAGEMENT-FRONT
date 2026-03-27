@@ -91,7 +91,7 @@ export class DocumentsModalComponent {
       descriptions: new FormControl (this.data.row === null ? '' : this.data.row.descriptions,Validators.compose([Validators.required])),
       file: new FormControl (this.data.row === null ? '' : this.data.row.file,Validators.compose([Validators.required])),
       id: new FormControl (this.data.row === null ? '' : this.data.row.id,),
-      car_id: new FormControl (this.data.row === null ? '' : this.data.row.car_id,),
+      car_id: new FormControl (this.data.row === null ? '' : this.data.row.cars[0].id),
   	});
   }
 
@@ -119,7 +119,13 @@ export class DocumentsModalComponent {
         if(response) {
           this.cars = response.items.map((r: any) => ({ ...r }));
           this.filteredCars = [...this.cars];
+          if (this.data.row.cars[0].id) {
+            const car = this.cars.find(c => c.id === this.data.row.cars[0].id);
+            if (car) {
+              this.selectedCarLabel = `${car.make} - ${car.model}`;
+            }
           }
+        }
       },
       error: (err) => {
         if (err.error === "Token expired") return;

@@ -1,15 +1,31 @@
 <mat-dialog-content>
   <div class="p-[20px]">
     <div  class="flex flex-col gap-4">
-      <p class="text-foreground font-semibold">Abono</p>
+      <p class="text-foreground font-semibold">
+        <span *ngIf="data.flag !== 4 || data.flag === 5">Abono</span>
+        <span *ngIf="data.flag === 4">Agregar pago</span>
+      </p>
+
+      <div *ngIf="data.flag === 4 || data.flag === 5">
+        <label class="text-foreground text-[12px] font-medium">Información del Monto:</label>
+        <div class="border border-border/60 rounded-lg bg-card p-2 flex flex-wrap gap-2">
+          <p class="text-foreground text-[11px]"><strong>Monto:</strong> {{ data.itemSelected.amount | currency }}</p>
+          <p class="text-foreground text-[11px]"><strong>Monto pagado:</strong> {{ incomeAmount() | currency }}</p>
+          <p class="text-foreground text-[11px]"><strong>Fecha de pago:</strong> {{ data.itemSelected.paid_at | date : 'dd/MM/yyyy' }}</p>
+        </div>
+      </div>
+      
       <div>
         <form  [formGroup]="saveForm" class="flex flex-col gap-6">
           <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2">
             <div class="flex flex-col gap-2" >
-              <p class="text-foreground text-[11px] font-medium">Monto recibido por Apartado:</p>
+              <p class="text-foreground text-[11px] font-medium">
+                <span *ngIf="data.flag !== 4 || data.flag !== 5">Monto recibido por Apartado:</span>
+                <span *ngIf="data.flag === 4 || data.flag === 5">Monto:</span>
+              </p>
               <input
                 class="py-2 pl-8 pr-2"
-                placeholder="Monto recibido por Apartado"
+                [placeholder]="data.flag !== 4 || data.flag !== 5 ? 'Monto recibido por Apartado' : 'Monto'"
                 formControlName="amount" 
                 type="text"
                 inputmode="numeric" 
@@ -154,7 +170,7 @@
 
 <mat-dialog-actions align="end">
   <div class="flex gap-2 p-[20px]">
-    <app-button [loading]="loading" (click)="save()" full impact="bold" tone="primary" shape="rounded" size="medium">Guardar</app-button>
+    <app-button [loading]="loading" (click)="data.flag === 4 ? saveMonto() : save()"  full impact="bold" tone="primary" shape="rounded" size="medium">Guardar</app-button>
     <app-button [disabled]="loading"  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
   </div>
 </mat-dialog-actions>

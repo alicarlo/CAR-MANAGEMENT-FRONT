@@ -348,6 +348,44 @@
                 </div>
               </div>
             </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Margen:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Margen"
+                formControlName="margen" 
+                type="text"
+                inputmode="numeric" 
+                mask="separator"
+                thousandSeparator=","   
+                [dropSpecialCharacters]="true"
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Comision:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Comision"
+                formControlName="comision" 
+                type="text"
+                inputmode="numeric" 
+                mask="separator"
+                thousandSeparator=","   
+                [dropSpecialCharacters]="true"
+              />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <p class="text-foreground text-[11px] font-medium">Bono:</p>
+              <input
+                class="py-2 pl-8 pr-2"
+                placeholder="Bono"
+                formControlName="bono" 
+                type="text"
+              />
+            </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">

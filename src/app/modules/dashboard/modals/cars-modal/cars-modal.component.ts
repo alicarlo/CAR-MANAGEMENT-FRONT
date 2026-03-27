@@ -129,7 +129,9 @@ export class CarsModalComponent {
 
   init() {
     this.saveForm = this._FormBuilder.group({
-
+      margen: new FormControl(this.data.row === null ? '' : this.data.row.margen),
+      comision: new FormControl(this.data.row === null ? '' : this.data.row.comision),
+      bono: new FormControl(this.data.row === null ? '' : this.data.row.bono),
       cost: new FormControl(this.data.row === null ? null : this.data.row.cost, Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
       make: new FormControl (this.data.row === null ? '' : this.data.row.make,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
       model: new FormControl (this.data.row === null ? '' : this.data.row.model,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),

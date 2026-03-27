@@ -13,6 +13,7 @@ import { TypePaymentsService } from 'src/app/core/services/typePayments/type-pay
 import { IncomeService } from 'src/app/core/services/income/income.service';
 import moment from 'moment';
 import { environment } from 'src/environments/environment';
+import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
 
 @Component({
   selector: 'app-income-modal',
@@ -47,6 +48,8 @@ export class IncomeModalComponent {
   previewUrl: string | null = null;
   fileIcon: string = 'insert_drive_file';
   fileExt: string = '';
+
+  ref: any;
   constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 
@@ -55,12 +58,12 @@ export class IncomeModalComponent {
     private _ToastrService: ToastrService,
     private _IncomeService: IncomeService,
     private _TypePaymentsService: TypePaymentsService,
-    private _AuthService: AuthService
+    private _AuthService: AuthService,
+    private _MatDialog: MatDialog,
   ) 
   {}
 
   ngOnInit(): void {
-
     this.init();
     this.getTypePayments();
   }
@@ -75,7 +78,8 @@ export class IncomeModalComponent {
         comments: new FormControl(this.data.row === null ? '' : this.data.row.layaway.comments),
         id: new FormControl(this.data.row === null ? '' : this.data.row.id),
       });
-    }else{
+    }else
+    if(this.data.flag === 1){
       this.saveForm = this._FormBuilder.group({
         user_id: new FormControl(this._AuthService.user()?.user_id),
         layaway_id: new FormControl(this.data.row.id),
@@ -86,7 +90,25 @@ export class IncomeModalComponent {
         file: new FormControl (null),
         name: new FormControl (''),
       });
+    }else{
+      this.saveForm = this._FormBuilder.group({
+        // sale_id
+        user_id: new FormControl(this._AuthService.user()?.user_id),
+        installment_id: new FormControl(this.data.itemSelected.id),
+        payment_method_id: new FormControl('',Validators.compose([Validators.required])),
+        amount: new FormControl('',Validators.compose([Validators.required])),
+        comments: new FormControl(''),
+        date_income: new FormControl(this.todayStr),
+        file: new FormControl (null),
+      });
     }
+  }
+
+  incomeAmount() {
+    return (this.data.itemSelected.incomes || []).reduce(
+      (acc: number, item: any) => acc + (Number(item.amount) || 0),
+      0
+    );
   }
 
   dateFormat(date: string) { 
@@ -153,7 +175,7 @@ export class IncomeModalComponent {
           let type: any = 10;
           const formData = new FormData();
           formData.append('document_type_id', type);
-          formData.append('descriptions', 'Abono de apartado');
+          formData.append('descriptions', this.data.flag === 5 ? 'Abono de apartado' : 'Abono de cobranza');
           formData.append('file', this.saveForm.value.file);
 
           const token = this._AuthService.tokenValue;
@@ -184,6 +206,9 @@ export class IncomeModalComponent {
         filledValues['document_id'] = documentId;
       }
 
+      if (this.data.flag !== 0) {
+        filledValues['description'] = this.saveForm.value.comments;
+      }
       
       methodMap[methodSelect](filledValues).subscribe({
       next: async (response) => {
@@ -216,6 +241,164 @@ export class IncomeModalComponent {
         this._ToastrService.error(err.error, 'Error');
       },
     })
+  }
+
+  async actionModalFile(flag: number,action: string, data: any, msg: string, color: string = '!text-blue-500', icon = 'cloud_download') {
+      color = flag === 1
+        ? '!text-blue-500'
+        : flag === 2
+          ? '!text-red-500'
+          : '!text-green-500';
+      icon = flag === 1
+        ? 'cloud_download'
+        : flag === 2
+          ? 'delete'
+          : 'check';
+          
+      let dataSend = {action, row: data, msg, color, icon};
+  
+      this.ref = this._MatDialog.open(ActionMessageComponent, {
+        data: dataSend,
+        disableClose: true,
+        panelClass: ['custom-dialog-container', 'dialog-40'],
+        width: '40vw',
+        height: '40vh',
+        maxWidth: '40vw'
+      });
+      
+      return new Promise((resolve) => {
+        this.ref.componentInstance.accept.subscribe(() => {
+          this.ref.close(true);
+          resolve(true);
+        });
+
+        this.ref.afterClosed().subscribe((result: any) => {
+          resolve(!!result);
+        });
+      });
+    }
+
+  async saveMonto() {
+    if (this.saveForm.invalid) {
+      this.saveForm.markAllAsTouched(); 
+      return;
+    }
+
+    const flagShow =  await this.actionModalFile(3,'approve', '', 'Desea continuar con el pago?');
+    if (flagShow === false) return;
+    this.loading = true;
+    
+    const incomes = this.buildIncomesFromPayment();
+    if (!incomes) return;
+    const payload = {
+      incomes
+    };
+
+    let documentId = '';    
+    try {
+      if (this.saveForm.value.file !== null) {
+        let type: any = 10;
+        const formData = new FormData();
+        formData.append('document_type_id', type);
+        formData.append('descriptions', 'Pago en cobranza');
+        formData.append('file', this.saveForm.value.file);
+
+        const token = this._AuthService.tokenValue;
+        const response = await fetch(`${environment.apiUrl}/document/`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          this.loading = false;
+          throw new Error(`Error en la solicitud: ${response.statusText}`);
+        }
+
+        const raw = await response.text();
+        let data: any;
+        data = JSON.parse(raw);
+        documentId = data.id;
+      }
+      const methodMap = {
+        registerIncome: this._IncomeService.registerIncome.bind(this._IncomeService),
+        updateInstallment:   this._IncomeService.updateIntallment.bind(this._IncomeService),
+      } as const;
+
+      let completed = 0;
+      let total = incomes.length;
+      let hasError = false;
+
+      for (const income of incomes) {
+        const payload: any = {
+          user_id: income.user_id,
+          installment_id: income.installment_id,
+          payment_method_id: income.payment_method_id,
+          amount: income.amount,
+          comments: income.comments,
+          date_income: income.date_income,
+          file: income.file,
+        };
+
+        if (documentId !== '') {
+          payload['document_id'] = documentId;
+        }
+
+        methodMap.registerIncome(payload).subscribe({
+          next: (response) => {
+
+            if (income.paid === true) {
+              methodMap.updateInstallment({ paid: true, id: income.installment_id }).subscribe({
+                next: () => finish(),
+                error: (err) => handleError(err)
+              });
+            } else {
+              finish();
+            }
+          },
+          error: (err) => handleError(err)
+        });
+      }
+
+      const finish = () => {
+        completed++;
+
+        if (completed === total && !hasError) {
+          this.loading = false;
+          this._ToastrService.success('Pago registrado correctamente', 'Éxito');
+          this.close(true);
+        }
+      };
+
+      const handleError = (err: any) => {
+        hasError = true;
+        this.loading = false;
+
+        if (!Array.isArray(err.error)) {
+          this._ToastrService.error(err.error, 'Error');  
+          return;
+        }
+
+        if (err.error === "Token expired") {
+          this.close();
+          return;
+        }
+
+        if (err.error?.length) {
+          for (const item of err.error) {
+            this._ToastrService.error(item.msg, 'Error');  
+          }
+        }
+      };
+    
+    } catch (err: any) {
+      this.loading = false;
+      this._ToastrService.error(err.message, 'Error');
+    }
+          
+      
   }
 
   close(flag: boolean = false) {
@@ -323,5 +506,195 @@ export class IncomeModalComponent {
   private getExt(name: string): string {
     const i = name.lastIndexOf('.');
     return i >= 0 ? name.slice(i).toLowerCase() : '';
+  }
+
+
+  buildIncomesFromPayment() {
+    let payment = this.saveForm.value.amount;
+
+    // limpiar formato $13,571.43
+    payment = Number((payment + '').replace(/[$,]/g, ''));
+
+    const selected = this.data.itemSelected;
+
+    // ❌ validar monto inválido general
+    if (!payment || payment <= 0) {
+      this.saveForm.get('amount')?.setErrors({ invalidAmount: true });
+      this._ToastrService.error(
+        'El monto debe ser mayor, si requieres abonar un monto parcial, usa el botón "Abonar"',
+        'Error'
+      );
+      this.loading = false;
+      return null;
+    }
+
+    const installments = this.data.data;
+
+    // 🔥 calcular pendiente del seleccionado
+    const selectedPaid = (selected.incomes || []).reduce(
+      (acc: number, inc: any) => acc + (Number(inc.amount) || 0),
+      0
+    );
+
+    const selectedPending = Math.max(
+      (Number(selected.amount) || 0) - selectedPaid,
+      0
+    );
+
+    // 🔴 VALIDACIÓN IMPORTANTE
+    if (payment < selectedPending) {
+      this.saveForm.get('amount')?.setErrors({ minAmount: true });
+      this._ToastrService.error(
+        `El monto debe ser igual o mayor a ${selectedPending}, si requieres abonar un monto parcial, usa el botón "Abonar"`,
+        'Error'
+      );
+      this.loading = false;
+      return null;
+    }
+
+    let remaining = payment;
+    let startProcessing = false;
+
+    const commonData = {
+      user_id: this.saveForm.value.user_id,
+      payment_method_id: this.saveForm.value.payment_method_id,
+      comments: this.saveForm.value.comments,
+      date_income: this.saveForm.value.date_income,
+      file: this.saveForm.value.file
+    };
+
+    const incomes: any[] = [];
+
+    for (const item of installments) {
+
+      if (item.id === selected.id) {
+        startProcessing = true;
+      }
+
+      if (!startProcessing) continue;
+      if (item.paid) continue;
+      if (remaining <= 0) break;
+
+      // 🔥 calcular lo ya pagado
+      const totalPaid = (item.incomes || []).reduce(
+        (acc: number, inc: any) => acc + (Number(inc.amount) || 0),
+        0
+      );
+
+      // 🔥 calcular pendiente real
+      const pendingAmount = Math.max(
+        (Number(item.amount) || 0) - totalPaid,
+        0
+      );
+
+      if (pendingAmount <= 0) continue;
+
+      if (remaining >= pendingAmount) {
+        // ✅ pago completo
+        incomes.push({
+          installment_id: item.id,
+          amount: pendingAmount,
+          paid: true,
+          ...commonData
+        });
+
+        remaining -= pendingAmount;
+
+      } else {
+        // ⚠️ pago parcial
+        incomes.push({
+          installment_id: item.id,
+          amount: remaining,
+          paid: false,
+          ...commonData
+        });
+
+        remaining = 0;
+      }
+    }
+
+    return incomes;
+  }
+
+  buildIncomesFromPayment2() {
+    let payment = this.saveForm.value.amount;
+
+    // limpiar formato $13,571.43
+    payment = Number((payment + '').replace(/[$,]/g, ''));
+
+    const selected = this.data.itemSelected;
+
+    // ❌ validar monto inválido general
+    if (!payment || payment <= 0) {
+      this.saveForm.get('amount')?.setErrors({ invalidAmount: true });
+      this._ToastrService.error(
+        'El monto debe ser mayor, si requieres abonar un monto parcial, usa el botón "Abonar"',
+        'Error'
+      );
+      this.loading = false;
+      return null;
+    }
+
+    // 🔴 VALIDACIÓN IMPORTANTE (la que te faltaba)
+    if (payment < selected.amount) {
+      this.saveForm.get('amount')?.setErrors({ minAmount: true });
+      this._ToastrService.error(
+        `El monto debe ser igual o mayor a ${selected.amount}, si requieres abonar un monto parcial, usa el botón "Abonar`,
+        'Error'
+      );
+      this.loading = false;
+      return null;
+    }
+
+    const installments = this.data.data;
+
+    let remaining = payment;
+    let startProcessing = false;
+
+    const commonData = {
+      user_id: this.saveForm.value.user_id,
+      payment_method_id: this.saveForm.value.payment_method_id,
+      comments: this.saveForm.value.comments,
+      date_income: this.saveForm.value.date_income,
+      file: this.saveForm.value.file
+    };
+
+    const incomes: any[] = [];
+
+    for (const item of installments) {
+
+      if (item.id === selected.id) {
+        startProcessing = true;
+      }
+
+      if (!startProcessing) continue;
+      if (item.paid) continue;
+      if (remaining <= 0) break;
+
+      if (remaining >= item.amount) {
+        // ✅ pago completo
+        incomes.push({
+          installment_id: item.id,
+          amount: item.amount,
+          paid: true,
+          ...commonData
+        });
+
+        remaining -= item.amount;
+
+      } else {
+        // ⚠️ pago parcial (solo en siguientes, nunca en el seleccionado)
+        incomes.push({
+          installment_id: item.id,
+          amount: remaining,
+          paid: false,
+          ...commonData
+        });
+
+        remaining = 0;
+      }
+    }
+
+    return incomes;
   }
 }

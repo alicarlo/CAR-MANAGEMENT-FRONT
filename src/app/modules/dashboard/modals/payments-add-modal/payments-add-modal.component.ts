@@ -5,6 +5,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
 import { ToastrService } from 'ngx-toastr';
 import { STATUS } from 'src/app/core/constants/global';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
@@ -17,7 +18,8 @@ import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-payments-add-modal',
-  imports: [ButtonComponent, CommonModule, MatDialogModule, FormsModule, ReactiveFormsModule, MatIconModule,MatDatepickerModule, MatNativeDateModule],
+  imports: [ NgxMaskDirective, NgxMaskPipe,ButtonComponent, CommonModule, MatDialogModule, FormsModule, ReactiveFormsModule, MatIconModule,MatDatepickerModule, MatNativeDateModule],
+  providers: [provideNgxMask()],
   templateUrl: './payments-add-modal.component.html',
   styleUrl: './payments-add-modal.component.css'
 })

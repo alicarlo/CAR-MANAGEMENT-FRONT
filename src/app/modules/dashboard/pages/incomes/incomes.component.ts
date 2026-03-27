@@ -51,7 +51,7 @@ export class IncomesComponent {
 
     { key: 'client', type: 'text' },
     { key: 'carData', type: 'text' },
-    { key: '', type: 'text' },
+    { key: 'description', type: 'text' },
     { key: 'status', type: 'status' },
     { key: 'statusReview', type: '',
       show: [
@@ -138,6 +138,7 @@ export class IncomesComponent {
             userData: r.user.full_name,
             typeIncome: r.sale.sales_type,
             paymenthMethod: r.payment_method.name,
+            description: r.description === null ? '-' : r.description,
             client: r.source === 'layaway' ? r.layaway.client.full_name : r.sale.client.full_name,
             carData: r.source === 'layaway' ? `${r.layaway.car.key} ${r.layaway.car.make} ${r.layaway.car.version} ${r.layaway.car.model} ${r.layaway.car.color}` : `${r.sale.car.key} ${r.sale.car.make} ${r.sale.car.version} ${r.sale.car.model} ${r.sale.car.color}`,
             amount: r.amount,

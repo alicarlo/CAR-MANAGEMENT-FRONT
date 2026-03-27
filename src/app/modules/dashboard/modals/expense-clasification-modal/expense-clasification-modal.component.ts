@@ -29,7 +29,7 @@ export class ExpenseClasificationModalComponent {
       {type: 'minlength', message: 'Minimo 3 caracteres'},
 		],
     'bill_type_id':[  
-      {type: 'required', message: 'Tipo de gastoes requerido'},
+      {type: 'required', message: 'Tipo de gasto es requerido'},
     ]
 	}
   typeExpense: any[] = [];

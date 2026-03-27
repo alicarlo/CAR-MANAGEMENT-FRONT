@@ -141,8 +141,10 @@
               <input
                 class="py-2 pl-8 pr-2"
                 placeholder="Monto"
-                type="number"
-                min="1"
+                type="text"
+                inputmode="numeric" 
+                mask="separator.2"          
+                decimalMarker="."
                 formControlName="amount" 
               />
               <div class="error-messages">

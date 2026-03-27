@@ -202,6 +202,7 @@ export class ShoppingModalComponent {
       },
     })
   }
+  
 
   close(flag: boolean = false) {
     this.dialogRef?.close(flag);

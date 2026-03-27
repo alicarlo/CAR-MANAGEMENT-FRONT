@@ -12,6 +12,17 @@ export class IncomeService {
   private error = inject(ErrorHandlerService);
   constructor() { }
 
+
+  public updateIntallment(bodyData: any): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.patch<any>(`${environment.apiUrl}/installment/${bodyData.id}`, bodyData ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
   public registerIncome(bodyData: any): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),

@@ -44,7 +44,7 @@
           >
             Próximo servicio:
             <span class="font-normal">
-              {{ data.row.arrive.review?.proximo_servicio | date:'dd/MM/yyyy' }}
+              {{ data.row.arrive.review?.proximo_servicio | date:'dd/MM/yyyy':'UTC' }}
             </span>
           </p>
         </div>
@@ -83,7 +83,7 @@
           >
             Expira:
             <span class="font-normal">
-              {{ data.row.arrive.review?.expira_garantia | date:'dd/MM/yyyy' }}
+              {{ data.row.arrive.review?.expira_garantia | date:'dd/MM/yyyy':'UTC' }}
             </span>
           </p>
         </div>

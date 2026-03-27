@@ -28,7 +28,7 @@ export class ActionMessageComponent {
 
   onAccept() { 
     this.accept.emit();
-   }   
+  }   
 
   onCancel() { 
     this.ref.close(false); 

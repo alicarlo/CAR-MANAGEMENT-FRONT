@@ -169,7 +169,7 @@ export class CollectionsComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-
+        this.getClassification();
       }
     });
   }
