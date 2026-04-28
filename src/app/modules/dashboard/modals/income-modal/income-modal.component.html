@@ -20,12 +20,13 @@
           <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2">
             <div class="flex flex-col gap-2" >
               <p class="text-foreground text-[11px] font-medium">
-                <span *ngIf="data.flag !== 4 || data.flag !== 5">Monto recibido por Apartado:</span>
-                <span *ngIf="data.flag === 4 || data.flag === 5">Monto:</span>
+                <span *ngIf="isApartado">Monto recibido por Apartado:</span>
+                <span *ngIf="!isApartado">Monto:</span>
               </p>
+
               <input
                 class="py-2 pl-8 pr-2"
-                [placeholder]="data.flag !== 4 || data.flag !== 5 ? 'Monto recibido por Apartado' : 'Monto'"
+                [placeholder]="isApartado ? 'Monto recibido por Apartado' : 'Monto'"
                 formControlName="amount" 
                 type="text"
                 inputmode="numeric" 

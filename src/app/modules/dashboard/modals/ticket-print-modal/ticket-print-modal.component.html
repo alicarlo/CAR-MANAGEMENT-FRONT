@@ -3,7 +3,7 @@
     <div  class="flex flex-col gap-4">
       <p class="text-foreground font-semibold">Ticket</p>
 
-      <div style="display: flex; width: 100%; justify-content: center;" >
+      <div style="display: flex; width: 100%; justify-content: center;" *ngIf="file === 1">
         <div id="print-section" style="width: 80mm; ">
           <div style="display: flex; flex-direction: column; width: 100%;   border-radius: 12px;">
             <br>
@@ -41,13 +41,1053 @@
           </div>
         </div>
       </div>
+
+      <!-- FORMATO A4 -->
+      <!-- CONTENEDOR SCROLL -->
+      <div class="w-full flex justify-center bg-gray-200 p-4 overflow-aut" *ngIf="file === 2">
+
+        <!-- HOJA A4 -->
+        <div id="print-section"
+            style="
+              width: 794px;
+              min-height: 1123px;
+              background: white;
+              padding: 60px;
+              box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+              font-family: Roboto, 'Helvetica Neue', sans-serif;
+              color: black;
+            ">
+
+          <!-- HEADER -->
+          <div style="display:flex; flex-direction:column; ; margin-bottom:30px;">
+            <div style="display:flex; width: 100%; justify-content: center;">
+              <img src="./assets/imgs/machucas.png" style=" height:80px; width: 112px;">
+            </div>
+            
+            <h2 style="margin:10px 0 0 0; font-weight:100; text-align:center">MACHUCAS AUTOMOTRIZ</h2>
+            <br>
+            <div style="display: flex; justify-content: space-between;">
+              <div style="display: flex; flex-direction: column; text-align: start;">
+                <p style="font-size:12px;">CALZADA INDENPENDENCIA 1375</p>
+                <p style="font-size:12px;">COL BENITO JUAREZ</p>
+                <p style="font-size:12px;">CP 21240 MEXICALI, B.C TEL. 686-5657272</p>
+              </div>
+              <div style="display: flex; flex-direction: column; text-align: end;">
+                <p style="font-size:12px;">BLVD LAZARO CARDENAS 1498</p>
+                <p style="font-size:12px;">COL BENITO JUAREZ</p>
+                <p style="font-size:12px;">CP 21240 MEXICALI, B.C TEL. 686-5657272</p>
+              </div>
+            </div>
+            <p style="font-size:12px; text-align: center;">RFC MAU000519AG0</p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; margin-bottom:20px;">
+            <div style="display: flex; gap: 20px;">
+              <p style="font-size:12px;">No DE RECIBO </p>
+              <p style="font-size:12px;">{{ dataTicket.id }}</p>
+            </div>
+            
+            <div style="display: flex; gap: 20px;">
+              <p style="font-size:12px;">FECHA Y HORA</p>
+              <p style="font-size:12px;">{{ currentDate }}</p>
+            </div>
+            
+          </div>
+          <div style="margin-bottom:20px;">
+            <p style="font-size:12px; background-color: black; color: white; width: 135px;">DATOS DEL CLIENTE:</p>
+            <p style="font-size:12px;">NOMBRE: {{ dataTicket.full.client.full_name }}</p>
+            <p style="font-size:12px;">DIRECCION: {{ dataTicket.full.client.address_street_1 }}</p>
+            <p style="font-size:12px;">TELEFONO: {{ dataTicket.full.client.phone }}</p>
+          </div>
+
+          <div style="margin-bottom:20px;">
+            <p style="font-size:12px; background-color: black; color: white; width: 75px;">CONCEPTO:</p>
+            <p style="font-size:12px;">TIPO DE PAGO: {{ formatIncomeType(dataTicket.income_type) }}</p>
+            <p style="font-size:12px;">FORMA DE PAGO: {{ dataTicket.paymenthMethod }}</p>
+          </div>
+
+          <div style="margin-bottom:20px;">
+            <p style="font-size:12px; background-color: black; color: white; width: 115px;">OBSERVACIONES:</p>
+            <br>
+    
+            <div style="display: flex; gap: 20px;">
+              <p style="font-size:12px; width: 80px;">SUBTOTAL:</p>
+              <p style="font-size:12px;">{{ dataTicket.full.incomeTotal| currency }}</p>
+            </div>
+
+            <div style="display: flex; gap: 20px;">
+              <p style="font-size:12px; width: 80px;">TOTAL:</p>
+              <p style="font-size:12px;">{{ dataTicket.full.incomeTotal | currency }}</p>
+            </div>
+           
+          </div>
+
+          <div style="margin-bottom:20px;">
+            <p style="font-size:12px;">IMPORTE CON LETRA:</p>
+            <p style="font-size:12px;">{{ numeroALetras(dataTicket.full.incomeTotal) }}</p>
+          </div>
+
+          <div style="margin-bottom:20px;">
+            <p style="font-size:12px; background-color: black; color: white; width: 55px;">RECIBE:</p>
+            <br>
+            <p style="font-size:12px;">{{ user.full_name }}</p>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="w-full flex justify-center bg-gray-200 p-4 overflow-auto" *ngIf="file === 3">
+
+        <!-- HOJA A4 -->
+        <div id="print-section"
+            style="
+              width: 794px;
+              min-height: 1123px;
+              background: white;
+              padding: 45px 50px;
+              box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+              font-family: Roboto, 'Helvetica Neue', sans-serif;
+              color: black;
+              font-size: 11px;
+              line-height: 1.45;
+            ">
+
+          <!-- ENCABEZADO -->
+          <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:20px;">
+            <img src="./assets/imgs/machucas.png" style="height:70px; width:98px; margin-bottom:10px;">
+            <p style="font-size:12px; font-weight:700; text-align:center; margin:0;">
+              CONTRATO DE COMPRA-VENTA DE VEHÍCULOS AUTOMOTORES USADOS
+            </p>
+          </div>
+
+          <!-- FECHA Y LUGAR -->
+          <div style="margin-bottom:16px;">
+            <p style="margin:0 0 6px 0;">
+              EN 
+              <span style="border-bottom:1px solid black; min-width:140px;"></span>
+              A
+              <span style="border-bottom:1px solid black; min-width:40px; text-align:center;">
+                {{ day }}
+              </span>
+              DE
+              <span style="border-bottom:1px solid black; min-width:140px; text-align:center;">
+                {{ month }}
+              </span>
+              DEL
+              <span style="border-bottom:1px solid black; min-width:70px; text-align:center;">
+                {{ year }}
+              </span>
+            </p>
+
+            <p style="margin:0; text-align:justify;">
+              CONTRATO DE COMPRA-VENTA DE VEHÍCULOS AUTOMOTORES USADOS QUE CELEBRAN POR UNA PARTE
+              <b>MACHUCAS AUTOMOTRIZ S. DE R.L.</b>, A QUIEN EN LO SUCESIVO SE LE DENOMINARÁ
+              <b>“EL VENDEDOR”</b> Y POR OTRA PARTE
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:260px;">{{ contractData.clientName }}</span>
+              A QUIEN EN LO SUCESIVO SE LE DENOMINARÁ <b>“EL COMPRADOR”</b> AL TENOR DE LAS SIGUIENTES
+              DECLARACIONES Y CLÁUSULAS.
+            </p>
+          </div>
+
+          <!-- DECLARACIONES -->
+          <div style="margin-bottom:16px;">
+            <p style="font-weight:700; text-align:center; margin:0 0 8px 0;">D E C L A R A C I O N E S</p>
+
+            <p style="margin:0 0 6px 0;"><b>I. DECLARA EL “VENDEDOR”:</b></p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              a) SER UNA PERSONA MORAL, CUYA ACTIVIDAD PREPONDERANTE ES LA COMPRAVENTA DE VEHÍCULOS USADOS
+              QUE SE ENCUENTRA REGULADA Y EN CUMPLIMIENTO CONFORME A LAS NORMAS OFICIALES VIGENTES QUE NOS
+              RIGEN EN ESTE PAÍS EN MATERIA DE SEGURIDAD Y PROTECCIÓN AL MEDIO AMBIENTE, DEBIDAMENTE REGISTRADA
+              COMO SOCIO ACTIVO EN LA ASOCIACIÓN NACIONAL DE COMERCIANTES EN AUTOMÓVILES Y CAMIONES NUEVOS Y
+              USADOS, A.C. (ANCA). EL PROVEEDOR, COMO LEGÍTIMO PROPIETARIO, VENDE AL CLIENTE EL VEHÍCULO USADO
+              EN LAS CONDICIONES EN LAS QUE SE ENCUENTRA Y CUYAS CARACTERÍSTICAS SE DETALLAN EN ESTE CONTRATO.
+            </p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              INFORMACIÓN QUE SE PUEDE CONSTATAR EN LA PÁGINA WWW.ANCA.COM.MX, TEL. 018002602622 O VÍA
+              CORREO ELECTRÓNICO, CONTRATO&#64;ANCA.COM.MX
+            </p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              b) EN CASO DE PERSONA MORAL DECLARA QUE: ES UNA SOCIEDAD LEGALMENTE CONSTITUIDA, TAL COMO CONSTA
+              EN LA ESCRITURA PÚBLICA NO. 20692 DE FECHA 19 DE MAYO DEL 2000, PASADA ANTE LA FE DEL LIC. CARLOS
+              C. ENRÍQUEZ DE RIVERA, NOTARIO PÚBLICO NO. 9, INSCRITA EN EL REGISTRO PÚBLICO DE LA PROPIEDAD Y
+              COMERCIO DE MEXICALI, BAJA CALIFORNIA, BAJO EL NO. 5183305.
+            </p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              c) QUE ESTÁ REPRESENTADA POR JOSÉ MACHUCA VÁSQUEZ, SEGÚN TESTIMONIO NOTARIAL NO. 20800,
+              PASADO ANTE LA FE DEL NOTARIO PÚBLICO NO. 9 DE MEXICALI, BAJA CALIFORNIA, LIC. CARLOS C. ENRÍQUEZ DE RIVERA.
+            </p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              d) TENER SU DOMICILIO EN CALZADA INDEPENDENCIA 1375, COLONIA BENITO JUÁREZ, C.P. 21250,
+              CON R.F.C. MAU000519-AG0, TELÉFONO (686) 565-72-72, HORARIO DE ATENCIÓN DE LUNES A VIERNES
+              DE 9:00 A 19:00 HORAS, SÁBADO DE 9:00 A 18:00 HORAS Y DOMINGO PERMANECE CERRADO.
+            </p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              e) QUE ES EL LEGÍTIMO PROPIETARIO DEL VEHÍCULO MATERIA DE ESTE CONTRATO Y QUE PREVIAMENTE A LA
+              CELEBRACIÓN DEL MISMO, INFORMÓ AL “COMPRADOR” DE TODAS Y CADA UNA DE LAS CONDICIONES GENERALES
+              DEL VEHÍCULO.
+            </p>
+
+            <p style="margin:0 0 10px 0; text-align:justify;">
+              f) QUE SE INFORMÓ AL COMPRADOR LAS RESTRICCIONES QUE OPERA EL VENDEDOR, ASÍ COMO EL MONTO TOTAL
+              A PAGAR POR LA OPERACIÓN DE LA COMPRAVENTA DEL BIEN.
+            </p>
+
+            <p style="margin:0 0 6px 0;"><b>II. DECLARA EL “COMPRADOR”:</b></p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              I.- LLAMARSE COMO HA QUEDADO EXPRESADO, TENER SU DOMICILIO EN:
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:280px;">
+                {{ contractData?.client.address_street_1 }}, 
+                {{ contractData?.client.address_zip }}
+              </span>,
+              CON REGISTRO FEDERAL DE CAUSANTES:
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:100px;">
+                {{ contractData?.client.rfc }}
+              </span>
+              Y TELÉFONO DE CASA:
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px;">
+                {{ contractData?.client.phone }}
+              </span>
+              TELÉFONO CELULAR:
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px;">
+                {{ contractData?.client.phone_mobile}}
+              </span>
+              TELÉFONO DE TRABAJO:
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px;">
+                {{ contractData?.client.phone_work }}
+              </span>.
+            </p>
+
+            <p style="margin:0 0 10px 0; text-align:justify;">
+              II.- QUE PREVIAMENTE A LA CELEBRACIÓN DEL PRESENTE CONTRATO, SE LE INFORMÓ AL “COMPRADOR” SOBRE
+              EL PRECIO DE CONTADO DEL VEHÍCULO USADO, OBJETO DEL PRESENTE CONTRATO.
+            </p>
+          </div>
+
+          <!-- CLÁUSULA I -->
+          <div style="margin-bottom:16px;">
+            <p style="font-weight:700; margin:0 0 8px 0;">CLÁUSULAS</p>
+            <p style="margin:0 0 8px 0; text-align:justify;">
+              I.- “EL VENDEDOR” VENDE Y “EL COMPRADOR” COMPRA EL VEHÍCULO QUE A CONTINUACIÓN SE DESCRIBE:
+            </p>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 24px; margin-bottom:10px;">
+              <p style="margin:0;">MARCA <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">{{ contractData?.car?.make || dataTicket?.full?.car?.make || '' }}</span></p>
+              <p style="margin:0;">LÍNEA <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">{{ contractData?.car?.version || dataTicket?.full?.car?.version || '' }}</span></p>
+
+              <p style="margin:0;">MODELO <span style="border-bottom:1px solid black; display:inline-block; min-width:165px;">{{ contractData?.car?.model || dataTicket?.full?.car?.model || '' }}</span></p>
+              <p style="margin:0;">COLOR <span style="border-bottom:1px solid black; display:inline-block; min-width:175px;">{{ contractData?.car?.color || dataTicket?.full?.car?.color || '' }}</span></p>
+
+              <p style="margin:0;">No. DE SERIE <span style="border-bottom:1px solid black; display:inline-block; min-width:140px;">{{ contractData?.car?.vin || dataTicket?.full?.car?.vin || '' }}</span></p>
+              <p style="margin:0;">TIPO <span style="border-bottom:1px solid black; display:inline-block; min-width:190px;">{{ contractData?.car?.type || '' }}</span></p>
+
+              <p style="margin:0;">No. DE PEDIMENTO <span style="border-bottom:1px solid black; display:inline-block; min-width:120px;">{{ contractData?.car?.pedimento || '' }}</span></p>
+              <p style="margin:0;">CILINDROS <span style="border-bottom:1px solid black; display:inline-block; min-width:150px;">{{ contractData?.car?.cylinders || '' }}</span></p>
+
+              <p style="margin:0;">KM O MILLAS RECORRIDAS <span style="border-bottom:1px solid black; display:inline-block; min-width:100px;">{{ contractData?.car?.km  || dataTicket?.full?.car?.mileage || '' }}</span></p>
+              <p style="margin:0;">No. DE MOTOR <span style="border-bottom:1px solid black; display:inline-block; min-width:145px;">{{ contractData?.car?.engine_number || '' }}</span></p>
+            </div>
+
+            <p style="margin:0 0 8px 0;">
+              EL VEHÍCULO ANTES DESCRITO SE DESIGNARÁ AL SERVICIO
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:180px;"></span>,
+              MISMO QUE CUENTA CON EL SIGUIENTE INVENTARIO:
+            </p>
+          </div>
+
+          <!-- INVENTARIO -->
+          <div style="margin-bottom:16px;">
+            <table style="width:100%; border-collapse:collapse; font-size:10px;">
+              
+              <thead>
+                <tr>
+                  <th style="border:1px solid black; padding:4px; text-align:left;">EXTERIORES</th>
+                  <th style="border:1px solid black; padding:4px; width:45px;">SI</th>
+                  <th style="border:1px solid black; padding:4px; width:45px;">NO</th>
+
+                  <th style="border:1px solid black; padding:4px; text-align:left;">INTERIORES</th>
+                  <th style="border:1px solid black; padding:4px; width:45px;">SI</th>
+                  <th style="border:1px solid black; padding:4px; width:45px;">NO</th>
+
+                  <th style="border:1px solid black; padding:4px; text-align:left;">ACCESORIOS / MECÁNICOS</th>
+                  <th style="border:1px solid black; padding:4px; width:45px;">SI</th>
+                  <th style="border:1px solid black; padding:4px; width:45px;">NO</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let item of contractInventory">
+
+                  <!-- EXTERIORES -->
+                  <td style="border:1px solid black; padding:4px;">
+                    {{ item.exterior }}
+                  </td>
+                  <td style="border:1px solid black; padding:4px; text-align:center;">
+                    {{ item.exterior_yes ? 'X' : '' }}
+                  </td>
+                  <td style="border:1px solid black; padding:4px; text-align:center;">
+                    {{ item.exterior_no ? 'X' : '' }}
+                  </td>
+
+                  <!-- INTERIORES -->
+                  <td style="border:1px solid black; padding:4px;">
+                    {{ item.interior }}
+                  </td>
+                  <td style="border:1px solid black; padding:4px; text-align:center;">
+                    {{ item.interior_yes ? 'X' : '' }}
+                  </td>
+                  <td style="border:1px solid black; padding:4px; text-align:center;">
+                    {{ item.interior_no ? 'X' : '' }}
+                  </td>
+
+                  <!-- ACCESORIOS -->
+                  <td style="border:1px solid black; padding:4px;">
+                    {{ item.accessory }}
+                  </td>
+                  <td style="border:1px solid black; padding:4px; text-align:center;">
+                    {{ item.accessory_yes ? 'X' : '' }}
+                  </td>
+                  <td style="border:1px solid black; padding:4px; text-align:center;">
+                    {{ item.accessory_no ? 'X' : '' }}
+                  </td>
+
+                </tr>
+              </tbody>
+
+            </table>
+          </div>
+
+          <!-- TANQUE / OBSERVACIONES -->
+          <div style="margin-bottom:16px;">
+            <div style="display:flex; gap:16px; margin-bottom:8px;">
+              <p style="margin:0;">
+                TANQUE DE GASOLINA:
+                <span style="border-bottom:1px solid black; display:inline-block; min-width:50px; text-align:center;">
+                  {{ contractData?.contract?.percentage_gasoline }}
+                </span>
+              </p>
+            </div>
+
+            <p style="margin:0 0 6px 0;"><b>OBSERVACIONES ACERCA DE LAS CONDICIONES GENERALES DEL VEHÍCULO:</b></p>
+
+             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 24px;">
+
+              <p style="margin:0;">
+                A) CARROCERÍA 
+                <span style="border-bottom:1px solid black; display:inline-block; min-width:160px;">
+                  {{ contractData?.car?.comments?.carroceria || 'SIN OBSERVACIONES' }}
+                </span>
+              </p>
+
+              <p style="margin:0;">
+                B) PINTURA 
+                <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">
+                  {{ contractData?.car?.comments?.pintura || 'SIN OBSERVACIONES' }}
+                </span>
+              </p>
+
+              <p style="margin:0;">
+                C) LLANTAS 
+                <span style="border-bottom:1px solid black; display:inline-block; min-width:180px;">
+                  {{ contractData?.car?.comments?.llantas || 'SIN OBSERVACIONES' }}
+                </span>
+              </p>
+
+              <p style="margin:0;">
+                D) OTROS CONCEPTOS 
+                <span style="border-bottom:1px solid black; display:inline-block; min-width:120px;">
+                  {{ contractData?.car?.comments?.otros || 'SIN OBSERVACIONES' }}
+                </span>
+              </p>
+
+              <!-- OPCIONAL -->
+              <p style="margin:0;">
+                E) GENERALES 
+                <span style="border-bottom:1px solid black; display:inline-block; min-width:200px;">
+                  {{ contractData?.car?.comments?.generales || 'SIN OBSERVACIONES' }}
+                </span>
+              </p>
+
+            </div>
+          </div>
+
+          <!-- PRECIO -->
+          <div style="margin-bottom:16px;">
+            <p style="margin:0 0 8px 0; text-align:justify;">
+              III.- EL PRECIO DE LA COMPRA-VENTA, LO HAN DETERMINADO DE COMÚN ACUERDO “EL VENDEDOR” Y “EL COMPRADOR”,
+              SOBRE LAS SIGUIENTES BASES:
+            </p>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 24px;">
+              <p style="margin:0;">A) TIPO DE VENTA <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">
+                {{ contractData?.sales_type }}
+              </span></p>
+              <p style="margin:0;">B) PRECIO DE LA UNIDAD SIN IVA $ <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">
+                {{ contractData?.amount_sale }}
+              </span></p>
+
+              <p style="margin:0;">C) FORMA DE PAGO <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">
+                 {{ contractData?.contract.payment_method }}
+              </span></p>
+              <p style="margin:0;">D) FECHA DE ENTREGA <span style="border-bottom:1px solid black; display:inline-block; min-width:150px;">
+                {{ contractData?.date_delivery | date:'dd/MM/yyyy' }}
+              </span></p>
+            </div>
+
+            <p style="margin:10px 0 0 0;">
+              EL PRECIO DE CONTADO DEL PRESENTE VEHÍCULO ES DE $
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">
+                {{ contractData?.amount_sale }}
+              </span>
+              (
+              <span>
+                {{ numeroALetras(contractData?.amount_sale) }}
+              </span>
+              )
+            </p>
+          </div>
+
+          <!-- GARANTÍA -->
+          <div style="margin-bottom:16px;">
+            <p style="margin:0 0 8px 0; text-align:justify;">
+              VIII.- AMBAS PARTES MANIFIESTAN Y ESTÁN DE ACUERDO QUE POR TRATARSE DE UNA UNIDAD USADA,
+              LA QUE ADQUIERE “EL COMPRADOR” ESTE LA ACEPTA Y LA RECIBE EN EL ESTADO FÍSICO Y MECÁNICO
+              EN QUE SE ENCUENTRA.
+            </p>
+
+            <p style="margin:0 0 4px 0;">
+              (<span *ngIf="!contractData.guarantee">X</span>) SIN GARANTÍA
+            </p>
+            <p style="margin:0 0 8px 0;">
+              (<span *ngIf="contractData.guarantee">X</span>) CON GARANTÍA POR UN PLAZO DE
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:60px; text-align:center;">
+                <span *ngIf="!contractData.guarantee">0</span>
+                <span *ngIf="contractData.guarantee">{{ contractData.guarantee_time }}</span>
+              </span>
+              DÍAS
+            </p>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">
+              <div>
+                <p style="margin:0 0 4px 0; font-weight:700;">MOTOR</p>
+                <p style="margin:0 0 4px 0;">A) QUE NO PRESENTE GASTO DE ACEITE</p>
+                <p style="margin:0 0 4px 0;">B) QUE NO TENGA SONIDOS EXTRAÑOS</p>
+                <p style="margin:0;">C) QUE PRESENTE BUENA COMPRESIÓN Y PRESIÓN DE ACEITE</p>
+              </div>
+
+              <div>
+                <p style="margin:0 0 4px 0; font-weight:700;">TRANSMISIÓN</p>
+                <p style="margin:0 0 4px 0;">A) QUE CAMBIE SUS VELOCIDADES EN TIEMPO Y FORMA</p>
+                <p style="margin:0;">B) QUE NO TENGA VIBRACIONES A CAUSA DEL CONVERTIDOR</p>
+              </div>
+
+              <div>
+                <p style="margin:0 0 4px 0; font-weight:700;">DIFERENCIAL</p>
+                <p style="margin:0 0 4px 0;">A) SONIDOS EXTRAÑOS</p>
+                <p style="margin:0;">B) RUIDOS ANORMALES</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- CLÁUSULAS FINALES -->
+          <div style="margin-bottom:16px; text-align:justify;">
+            <p style="margin:0 0 6px 0;">
+              IX.- “EL COMPRADOR” EXIME A “EL VENDEDOR” DE TODA RESPONSABILIDAD, SI LAS PARTES QUE SE
+              GARANTIZAN SUFREN DAÑO POR DESCUIDO O NEGLIGENCIA DEL “COMPRADOR” DEBIDAMENTE COMPROBABLE.
+            </p>
+
+            <p style="margin:0 0 6px 0;">
+              XIII.- “EL COMPRADOR” ASUMIRÁ, AL MOMENTO DE RECIBIR EL VEHÍCULO, LA RESPONSABILIDAD SOBRE EL BUEN USO DEL MISMO.
+            </p>
+
+            <p style="margin:0 0 6px 0;">
+              XVI.- “EL COMPRADOR” TENDRÁ DERECHO A DEMANDAR LA RESCISIÓN DEL PRESENTE CONTRATO EN LOS CASOS
+              PREVISTOS POR LA LEY Y POR LAS OBLIGACIONES ESTIPULADAS EN EL PRESENTE CONTRATO.
+            </p>
+
+            <p style="margin:0 0 6px 0;">
+              XVII.- “EL VENDEDOR” SE HACE RESPONSABLE DE CUALQUIER SITUACIÓN LEGAL QUE ANTECEDA A LA FECHA DE
+              COMPRA-VENTA DEL VEHÍCULO OBJETO DEL PRESENTE CONTRATO.
+            </p>
+
+            <p style="margin:0 0 6px 0;">
+              XVIII.- “EL COMPRADOR” SE HACE RESPONSABLE DE LOS DAÑOS QUE PUDIERA OCASIONAR CON EL VEHÍCULO
+              OBJETO DEL PRESENTE CONTRATO, DESDE LA FIRMA DEL MISMO.
+            </p>
+
+            <p style="margin:0;">
+              XIX.- LOS CONTRATANTES CONVIENEN QUE POR EL INCUMPLIMIENTO DE CUALQUIERA DE SUS OBLIGACIONES
+              CONTENIDAS EN EL PRESENTE CONTRATO, SE APLICARÁ AL RESPONSABLE UNA PENA CONVENCIONAL EQUIVALENTE
+              AL 15% DEL PRECIO DE CONTADO DEL VEHÍCULO MATERIA DEL PRESENTE CONTRATO.
+            </p>
+          </div>
+
+          <!-- FIRMAS -->
+          <div style="margin-top:30px;">
+            <p style="margin:0 0 30px 0; text-align:justify;">
+              LEÍDO QUE FUE Y SIENDO LAS
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:80px;">{{ time }}</span>
+              DEL DÍA
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:220px;">
+                {{ date }}
+              </span>,
+              Y UNA VEZ HECHA LA EXPLICACIÓN DE SU ALCANCE LEGAL, ESTE CONTRATO FUE SUSCRITO POR DUPLICADO
+              EN LA CIUDAD DE MEXICALI, B.C.
+            </p>
+
+            <div style="display:flex; justify-content:space-between; margin-top:50px; gap:40px;">
+              <div style="width:45%; text-align:center;">
+                <div style="border-top:1px solid black; padding-top:6px;">
+                   {{ contractData.user.full_name }}
+                  <br>
+                  VENDEDOR
+                </div>
+              </div>
+
+              <div style="width:45%; text-align:center;">
+                <div style="border-top:1px solid black; padding-top:6px;">
+                   {{ contractData.client.full_name }}
+                  <br>
+                  COMPRADOR
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PIE -->
+          <div style="margin-top:30px; font-size:10px; text-align:center; line-height:1.35;">
+            <p style="margin:0;">QUEJAS Y RECLAMACIONES AL TELÉFONO (686) 565-72-72</p>
+            <p style="margin:0;">CALZ. INDEPENDENCIA #1375 COL. BENITO JUÁREZ, MEXICALI, B.C.</p>
+            <p style="margin:0;">HORARIO DE LUNES A SÁBADO DE 9:00 A.M. A 6:00 P.M.</p>
+            <p style="margin:0;">
+              CONTRATO REGISTRADO ANTE LA PROCURADURÍA FEDERAL DEL CONSUMIDOR BAJO EL No. DE REGISTRO 571-2007
+              DE FECHA 26 DE FEBRERO DEL 2007
+            </p>
+            <p style="margin:0;">
+              AVISO DE PRIVACIDAD. MACHUCAS AUTOMOTRIZ S. DE R.L. CON DOMICILIO EN CALZADA INDEPENDENCIA #1375,
+              COL. BENITO JUÁREZ, UTILIZARÁ SUS DATOS PERSONALES AQUÍ RECABADOS PARA LA ACREDITACIÓN DE CRÉDITO
+              DE VEHÍCULO AUTOMOTOR.
+            </p>
+            <p style="margin:0;">
+              PARA MAYOR INFORMACIÓN ACERCA DEL TRATAMIENTO Y LOS DERECHOS QUE PUEDE ACCEDER AL AVISO DE
+              PRIVACIDAD COMPLETO A TRAVÉS DE NUESTRA PÁGINA WWW.MACHUCASAUTOMOTRIZ.COM
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      <!--file 4-->
+      <div class="w-full flex justify-center bg-gray-200 p-4 overflow-auto" *ngIf="file === 4">
+        <!-- HOJA A4 -->
+        <div id="print-section"
+            style="
+              width: 794px;
+              min-height: 1123px;
+              background: white;
+              padding: 45px 50px;
+              box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+              font-family: Roboto, 'Helvetica Neue', sans-serif;
+              color: black;
+              font-size: 11px;
+              line-height: 1.45;
+            ">
+
+          <!-- ENCABEZADO -->
+          <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:20px;">
+            <img src="./assets/imgs/machucas.png" style="height:70px; width:98px; margin-bottom:10px;">
+            <p style="font-size:12px; font-weight:700; text-align:center; margin:0;">
+              CONTRATO DE COMPRA-VENTA CON RESERVA DE DOMINIO DE VEHÍCULOS AUTOMOTORES USADOS
+            </p>
+          </div>
+
+          <!-- FECHA Y LUGAR -->
+          <div style="margin-bottom:16px;">
+            <p style="margin:0 0 6px 0;">
+              EN 
+              <span style="border-bottom:1px solid black; min-width:140px;"></span>
+              A
+              <span style="border-bottom:1px solid black; min-width:40px; text-align:center;">
+                {{ day }}
+              </span>
+              DE
+              <span style="border-bottom:1px solid black; min-width:140px; text-align:center;">
+                {{ month }}
+              </span>
+              DEL
+              <span style="border-bottom:1px solid black; min-width:70px; text-align:center;">
+                {{ year }}
+              </span>
+            </p>
+
+            <p style="margin:0; text-align:justify;">
+              CONTRATO DE COMPRA-VENTA CON RESERVA DE DOMINIO DE VEHÍCULOS AUTOMOTORES USADOS QUE CELEBRAN POR UNA PARTE
+              <b>MACHUCAS AUTOMOTRIZ S. DE R.L.</b>, A QUIEN EN LOS SUCESIVO SE LE DENOMINARA
+              <b>“EL VENDEDOR”</b> Y POR OTRA PARTE
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:260px;">
+                {{ contractData.clientName }}
+              </span>
+              A QUIEN EN LOS SUCESIVO SE LE DENOMINARA <b>“EL COMPRADOR”</b> AL TENOR DE LAS SIGUIENTES
+              DECLARACIONES Y CLAUSULAS:
+            </p>
+          </div>
+
+          <!-- DECLARACIONES -->
+          <div style="margin-bottom:16px;">
+            <p style="font-weight:700; text-align:center; margin:0 0 8px 0;">D E C L A R A C I O N E S</p>
+
+            <p style="margin:0 0 6px 0;"><b>I. DECLARA EL “VENDEDOR”:</b></p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              a) SER UNA PERSONA MORAL, CUYA ACTIVIDAD PREPONDERANTE ES LA COMPRAVENTA DE VEHÍCULOS USADOS QUE ENCUENTRA REGULADO Y EN CUMPLIMIENTO CONFORME A LAS NORMAS OFICIALES VIGENTES QUE NOS RIGEN EN ESTE PAÍS EN MATERIA DE SEGURIDAD Y PROTECCIÓN AL MEDIO AMBIENTE, DEBIDAMENTE REGISTRADA COMO SOCIO ACTIVO EN LA ASOCIACIÓN NACIONAL DE COMERCIANTES EN AUTOMÓVILES Y CAMIONES NUEVOS Y USADOS, A. C. (ANCA). EL PROVEEDOR, COMO LEGÍTIMO PROPIETARIO VENDE AL CLIENTE EL VEHÍCULO USADO EN LAS CONDICIONES EN LAS QUE SE ENCUENTRA Y CUYAS CARACTERÍSTICAS SE DETALLAN EN ESTE CONTRATO, QUIEN LO RECIBE DESPUÉS DE HABER EFECTUADO UNA REVISIÓN DE FORMA DETALLADA Y QUE, CONFORME A LAS DISPOSICIONES APLICABLES, EL PROVEEDOR Y EL VEHÍCULO USADO CUMPLEN CON TODAS LAS ESPECIFICACIONES LEGALES Y COMERCIALES PARA REALIZAR LA PRESENTE COMPRAVENTA.
+            </p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              INFORMACIÓN QUE SE PUEDE CONSTATAR EN; LA PÁGINA WWW.ANCA.COM.MX, TEL. 018002602622 O VÍA CORREO ELECTRÓNICO, CONTRATO&#64;ANCA.COM.MX.
+            </p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              b) EN CASO DE PERSONA MORAL DECLARA QUE: ES UNA SOCIEDAD LEGALMENTE CONSTITUIDA, TAL COMO CONSTA EN LA ESCRITURA PUBLICA NO. 20692 DE FECHA 19 DE MAYO DEL 2000, PASADA ANTE LA FE DEL LIC. CARLOS C. ENRÍQUEZ DE RIVERA, NOTARIO PÚBLICO NO 9, INSCRITA EN EL REGISTRO PUBLICO DE LA PROPIEDAD DE COMERCIO DE MEXICALI, BAJA CALIFORNIA, BAJO EL NO.: 5183305.
+            </p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              c) QUE ESTA REPRESENTADA POR JOSÉ MACHUCA VÁSQUEZ, SEGÚN TESTIMONIO NOTARIAL NO.: 20800, PASADO ANTE LA FE DEL NOTARIO PÚBLICO NO. 9 DE MEXICALI, BAJA CALIFORNIA, LIC. CARLOS C. ENRÍQUEZ DE RIVERA.
+            </p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              d) TENER SU DOMICILIO EN CALZADA INDEPENDENCIA 1375 COLONIA BENITO JUÁREZ C.P. 21250, CON REGISTRO FEDERAL DE CONTRIBUYENTES MAU000519-AG0, TELÉFONO (686) 565-72-72, HORARIO DE ATENCIÓN DE LUNES A VIERNES DE 9:00 A 19:00 HORAS, SÁBADO DE 9:00 A 18:00 HORAS Y DOMINGO PERMANECE CERRADO.
+            </p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              e) QUE ES EL LEGÍTIMO PROPIETARIO DEL VEHÍCULO MATERIA DE ESTE CONTRATO Y QUE PREVIAMENTE A LA CELEBRACIÓN DEL MISMO, INFORMO AL “COMPRADOR” DE TODAS Y CADA UNA DE LAS CONDICIONES GENERALES DEL VEHÍCULO, PARA QUE EN SU CASO SEA REVISADO POR ESTE ÚLTIMO. ASÍ COMO LA INFORMACIÓN RELATIVA AL COSTO TOTAL DEL VEHÍCULO, EL COSTO DEL FINANCIAMIENTO, COSTO DE APERTURA DE CRÉDITO E INVESTIGACIÓN Y GARANTÍA QUE DEBE DE OTORGAR.
+            </p>
+
+            <p style="margin:0 0 10px 0; text-align:justify;">
+              f) QUE SE INFORMÓ AL COMPRADOR LAS RESTRICCIONES QUE OPERA EL VENDEDOR, ASÍ COMO EL MONTO TOTAL A PAGAR POR LA OPERACIÓN DE LA COMPRAVENTA DEL BIEN.
+            </p>
+
+            <p style="margin:0 0 6px 0;"><b>DECLARA “EL COMPRADOR”:</b></p>
+
+            <p style="margin:0 0 6px 0; text-align:justify;">
+              I.- LLAMARSE COMO HA QUEDADO EXPRESADO, TENER SU DOMICILIO EN:
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:280px;">
+                {{ contractData?.client.address_street_1 }}, {{ contractData?.client.address_zip }}
+              </span>,
+              CON REGISTRO FEDERAL DE CAUSANTES:
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:100px;">
+                {{ contractData?.client.rfc }}
+              </span>
+              Y TELÉFONO DE CASA:
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px;">
+                {{ contractData?.client.phone }}
+              </span>
+              TELÉFONO CELULAR:
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px;">
+                {{ contractData?.client.phone_mobile }}
+              </span>
+              TELÉFONO DE TRABAJO:
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px;">
+                {{ contractData?.client.phone_work }}
+              </span>
+              CAPACIDAD JURÍDICA PARA OBLIGARSE Y MANIFIESTA QUE ANTES DE FIRMAR HE LEÍDO EL CLAUSULADO DE ESTE CONTRATO.
+            </p>
+
+            <p style="margin:0 0 10px 0; text-align:justify;">
+              II.- QUE PREVIAMENTE A LA CELEBRACIÓN DEL PRESENTE CONTRATO, SE LE INFORMO “AL COMPRADOR” SOBRE EL PRECIO DE CONTADO DEL VEHÍCULO USADO, OBJETO DEL PRESENTE CONTRATO, EL MONTO DE LOS INTERESES, LA TASA QUE SE CALCULARA, EL MONTO Y DETALLE DE LOS CARGOS, EL NUMERO DE PAGOS A REALIZAR, SU PERIODICIDAD, LA CANTIDAD TOTAL A PAGAR POR DICHO VEHÍCULO Y EL DERECHO QUE TIENE A LIQUIDAR ANTICIPADAMENTE EL CRÉDITO CON LA CONSIGUIENTE REDUCCIÓN DE INTERESES.
+            </p>
+          </div>
+
+          <!-- CLAUSULAS -->
+          <div style="margin-bottom:16px;">
+            <p style="font-weight:700; margin:0 0 8px 0;">CLAUSULAS</p>
+
+            <p style="margin:0 0 8px 0; text-align:justify;">
+              I.- “EL VENDEDOR” VENDE Y “EL COMPRADOR” COMPRA EL VEHÍCULO QUE A CONTINUACIÓN SE DESCRIBE:
+            </p>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 24px; margin-bottom:10px;">
+              <p style="margin:0;">MARCA <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">{{ contractData?.car?.make }}</span></p>
+              <p style="margin:0;">LÍNEA <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">{{ contractData?.car?.version }}</span></p>
+
+              <p style="margin:0;">MODELO <span style="border-bottom:1px solid black; display:inline-block; min-width:165px;">{{ contractData?.car?.model }}</span></p>
+              <p style="margin:0;">COLOR <span style="border-bottom:1px solid black; display:inline-block; min-width:175px;">{{ contractData?.car?.color }}</span></p>
+
+              <p style="margin:0;">No. DE SERIE <span style="border-bottom:1px solid black; display:inline-block; min-width:140px;">{{ contractData?.car?.vin }}</span></p>
+              <p style="margin:0;">TIPO <span style="border-bottom:1px solid black; display:inline-block; min-width:190px;">{{ contractData?.car?.type }}</span></p>
+
+              <p style="margin:0;">No. DE PEDIMENTO <span style="border-bottom:1px solid black; display:inline-block; min-width:120px;">{{ contractData?.car?.pedimento }}</span></p>
+              <p style="margin:0;">CILINDROS <span style="border-bottom:1px solid black; display:inline-block; min-width:150px;">{{ contractData?.car?.cylinders }}</span></p>
+
+              <p style="margin:0;">KM O MILLAS RECORRIDAS <span style="border-bottom:1px solid black; display:inline-block; min-width:100px;">{{ contractData?.car?.km }}</span></p>
+              <p style="margin:0;">No. DE MOTOR <span style="border-bottom:1px solid black; display:inline-block; min-width:145px;">{{ contractData?.car?.engine_number }}</span></p>
+            </div>
+
+            <p style="margin:0 0 8px 0;">
+              EL VEHÍCULO ANTES DESCRITO SE DESIGNARÁ AL SERVICIO
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:180px;"></span>,
+              MISMO QUE CUENTA CON EL SIGUIENTE INVENTARIO:
+            </p>
+          </div>
+
+          <!-- INVENTARIO -->
+          <div style="margin-bottom:16px;">
+            <table style="width:100%; border-collapse:collapse; font-size:10px;">
+              <thead>
+                <tr>
+                  <th style="border:1px solid black; padding:4px; text-align:left;">EXTERIORES</th>
+                  <th style="border:1px solid black; padding:4px; width:45px;">SI</th>
+                  <th style="border:1px solid black; padding:4px; width:45px;">NO</th>
+
+                  <th style="border:1px solid black; padding:4px; text-align:left;">INTERIORES</th>
+                  <th style="border:1px solid black; padding:4px; width:45px;">SI</th>
+                  <th style="border:1px solid black; padding:4px; width:45px;">NO</th>
+
+                  <th style="border:1px solid black; padding:4px; text-align:left;">ACCESORIOS / MECÁNICOS</th>
+                  <th style="border:1px solid black; padding:4px; width:45px;">SI</th>
+                  <th style="border:1px solid black; padding:4px; width:45px;">NO</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let item of contractInventory">
+
+                  <td style="border:1px solid black; padding:4px;">{{ item.exterior }}</td>
+                  <td style="border:1px solid black; padding:4px; text-align:center;">{{ item.exterior_yes ? 'X' : '' }}</td>
+                  <td style="border:1px solid black; padding:4px; text-align:center;">{{ item.exterior_no ? 'X' : '' }}</td>
+
+                  <td style="border:1px solid black; padding:4px;">{{ item.interior }}</td>
+                  <td style="border:1px solid black; padding:4px; text-align:center;">{{ item.interior_yes ? 'X' : '' }}</td>
+                  <td style="border:1px solid black; padding:4px; text-align:center;">{{ item.interior_no ? 'X' : '' }}</td>
+
+                  <td style="border:1px solid black; padding:4px;">{{ item.accessory }}</td>
+                  <td style="border:1px solid black; padding:4px; text-align:center;">{{ item.accessory_yes ? 'X' : '' }}</td>
+                  <td style="border:1px solid black; padding:4px; text-align:center;">{{ item.accessory_no ? 'X' : '' }}</td>
+
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- TANQUE / OBSERVACIONES -->
+          <div style="margin-bottom:16px;">
+            <div style="display:flex; gap:16px; margin-bottom:8px;">
+              <p style="margin:0;">
+                TANQUE DE GASOLINA:
+                <span style="border-bottom:1px solid black; display:inline-block; min-width:50px; text-align:center;">
+                  {{ contractData?.contract?.percentage_gasoline }}
+                </span>
+              </p>
+            </div>
+
+            <p style="margin:0 0 6px 0;"><b>OBSERVACIONES ACERCA DE LAS CONDICIONES GENERALES DEL VEHÍCULO:</b></p>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 24px;">
+              <p style="margin:0;">
+                A) CARROCERÍA
+                <span style="border-bottom:1px solid black; display:inline-block; min-width:160px;">
+                  {{ contractData?.car?.comments?.carroceria || 'SIN OBSERVACIONES' }}
+                </span>
+              </p>
+
+              <p style="margin:0;">
+                B) PINTURA
+                <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">
+                  {{ contractData?.car?.comments?.pintura || 'SIN OBSERVACIONES' }}
+                </span>
+              </p>
+
+              <p style="margin:0;">
+                C) LLANTAS
+                <span style="border-bottom:1px solid black; display:inline-block; min-width:180px;">
+                  {{ contractData?.car?.comments?.llantas || 'SIN OBSERVACIONES' }}
+                </span>
+              </p>
+
+              <p style="margin:0;">
+                D) OTROS CONCEPTOS
+                <span style="border-bottom:1px solid black; display:inline-block; min-width:120px;">
+                  {{ contractData?.car?.comments?.otros || 'SIN OBSERVACIONES' }}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <!-- CLAUSULA II -->
+          <div style="margin-bottom:16px; text-align:justify;">
+            <p style="margin:0 0 6px 0;">
+              II.- “EL VENDEDOR” EN ESTE ACTO EXHIBE AL “COMPRADOR” LA DOCUMENTACIÓN EN COPIA SIMPLE QUE AMPARA LA PROPIEDAD DEL VEHÍCULO DESCRITO EN LA CLAUSULA ANTERIOR, CERCIORADO DE QUE DICHA DOCUMENTACIÓN CORRESPONDE FIELMENTE AL CITADO VEHÍCULO Y SE ENCUENTRA EN REGLA; QUEDANDO EN PODER DE “EL VENDEDOR” LA DOCUMENTACIÓN ORIGINAL, HASTA EN TANTO SEA LIQUIDADO TOTALMENTE DEL PRECIO PACTADO, POR LO QUE EL VENDEDOR EXPEDIRÁ COPIAS SIMPLES DE LA MISMA DOCUMENTACIÓN, ASÍ COMO ENTREGA OTROS DOCUMENTOS QUE ACREDITEN PAGO A:
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:220px;"></span>
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:220px;"></span>.
+            </p>
+          </div>
+
+          <!-- CLAUSULA III -->
+          <div style="margin-bottom:16px;">
+            <p style="margin:0 0 8px 0; text-align:justify;">
+              III.- EL PRECIO DE LA COMPRA-VENTA, LO HAN DETERMINADO DE COMÚN ACUERDO “EL VENDEDOR” Y “EL COMPRADOR”, SOBRE LA SIGUIENTES BASES:
+            </p>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 24px;">
+              <p style="margin:0;">A) TIPO DE VENTA <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">{{ contractData?.sales_type }}</span></p>
+              <p style="margin:0;">B) PRECIO DE LA UNIDAD SIN IVA $ <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">{{ contractData?.amount_sale }}</span></p>
+
+              <p style="margin:0;">C) FORMA DE PAGO <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">{{ contractData?.contract?.payment_method }}</span></p>
+              <p style="margin:0;">D) ANTICIPO $ <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">{{ contractData?.car?.down_payment }}</span></p>
+
+              <p style="margin:0;">E) ADEUDO $ <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">{{ adeudo(contractData.installments_data) }}</span></p>
+              <p style="margin:0;">F) NUMERO DE PAGOS <span style="border-bottom:1px solid black; display:inline-block; min-width:80px;">{{ contractData?.installments_data?.length }}</span></p>
+
+              <p style="margin:0;">G) FECHAS DE PAGO <span style="border-bottom:1px solid black; display:inline-block; min-width:200px;">DÍA {{ contractData?.contract?.payment_day }} DE CADA MES</span></p>
+              <p style="margin:0;">H) EL VEHÍCULO SE ENTREGARA EN LA FECHA <span style="border-bottom:1px solid black; display:inline-block; min-width:150px;">{{ contractData?.date_delivery | date:'dd/MM/yyyy' }}</span></p>
+            </div>
+
+            <p style="margin:10px 0 0 0;">
+              EL PRECIO DE CONTADO DEL PRESENTE VEHÍCULO ES DE $
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">
+                {{ contractData?.amount_sale }}
+              </span>
+              (
+              <span>
+                {{ numeroALetras(contractData?.amount_sale) }}
+              </span>
+              ),
+              EL CUAL SE SOSTIENE A “EL COMPRADOR” DURANTE 30 DÍAS.
+            </p>
+          </div>
+
+          <!-- CLAUSULA IV -->
+          <div style="margin-bottom:16px; text-align:justify;">
+            <p style="margin:0 0 6px 0;">
+              IV.- DEBIDO A LAS CARACTERÍSTICAS DEL COMERCIO DE AUTOS USADOS EN BAJA CALIFORNIA NORTE “EL COMPRADOR” NO REALIZA COBROS POR CONCEPTO DE TRAMITES O GESTORÍAS, CARGOS POR EXPEDICIÓN DE CRÉDITOS.
+            </p>
+          </div>
+
+          <!-- CLAUSULA V -->
+          <div style="margin-bottom:16px; text-align:justify;">
+            <p style="margin:0 0 6px 0;">
+              V.- POR EL ADEUDO A PAGAR A PLAZOS, LA CANTIDAD ESTABLECIDA EN EL ENCISO E) DE LA CLAUSULA TERCERA, “EL COMPRADOR” SUSCRIBE A LA ORDEN DE “EL VENDEDOR” PAGARES QUE FORMAN PARTE DEL PRESENTE CONTRATO, MISMOS QUE TENDRÁN EL CARÁCTER DE NO NEGOCIABLES Y SERÁN POR LA CANTIDAD DE:
+            </p>
+
+            <div *ngFor="let installment of contractData?.installments_data" style="margin:0 0 4px 0;">
+              <p style="margin:0;">
+                ${{ installment.amount }} ({{ numeroALetras(installment.amount) }})
+              </p>
+            </div>
+
+            <p style="margin:6px 0 0 0;">
+              CADA UNO, QUE VENCERÁN CON UNA PERIODICIDAD DE
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:140px;">MENSUAL</span>
+              Y EN FORMA SUCESIVA, LOS DÍAS
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:60px;">{{ contractData?.contract?.payment_day }}</span>
+              A PARTIR DEL DIA
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:60px;">{{ contractData?.contract?.payment_day }}</span>
+              DEL MES DE
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:140px;">
+                {{ formatDate(contractData?.installments_data?.[0]?.paid_at)}}
+              </span>
+              DEL AÑO
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:80px;">
+                {{ contractData?.installments_data?.length ? (contractData.installments_data[0].paid_at | date:'yyyy') : '' }}
+              </span>.
+            </p>
+          </div>
+
+          <!-- CLAUSULA VI -->
+          <div style="margin-bottom:16px; text-align:justify;">
+            <p style="margin:0 0 6px 0;">
+              VI.- AMBOS CONTRATANTES CONVIENEN QUE “EL VENDEDOR”, DE ACUERDO CON LO ESTABLECIDO EN EL ARTICULO 2113 DEL EL CÓDIGO CIVIL, PARA EL DISTRITO FEDERAL Y SU CORRELATIVO ARTICULO 2217 DEL CÓDIGO CIVIL PARA EL ESTADO DE BAJA CALIFORNIA EN VIGOR, SE RESERVA EL DOMINIO DEL VEHÍCULO MATERIA DEL PRESENTE CONTRATO, HASTA QUE EL PRECIO PACTADO Y DERIVACIONES LEGALES ESTÉN ÍNTEGRAMENTE PAGADOS.
+            </p>
+          </div>
+
+          <!-- CLAUSULA VII -->
+          <div style="margin-bottom:16px; text-align:justify;">
+            <p style="margin:0 0 6px 0;">
+              VII.- LOS DOCUMENTOS QUE AMPARAN LA PROPIEDAD DESCRITA EN LA CLAUSULA II, PERMANECERÁN EN PODER DE “EL VENDEDOR”, COMO GARANTÍA DE LA RESERVA DE DOMINIO DEL VEHÍCULO, OBJETO DEL PRESENTE CONTRATO, EXPIDIÉNDOLES A “EL COMPRADOR” LAS COPIAS FOTOSTÁTICAS RESPECTIVAS QUE ACREDITEN SU LEGITIMA PROPIEDAD.
+            </p>
+          </div>
+
+          <!-- CLAUSULA VIII -->
+          <div style="margin-bottom:16px;">
+            <p style="margin:0 0 8px 0; text-align:justify;">
+              VIII.- AMBAS PARTES MANIFIESTAN Y ESTÁN DE ACUERDO QUE POR TRATARSE DE UNA UNIDAD USADA, LA QUE ADQUIERE AL “COMPRADOR” ESTE LA ACEPTA Y LA RECIBE EN EL ESTADO DE ESO Y MECÁNICO EN QUE SE ENCUENTRA, EL CUAL LE HA SIDO FACILITADO PARA SU REVISION GENERAL, POR CUYO MOTIVO EL VEHÍCULO USADO SE VENDE:
+            </p>
+
+            <p style="margin:0 0 4px 0;">
+              ( <span *ngIf="!contractData.guarantee">X</span> ) SIN GARANTÍA; EN ESTE CASO; EL VENDEDOR NO ESTA OBLIGADO A REALIZAR NINGÚN TIPO DE REPARACION, POR LO QUE EL COMPRADOR ASUMIRA LOS COSTOS POR REPARACIONES, SUMINISTRO DE REFACCIONES, MANO DE OBRA CALIFICADA, ENTRE OTROS.
+            </p>
+
+            <p style="margin:0 0 8px 0;">
+              ( <span *ngIf="contractData.guarantee">X</span> ) CON GARANTIA POR UN PLAZO DE
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:60px; text-align:center;">
+                <span *ngIf="!contractData.guarantee">0</span>
+                <span *ngIf="contractData.guarantee">{{ contractData.guarantee_time}} DIAS</span>
+              </span>,
+              (ART. 77 DE LA LEY FEDERAL DE PROTECCIÓN AL CONSUMIDOR, LA GARANTIA NO PODRA SER INFERIOR A 90 DIAS NATURALES) CONTADOS A PARTIR DE LA ENTREGA DEL VEHÍCULO USADO, EXCLUYENDOSE LA CORRESPONDIENTE A PARTES ELÉCTRICAS Y DEBERÁ HACERSE VALIDA DEN EL DOMICILIO, TELEFONOS Y HORARIOS DE ATENCIÓN SEÑALADOS EN EL PRESENTE CONTRATO, SIEMPRE Y CUANDO NO SE HAYA EFECTUADO UNA REPARACION POR UN TERCERO. ASIMISMO, EL VENDEDOR SERA EL RESPONSABLE POR LAS DESCOMPOSTURAS, DAÑOS O PERDIDAS PARCIALES O TOTALES IMPUTABLES A EL, MIENTRAS EL VEHÍCULO SE ENCUENTRE BAJO SU RESPONSABILIDAD PARA LLEVAR A CABO AL COMPLIMIENTO DE LA GARANTIA.
+            </p>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">
+              <div>
+                <p style="margin:0 0 4px 0; font-weight:700;">MOTOR</p>
+                <p style="margin:0 0 4px 0;">A) QUE NO PRESENTE GASTO DE ACEITE (FUERA DE LO NORMAL)</p>
+                <p style="margin:0 0 4px 0;">B) QUE NO TENGA SONIDOS DE: METALES DE BIELA, BANCADA, ENGRANES, CADENA DE TIEMPO Y BOTADORES.</p>
+                <p style="margin:0;">C) QUE PRESENTE BUENA COMPRESIÓN Y PRESIÓN DE ACEITE</p>
+              </div>
+
+              <div>
+                <p style="margin:0 0 4px 0; font-weight:700;">TRANSMISIÓN</p>
+                <p style="margin:0 0 4px 0;">A) QUE CAMBIE SUS VELOCIDADES EN TIEMPO Y FORMA</p>
+                <p style="margin:0;">B) QUE NO TENGA VIBRACIONES A CAUSA DEL CONVERTIDOR.</p>
+              </div>
+
+              <div>
+                <p style="margin:0 0 4px 0; font-weight:700;">DIFERENCIAL</p>
+                <p style="margin:0 0 4px 0;">A) SONIDOS EXTRAÑOS</p>
+                <p style="margin:0;">B) RUIDOS ANORMALES</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- CLAUSULAS IX A XIX -->
+          <div style="margin-bottom:16px; text-align:justify;">
+            <p style="margin:0 0 6px 0;">
+              IX.- “EL COMPRADOR” EXIME A “EL VENDEDOR” DE TODA RESPONSABILIDAD, SI LAS PARTES QUE SE GARANTIZAN SUFREN DAÑO POR DESCUIDO O NEGLIGENCIA DE “EL COMPRADOR” DEBIDAMENTE COMPROBABLE.
+            </p>
+
+            <p style="margin:0 0 6px 0;">
+              X.- “EL COMPRADOR” SE OBLIGA A NO VENDER NI GRAVAR EN FORMA ALGUNA EL VEHÍCULO OBJETO DE ESTE CONTRATO, HASTA QUE LIQUIDE EL PRECIO EN SU TOTALIDAD.
+            </p>
+
+            <p style="margin:0 0 6px 0;">
+              XI.- “EL COMPRADOR” TENDRÁ LA OBLIGACIÓN DE INFORMAR A “EL VENDEDOR” DURANTE LA VIGENCIA DEL CONTRATO, SOBRE EL CAMBIO DE DOMICILIO QUE LLEGARE A TENER, EN UN PLAZO MÁXIMO DE 15 DÍAS, POSTERIORES A LA VERIFICACIÓN DEL CAMBIO.
+            </p>
+
+            <p style="margin:0 0 6px 0;">
+              XII.- PARA DAR CUMPLIMIENTO A LO PREVISTO POR EL ARTICULO 70 DE LA LEY FEDERAL DE PROTECCIÓN AL CONSUMIDOR, LOS CONTRATANTES, DE COMÚN ACUERDO Y PARA EL CASO DE QUE SE RESCINDIERA AL PRESENTE CONTRATO, DEBERÁN RESTITUIRSE MUTUAMENTE LAS PRESENTACIONES QUE SE HUBIERAN HECHO. SI “EL COMPRADOR” HUBIERA PAGADO MAS DE LA TERCERA PARTE DEL IMPORTE DE LA COMPRA-VENTA, PODRÁ OPTAR POR LA RESCISIÓN O SOLICITAR EL PAGO DE ADEUDO VENCIDO EN TÉRMINOS DE LO PREVISTO EN EL ARTICULO 71 DEL CITADO ORDENAMIENTO LEGAL. “EL VENDEDOR” TENDRÁ DERECHO A EXIGIR POR EL USO DEL VEHÍCULO EL PAGO DE UNA ALQUILER O RENTA, APLICADO A LA TARIFA MAS ECONÓMICA QUE EXISTE EN EL MERCADO DE AUTO RENTAS Y EN SU CASO, UNA COMPENSACIÓN POR EL DEMERITO QUE HAYA SUFRIDO DICHA UNIDAD, LA CUAL DEBE SER FIJADA POR PERITOS QUE DESIGNEN LAS PARTES DE COMÚN ACUERDO.
+            </p>
+
+            <p style="margin:0 0 6px 0;">
+              XIII.- “EL COMPRADOR” ASUMIRÁ, AL MOMENTO DE RECIBIR EL VEHÍCULO LA RESPONSABILIDAD SOBRE EL BUEN USO DEL MISMO, DESDE SU ENTREGA.
+            </p>
+
+            <p style="margin:0 0 6px 0;">
+              XIV.- CON BASE EN LO PREVISTO POR EL ARTICULO 66 DE LA LEY FEDERAL DE PROTECCIÓN AL CONSUMIDOR, LOS PAGOS NO CUBIERTOS A SU VENCIMIENTO CAUSARAN UN INTERÉS MORATORIO QUE NO EXCEDERÁ DEL T.I.I.E. QUE FIJE EL BANCO DE MÉXICO EN LA FECHA DEL INCUMPLIMIENTO PACTÁNDOSE DE MUTUO ACUERDO A LA FIRMA DE DICHOS DOCUMENTOS.
+            </p>
+
+            <p style="margin:0 0 6px 0;">
+              XV.- “EL VENDEDOR” PODRÁ DEMANDAR LA RESCISIÓN O EL VENCIMIENTO ANTICIPADO DEL SALDO DEL ADEUDO DEL PRESENTE CONTRATO Y EN CONSECUENCIA EXIGIR SU PAGO TOTAL, CUANDO OCURRAN CUALQUIER DE LAS SIGUIENTES CAUSAS:
+            </p>
+
+            <p style="margin:0 0 4px 12px;">
+              A) CUANDO EL VEHÍCULO DE LA COMPRA-VENTA SUFRA DESTRUCCIÓN TOTAL O DAÑOS PARCIALES QUE AFECTEN SU NATURALEZA O ESTE SEA MATERIA DEL EMBARGO, SECUESTRO JUDICIAL U OTRO ACONTECIMIENTO SEMEJANTE A LOS CITADOS EN ESTA CLAUSULA DE LO QUE SEA RESPONSABLE “EL COMPRADOR” POR CESIÓN O TRASPASO DE DERECHOS O ARRENDAMIENTO DEL VEHÍCULO Y DE CUALQUIERA DE LOS DERECHOS QUE ADQUIERE “EL COMPRADOR” Y SIN QUE MEDIE CONSENTIMIENTO OTORGADO POR ESCRITO DE “EL VENDEDOR”.
+            </p>
+            <p style="margin:0 0 4px 12px;">
+              B) POR FALTA DE PAGO, A LA FECHA DE VENCIMIENTO DE DOS O MAS ABONOS PACTADOS.
+            </p>
+            <p style="margin:0 0 6px 12px;">
+              C) POR HABER CAMBIADO DE DOMICILIO SIN AVISO A “EL VENDEDOR”, EN TÉRMINOS DE LA CLAUSULA XI.
+            </p>
+
+            <p style="margin:0 0 6px 0;">
+              XVI.- “EL COMPRADOR”, TENDRÁ DERECHO A DEMANDAR LA RESCISIÓN DEL PRESENTE CONTRATO EN LOS SIGUIENTES CASOS:
+            </p>
+            <p style="margin:0 0 4px 12px;">
+              A) POR INCUMPLIMIENTO DE “EL VENDEDOR” A CUALESQUIERA DE LAS OBLIGACIONES ESTIPULADAS EN EL PRESENTE CONTRATO.
+            </p>
+            <p style="margin:0 0 4px 12px;">
+              B) SI “EL COMPRADOR” LLEGARA A DETECTAR DEFECTOS O VICIOS OCULTOS, CON BASE EN LA CLAUSULA VIII Y EN LOS ARTÍCULOS 77 Y 82 DE LA LEY FEDERAL DE PROTECCIÓN AL CONSUMIDOR.
+            </p>
+            <p style="margin:0 0 4px 12px;">
+              C) SI EL VENDEDOR NO ENTREGA EL VEHÍCULO EN LA FECHA ESTIPULADA EN LA CLAUSULA III, INCISO H) DEL PRESENTE CONTRATO.
+            </p>
+            <p style="margin:0 0 6px 12px;">
+              D) SI EL VEHÍCULO LE FUERA ENTREGADO A “EL COMPRADOR” EN CONDICIONES CON CARACTERÍSTICAS DISTINTAS A LAS SEÑALADAS EN LA CLAUSULA I DEL PRESENTE CONTRATO.
+            </p>
+
+            <p style="margin:0 0 6px 0;">
+              XVII.- “EL VENDEDOR” SE HACE RESPONSABLE DE CUALQUIER SITUACIÓN LEGAL QUE ANTECEDA A LA FECHA DE COMPRA-VENTA DEL VEHÍCULO OBJETO DEL PRESENTE CONTRATO, SIN NINGUNA RESPONSABILIDAD PARA “EL COMPRADOR”.
+            </p>
+
+            <p style="margin:0 0 6px 0;">
+              XVIII.- “EL COMPRADOR” SE HACE RESPONSABLE DE LOS DAÑOS QUE PUDIERA OCASIONA CON EL VEHÍCULO OBJETO DEL PRESENTE CONTRATO, DESDE LA FIRMA DEL MISMO.
+            </p>
+
+            <p style="margin:0;">
+              XIX.- LOS CONTRATANTES CONVIENEN QUE POR EL INCUMPLIMIENTO QUE CUALESQUIERA DE SUS OBLIGACIONES CONTENIDAS EN EL PRESENTE CONTRATO, SE APLICARA AL RESPONSABLE UNA PENA CONVENCIONAL EQUIVALENTE AL 15% DEL PRECIO DE CONTADO DEL VEHÍCULO MATERIA DEL PRESENTE CONTRATO, EN CASO DE SER “EL VENDEDOR” DEBERÁ PAGAR LOS RESPECTIVOS INTERESES EN TÉRMINOS DE LA CLAUSULA XIV.
+            </p>
+          </div>
+
+          <!-- CIERRE -->
+          <div style="margin-bottom:16px; text-align:justify;">
+            <p style="margin:0 0 6px 0;">
+              LA PROCURADURÍA FEDERAL DEL CONSUMIDOR ES COMPETENTE EN LA VÍA ADMINISTRATIVA PARA RESOLVER CUALQUIER CONTROVERSIA QUE SE SUSCITE SOBRE LA INTERPRETACIÓN O CUMPLIMIENTO DEL PRESENTE CONTRATO, SIN PREJUICIO DE LO ANTERIOR, LAS PARTES SE SOMETEN A LA JURISDICCIÓN DE LOS TRIBUNALES COMPETENTES DE LA CIUDAD DE MEXICALI, B.C., RENUNCIANDO EXPRESAMENTE A CUALQUIER OTRA JURISDICCIÓN QUE PUDIERA CORRESPONDERLES POR RAZÓN DE SUS DOMICILIOS PRESENTES O FUTUROS O POR CUALQUIER OTRA RAZÓN.
+            </p>
+          </div>
+
+          <!-- FIRMAS -->
+          <div style="margin-top:30px;">
+            <p style="margin:0 0 30px 0; text-align:justify;">
+              LEÍDO QUE FUE Y SIENDO LAS
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:80px;">
+                {{ time }}
+              </span>
+              DEL DIA
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:220px;">
+                {{ date }}
+              </span>
+              Y UNA VEZ HECHA LA EXPLICACIÓN DE SU ALCANCE LEGAL, ESTE CONTRATO FUE SUSCRITO POR DUPLICADO EN LA CIUDAD DE MEXICALI, B.C.
+            </p>
+
+            <div style="display:flex; justify-content:space-between; margin-top:50px; gap:40px;">
+              <div style="width:45%; text-align:center;">
+                <div style="border-top:1px solid black; padding-top:6px;">
+                  {{ contractData.user.full_name }}
+                  <br>
+                  VENDEDOR
+                </div>
+              </div>
+
+              <div style="width:45%; text-align:center;">
+                <div style="border-top:1px solid black; padding-top:6px;">
+                  {{ contractData.client.full_name }}
+                  <br>
+                  COMPRADOR
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PIE -->
+          <div style="margin-top:30px; font-size:10px; text-align:center; line-height:1.35;">
+            <p style="margin:0;">QUEJAS Y RECLAMACIONES AL TELÉFONO (686) 565-72-72</p>
+            <p style="margin:0;">CALZ. INDEPENDENCIA #1375 COL. BENITO JUÁREZ</p>
+            <p style="margin:0;">MEXICALI, B.C.</p>
+            <p style="margin:0;">HORARIO DE LUNES A SÁBADO DE 9:00 A.M. A 6:00 P.M.</p>
+            <p style="margin:0;">
+              CONTRATO REGISTRADO ANTE LA PROCURADURÍA FEDERAL DEL CONSUMIDOS BAJO EL No. DE REGISTRO 571-2007 DE FECHA 26 DE FEBRERO DEL 2007
+            </p>
+            <p style="margin:0;">
+              AVISO DE PRIVACIDAD. MACHUCAS AUTOMOTRIZ S. DE R.L. CON DOMICILIO EN CALZADA INDEPENDENCIA #1375, COL. BENITO JUÁREZ UTILIZARA SUS DATOS PERSONALES AQUÍ RECABADOS PARA LA ACREDITACIÓN DE CRÉDITO DE VEHÍCULO AUTOMOTOR.
+            </p>
+            <p style="margin:0;">
+              PARA MAYOR INFORMACIÓN ACERCA DEL TRATAMIENTO Y LOS DERECHOS QUE PUEDE ACCEDER AL AVISO DE PRIVACIDAD COMPLETO A TRAVÉS DE NUESTRA PAGINA WWW.MACHUCASAUTOMOTRIZ.COM
+            </p>
+          </div>
+
+        </div>
+      </div>
     </div>
   </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
   <div class="flex gap-2 p-[20px]">
-    <app-button [loading]="loading" printSectionId="print-section" ngxPrint full impact="bold" tone="primary" shape="rounded" size="medium">Imprimir</app-button>
+    <app-button [loading]="loading" printSectionId="print-section" ngxPrint [useExistingCss]="true"  full impact="bold" tone="primary" shape="rounded" size="medium">Imprimir</app-button>
     <app-button [disabled]="loading"  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
   </div>
 </mat-dialog-actions>

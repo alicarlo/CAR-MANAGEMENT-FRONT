@@ -24,7 +24,7 @@ export class ShoppingComponent {
   columns: any = [
     { key: 'investor', type: 'text' },
     { key: 'key', type: 'text' },
-    { key: 'carData', type: 'text' },
+    { key: 'carDataShow', type: 'text' },
     { key: 'car_type', type: 'text' },
     { key: 'arrived_at', type: 'dob' },
     { key: 'total', type: 'money' },
@@ -184,7 +184,8 @@ export class ShoppingComponent {
           this.hasNext = response.pagination.has_next;
           this.hasPrev = response.pagination.has_prev;
           this.purchase = response.items.map((r: any) => ({ ...r, 
-            carData:  r.car ?  `${r.car.make } ${r.car.version} ${r.car.model } ${r.car.color }` : '-',
+            carDataShow:  r.car ?  `${r.car.make } ${r.car.version} ${r.car.model } ${r.car.color }` : '-',
+            carData:  r.car,
             car_type: r.car.car_type.name, 
             investor: r.investor.full_name,
             key: r.car.key,

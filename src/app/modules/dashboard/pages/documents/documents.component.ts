@@ -31,7 +31,8 @@ export class DocumentsComponent {
 
   readonly actions: RowAction[] = [
     { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Elimnar' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar' },
+    { icon: 'description', id: 'contract', label: 'Descargar Documento' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -66,6 +67,7 @@ export class DocumentsComponent {
   onRowAction(e: RowActionEvent<any>) {
     if (e.id === 'edit')  this.openModal(e.id,e.row);
     if (e.id === 'delete') this.actionModal(e.id,e.row, 'Desea eliminar el registro?');
+    if (e.id === 'contract') this.actionModal(e.id,e.row, 'Desea descargar el documento?','!text-blue-500', 'description');
   }
 
   getDocuments() {
@@ -153,7 +155,14 @@ export class DocumentsComponent {
     ref.componentInstance.accept.subscribe(async () => {
       ref.componentInstance.loading = true;
       try {
-        await this.deleteDocument(data.id)
+
+        if(dataSend.action === 'contract') {
+          await this.downloadDirect(data.url)
+        }else{
+          await this.deleteDocument(data.id)
+        }
+
+        
         ref.componentInstance.loading = false;
         ref.close(true);
         this.getDocuments();
@@ -161,6 +170,11 @@ export class DocumentsComponent {
         ref.componentInstance.loading = false;
       }
     });
+  }
+
+  async downloadDirect(url: string, filename?: string) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    return;
   }
 
   async deleteDocument(id: string) {

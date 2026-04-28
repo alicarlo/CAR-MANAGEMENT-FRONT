@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { ClientsService } from 'src/app/core/services/clients/clients.service';
-import  moment from 'moment';
+import moment from 'moment-timezone';
 import { STATUS } from 'src/app/core/constants/global';
 import { TypeDocumentsService } from 'src/app/core/services/typeDocuments/type-documents.service';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
@@ -31,7 +31,7 @@ export class DocumentsModalComponent {
     'document_type_id':[
 			{type: 'required', message: 'Campo es requerido'},
 		],
-		'descriptions':[
+		'description':[
       {type: 'required', message: 'Campo es requerido'},
 		],
 		'file':[
@@ -40,10 +40,13 @@ export class DocumentsModalComponent {
     'car_id':[
 			{type: 'required', message: 'Auto es requerido'},
 		],
+    'require_at':[
+      {type: 'required', message: 'Fecha es requerido'},
+    ]
 	}
 
   sexOptions = ['male', 'female'];
-  todayStr = new Date().toISOString().slice(0, 10); 
+  todayStr = moment().tz('America/Tijuana').format('YYYY-MM-DD');
   status = [STATUS.ACTIVE, STATUS.INACTIVE]; 
 
   maxSizeBytes = 25 * 1024 * 1024; // 25MB
@@ -59,6 +62,8 @@ export class DocumentsModalComponent {
   filteredCars: any[] = [];
   carsDropdownOpen = false;
   selectedCarLabel = '';
+
+  requiteDate: boolean = false;
   constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 
@@ -74,6 +79,7 @@ export class DocumentsModalComponent {
   ngOnInit(): void {
     this.init();
     this.getTypeDocument();
+    /*
      this.carFilterControl.valueChanges.subscribe(term => {
         const value = (term || '').toString().toLowerCase().trim();
 
@@ -82,17 +88,65 @@ export class DocumentsModalComponent {
           return text.includes(value);
         });
       });
+      */
+
+    this.saveForm.get('document_type_id').valueChanges.subscribe((value: any) => {
+      this.requiteDate = this.typeDocument.find((item: any) => item.id === value).require_date;
+      if (this.requiteDate) {
+        this.saveForm.get('require_at')?.enable();
+        this.saveForm.get('require_at')?.setValidators([Validators.required]);
+        return;
+      }
+      this.saveForm.get('require_at')?.disable();
+      this.saveForm.get('require_at')?.setValidators([]);
+    })
+
+    this.carFilterControl.valueChanges.subscribe(term => {
+      const value = (term || '')
+        .toString()
+        .toLowerCase()
+        .trim();
+
+      this.filteredCars = this.cars.filter((car: any) => {
+
+        const text = [
+          car.key,
+          car.make,
+          car.model,
+          car.plate,
+          car.color,
+          car.version
+        ]
+          .map(v => (v || '').toString().toLowerCase())
+          .join(' ');
+
+        return text.includes(value);
+      });
+    });
     this.getCars();
   }
 
   init() {
     this.saveForm = this._FormBuilder.group({
       document_type_id: new FormControl (this.data.row === null ? '' : this.data.row.document_type_id,Validators.compose([Validators.required])),
-      descriptions: new FormControl (this.data.row === null ? '' : this.data.row.descriptions,Validators.compose([Validators.required])),
-      file: new FormControl (this.data.row === null ? '' : this.data.row.file,Validators.compose([Validators.required])),
+      description: new FormControl (this.data.row === null ? '' : this.data.row.description,Validators.compose([Validators.required])),
+      file: new FormControl (this.data.row === null ? '' : this.data.row.file,this.data.row !== null ? [] : [Validators.required]),
       id: new FormControl (this.data.row === null ? '' : this.data.row.id,),
-      car_id: new FormControl (this.data.row === null ? '' : this.data.row.cars[0].id),
+      car_id: new FormControl (this.data.row === null ? '' : this.data.row.cars.length === 0 ? '' : this.data.row.cars[0].id ),
+      require_at: new FormControl(
+        this.data.row?.require_at ?? null,
+        this.requiteDate ? [Validators.required] : []
+      ) 
   	});
+
+
+  }
+
+  openPicker(input: HTMLInputElement) {
+    (input as any).showPicker?.();
+    if (!('showPicker' in (HTMLInputElement.prototype as any))) {
+      input.focus();
+    }
   }
 
   toggleCarsDropdown() {
@@ -119,7 +173,8 @@ export class DocumentsModalComponent {
         if(response) {
           this.cars = response.items.map((r: any) => ({ ...r }));
           this.filteredCars = [...this.cars];
-          if (this.data.row.cars[0].id) {
+
+          if (this.data.row && this.data.row.cars.length !== 0 && this.data.row.cars[0].id) {
             const car = this.cars.find(c => c.id === this.data.row.cars[0].id);
             if (car) {
               this.selectedCarLabel = `${car.make} - ${car.model}`;
@@ -161,8 +216,19 @@ export class DocumentsModalComponent {
       let carArray = [this.saveForm.value.car_id]
       formData.append('car_id', this.saveForm.value.car_id);
       formData.append('document_type_id', this.saveForm.value.document_type_id);
-      formData.append('descriptions', this.saveForm.value.descriptions);
-      formData.append('file', this.saveForm.value.file);
+      formData.append('descriptions', this.saveForm.value.description);
+      if (this.requiteDate) {
+        formData.append('require_at', this.saveForm.value.require_at);
+      }
+      if (this.data.row == null) {
+        formData.append('file', this.saveForm.value.file);
+      }else{
+        if (this.saveForm.value.file !== null) {
+          formData.append('file', this.saveForm.value.file);
+        }
+        
+      }
+      // formData.append('file', this.saveForm.value.file);
 
       const token = this._AuthService.tokenValue;
       const response = await fetch(`${environment.apiUrl}/document/${this.saveForm.value.id}`, {

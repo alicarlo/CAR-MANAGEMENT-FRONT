@@ -14,6 +14,7 @@ import { LayawayShowModalComponent } from '../../modals/layaway-show-modal/layaw
 import { SalesModalComponent } from '../../modals/sales-modal/sales-modal.component';
 import { SalesService } from 'src/app/core/services/sales/sales.service';
 import moment from 'moment';
+import { TicketPrintModalComponent } from '../../modals/ticket-print-modal/ticket-print-modal.component';
 
 @Component({
   selector: 'app-sales',
@@ -33,9 +34,24 @@ export class SalesComponent {
     { key: 'date_delivery_aux', type: 'dob' },
     { key: 'hour_delivery_aux', type: 'text' },
     { key: 'amount_sale', type: 'money' },
+    { key: 'salesTypeStatus1', type: '',
+      show: [
+        { id: 'ticketContado', value: [2] },
+      ] 
+     },
+     { key: 'salesTypeStatus2', type: '',
+      show: [
+        { id: 'ticketCredito', value: [2] },
+      ] 
+     },
+    
   ]
   readonly actions: RowAction[] = [
     { icon: 'delete', id: 'delete', label: 'Eliminar venta' },
+    // { icon: 'file_copy', id: 'contract', label: 'Descargar contrato' },
+    // { icon: 'print', id: 'print', label: 'Imprimir ticket' },
+    { icon: 'description',  id: 'ticketContado',  label: 'Contrato de venta a contado' },
+    { icon: 'file_copy',  id: 'ticketCredito',  label: 'Contrato de venta a credito' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -69,6 +85,9 @@ export class SalesComponent {
   onRowAction(e: RowActionEvent<any>) {
     if (e.id === 'search') this.openShowModal(e.id,e.row);
     if (e.id === 'delete') this.actionModal(e.id,e.row, 'Desea eliminar el registro?');
+    // if (e.id === 'contract') this.actionModal(e.id,e.row, 'Desea descargar el contrato?', '!text-blue-500', 'description');
+    if (e.id === 'ticketContado')  this.openTicketModal(e.id,e.row,3);
+    if (e.id === 'ticketCredito')  this.openTicketModal(e.id,e.row,4);
   }
 
   openShowModal(action: string, data: any) {
@@ -120,7 +139,14 @@ export class SalesComponent {
     ref.componentInstance.accept.subscribe(async () => {
       ref.componentInstance.loading = true;
       try {
-        await this.deleteSale(data.id)
+        if (action === 'delete') {
+          await this.deleteSale(data.id);
+        }
+
+        if (action === 'contract') {
+          await this.contractSale(data.id);
+        }
+        
         ref.componentInstance.loading = false;
         ref.close(true);
         this.getSale();
@@ -204,6 +230,8 @@ export class SalesComponent {
             date_delivery_aux: moment(r.date_delivery).format('YYYY-MM-DD'),
             hour_delivery_aux: moment(r.hour_delivery).format('HH:mm A'),
             carData:  r.car  ?  `${r.car.key} ${r.car.make } ${r.car.version} ${r.car.model } ${r.car.color }` : '-',
+            salesTypeStatus1: r.sales_type === 'contado' ? 1 : 2,
+            salesTypeStatus2: r.sales_type === 'credito' ? 1 : 2,
             ...r
           }));
           
@@ -222,4 +250,46 @@ export class SalesComponent {
       },
     }) 
   }
+
+  async contractSale(id: string) {
+    return new Promise((resolve, reject) => {
+      this._SalesService.getContractSale(id).subscribe({
+        next: (response: any) => {
+          if(response) {
+            this.downloadFile(response);
+            resolve(true);
+          }
+        },
+        error: (err) => {
+          reject(err);
+          // this._ToastrService.error(err.error, 'Error');
+        },
+      })
+    })
+  }
+
+  async downloadFile(url: string, filename?: string) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    return;
+  }
+
+  openTicketModal(action: string, data: any, flag: number) {
+      let dataSend = {data, full: data, flag};
+      const dialogRef = this._MatDialog.open(TicketPrintModalComponent, {
+        disableClose: true,
+        data: dataSend,
+        /// panelClass: ['custom-dialog-container', 'dialog-ticket'],
+        panelClass: ['custom-dialog-container'],
+        width: '100vw',
+        height: '75vh',
+        maxWidth: '100vw'
+      });
+  
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          // this.getIncomes();
+        }
+      });
+    }
+      
 }

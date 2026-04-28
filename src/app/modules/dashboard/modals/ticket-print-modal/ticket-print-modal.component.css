@@ -30,3 +30,46 @@ p {
 .size {
 	font-size: 12px;
 }
+
+/*
+@media print {
+  body {
+    margin: 0;
+  }
+
+  #print-section {
+    width: 210mm !important;
+    height: 297mm !important;
+    box-shadow: none !important;
+  }
+}
+  */
+
+@media print {
+
+  body {
+    margin: 0;
+    background: white !important;
+  }
+
+  #print-section {
+    width: 210mm !important;
+    min-height: 297mm !important; 
+    height: auto !important;     
+    box-shadow: none !important;
+    padding: 20px !important;
+  }
+
+
+  @media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+  #print-section * {
+    page-break-inside: avoid;
+  }
+
+}

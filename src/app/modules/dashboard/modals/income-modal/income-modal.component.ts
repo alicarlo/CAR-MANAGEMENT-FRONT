@@ -11,7 +11,7 @@ import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { TypePaymentsService } from 'src/app/core/services/typePayments/type-payments.service';
 import { IncomeService } from 'src/app/core/services/income/income.service';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { environment } from 'src/environments/environment';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
 
@@ -41,7 +41,7 @@ export class IncomeModalComponent {
 	}
 
   typePayments: any[] = [];
-  todayStr = new Date().toISOString().slice(0, 10); 
+  todayStr = moment().tz('America/Tijuana').format('YYYY-MM-DD'); 
 
   maxSizeBytes = 25 * 1024 * 1024; // 25MB
   selectedFile: File | null = null;
@@ -49,7 +49,7 @@ export class IncomeModalComponent {
   fileIcon: string = 'insert_drive_file';
   fileExt: string = '';
 
-  ref: any;
+  ref: any = null;
   constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 
@@ -62,6 +62,10 @@ export class IncomeModalComponent {
     private _MatDialog: MatDialog,
   ) 
   {}
+
+  get isApartado(): boolean {
+    return Number(this.data.flag) === 4;
+  }
 
   ngOnInit(): void {
     this.init();
@@ -142,6 +146,15 @@ export class IncomeModalComponent {
       return;
     }
 
+    if (this.data.flag === 5) {
+      let res = this.data.itemSelected.amount - this.incomeAmount()
+      if (this.saveForm.value.amount > res) {
+        this._ToastrService.warning('El monto ingresado es mayor al saldo pendiente', 'Mensaje');
+        return;
+      }
+    }
+
+
     this.loading = true;
     let filledValues = Object.keys(this.saveForm.value).reduce((acc, key) => {
       const val = this.saveForm.value[key as keyof typeof this.saveForm.value];
@@ -156,6 +169,9 @@ export class IncomeModalComponent {
     }else
     if(this.data.flag === 4){
       // filledValues['income_type'] = 'cobros_adicionales'
+    }else
+    if(this.data.flag === 5){
+      filledValues['income_type'] = 'mensualidad_venta'
     }
   
     const methodMap = {
@@ -256,7 +272,7 @@ export class IncomeModalComponent {
           : 'check';
           
       let dataSend = {action, row: data, msg, color, icon};
-  
+
       this.ref = this._MatDialog.open(ActionMessageComponent, {
         data: dataSend,
         disableClose: true,
@@ -269,6 +285,7 @@ export class IncomeModalComponent {
       return new Promise((resolve) => {
         this.ref.componentInstance.accept.subscribe(() => {
           this.ref.close(true);
+          this.ref = null;
           resolve(true);
         });
 
@@ -283,7 +300,6 @@ export class IncomeModalComponent {
       this.saveForm.markAllAsTouched(); 
       return;
     }
-
     const flagShow =  await this.actionModalFile(3,'approve', '', 'Desea continuar con el pago?');
     if (flagShow === false) return;
     this.loading = true;
@@ -340,6 +356,7 @@ export class IncomeModalComponent {
           comments: income.comments,
           date_income: income.date_income,
           file: income.file,
+          income_type: 'mensualidad_venta'
         };
 
         if (documentId !== '') {
@@ -520,9 +537,9 @@ export class IncomeModalComponent {
     // ❌ validar monto inválido general
     if (!payment || payment <= 0) {
       this.saveForm.get('amount')?.setErrors({ invalidAmount: true });
-      this._ToastrService.error(
+      this._ToastrService.warning(
         'El monto debe ser mayor, si requieres abonar un monto parcial, usa el botón "Abonar"',
-        'Error'
+        'Mensaje'
       );
       this.loading = false;
       return null;
@@ -543,10 +560,15 @@ export class IncomeModalComponent {
 
     // 🔴 VALIDACIÓN IMPORTANTE
     if (payment < selectedPending) {
-      this.saveForm.get('amount')?.setErrors({ minAmount: true });
-      this._ToastrService.error(
-        `El monto debe ser igual o mayor a ${selectedPending}, si requieres abonar un monto parcial, usa el botón "Abonar"`,
-        'Error'
+
+      const formattedAmount = new Intl.NumberFormat('es-MX', {
+        style: 'currency',
+        currency: 'MXN'
+      }).format(selectedPending);
+      // this.saveForm.get('amount')?.setErrors({ minAmount: true });
+      this._ToastrService.warning(
+        `El monto debe ser igual o mayor a ${formattedAmount}, si requieres abonar un monto parcial, usa el botón "Abonar"`,
+        'Mensaje'
       );
       this.loading = false;
       return null;
@@ -626,10 +648,10 @@ export class IncomeModalComponent {
 
     // ❌ validar monto inválido general
     if (!payment || payment <= 0) {
-      this.saveForm.get('amount')?.setErrors({ invalidAmount: true });
-      this._ToastrService.error(
+      // this.saveForm.get('amount')?.setErrors({ invalidAmount: true });
+      this._ToastrService.warning(
         'El monto debe ser mayor, si requieres abonar un monto parcial, usa el botón "Abonar"',
-        'Error'
+        'Mensaje'
       );
       this.loading = false;
       return null;
@@ -637,10 +659,15 @@ export class IncomeModalComponent {
 
     // 🔴 VALIDACIÓN IMPORTANTE (la que te faltaba)
     if (payment < selected.amount) {
-      this.saveForm.get('amount')?.setErrors({ minAmount: true });
-      this._ToastrService.error(
-        `El monto debe ser igual o mayor a ${selected.amount}, si requieres abonar un monto parcial, usa el botón "Abonar`,
-        'Error'
+      // this.saveForm.get('amount')?.setErrors({ minAmount: true });
+
+      const formattedAmount = new Intl.NumberFormat('es-MX', {
+        style: 'currency',
+        currency: 'MXN'
+      }).format(selected.amount);
+      this._ToastrService.warning(
+        `El monto debe ser igual o mayor a ${formattedAmount}, si requieres abonar un monto parcial, usa el botón "Abonar`,
+        'Mensaje'
       );
       this.loading = false;
       return null;

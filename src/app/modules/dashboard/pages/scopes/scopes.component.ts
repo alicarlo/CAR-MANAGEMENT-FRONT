@@ -28,7 +28,7 @@ export class ScopesComponent {
 
   readonly actions: RowAction[] = [
     { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Elimnar' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -132,7 +132,8 @@ export class ScopesComponent {
 
   getScopes() {
     this.loading = false;
-    this._ScopesService.getScopes(this.pageSize, this.currentPage).subscribe({
+    // view
+    this._ScopesService.getScopes(500, this.currentPage).subscribe({
       next: async (response: any) => {
         if(response) {
           this.totalPages = response.pagination.total_pages;

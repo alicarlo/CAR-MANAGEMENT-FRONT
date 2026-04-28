@@ -16,6 +16,7 @@ import { ShopingService } from 'src/app/core/services/shoping/shoping.service';
 import { environment } from 'src/environments/environment';
 import moment from 'moment';
 import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
+import { elementAt } from 'rxjs';
 
 
 @Component({
@@ -49,6 +50,9 @@ export class BillsModalComponent {
     ],
     'bill_date': [
       {type: 'required', message: 'Fecha de gasto requerido'},
+    ],
+    'car_id': [
+      {type: 'required', message: 'Auto es requerido'},
     ]
 	}
 
@@ -69,6 +73,8 @@ export class BillsModalComponent {
   classificationDropdownOpen = false;
   classificationFilterControl = new FormControl('');
   selectedClassificationLabel = '';
+
+  flagShow: boolean = false;
   constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 
@@ -88,11 +94,34 @@ export class BillsModalComponent {
 
   ngOnInit(): void {
     this.init();
-    this.carFilterControl.valueChanges.subscribe(term => {
+    /*this.carFilterControl.valueChanges.subscribe(term => {
       const value = (term || '').toString().toLowerCase().trim();
 
       this.filteredCars = this.cars.filter(car => {
         const text = `${car.key} ${car.make} ${car.model} ${car.plate || ''}`.toLowerCase();
+        return text.includes(value);
+      });
+    });
+    */
+   this.carFilterControl.valueChanges.subscribe(term => {
+      const value = (term || '')
+        .toString()
+        .toLowerCase()
+        .trim();
+
+      this.filteredCars = this.cars.filter(car => {
+
+        const text = [
+          car.key,
+          car.make,
+          car.model,
+          car.plate,
+          car.color,
+          car.version
+        ]
+          .map(v => (v || '').toString().toLowerCase())
+          .join(' ');
+
         return text.includes(value);
       });
     });
@@ -106,6 +135,26 @@ export class BillsModalComponent {
         return text.includes(value);
       });
     });
+
+    this.saveForm.get('option')?.valueChanges.subscribe((value: any) => {
+      const control = this.saveForm.get('car_id');
+
+      if (!control) return;
+
+      if (value === 'auto') {
+        control.enable();
+        control.setValidators([Validators.required]);
+      } else {
+        control.setValue('');
+        control.clearValidators();
+        control.disable();
+      }
+
+      control.updateValueAndValidity(); // 🔥 CLAVE
+    });
+      
+
+ 
     this.getClassification();
     this.getCars();
     this.getUsers();
@@ -113,7 +162,7 @@ export class BillsModalComponent {
     // this.getTypeExpense();
   }
 
-   openPicker(input: HTMLInputElement) {
+  openPicker(input: HTMLInputElement) {
     (input as any).showPicker?.();
     if (!('showPicker' in (HTMLInputElement.prototype as any))) {
       input.focus();
@@ -122,10 +171,24 @@ export class BillsModalComponent {
 
   init() {
     this.saveForm = this._FormBuilder.group({
-      option: new FormControl (null,this.data?.row !== null ? [] : [Validators.required]),
+      // option: new FormControl (null,this.data?.row !== null ? [] : [Validators.required]),
+      // option: new FormControl (this.data.row === null ? null : this.data.row.name, [Validators.required]),
+      option: new FormControl(
+        this.data?.row === null
+          ? null
+          : (this.data?.row?.cars?.length ?? 0) === 0
+            ? 'oficina'
+            : 'auto',
+        [Validators.required]
+      ),
       classification_bill_id: new FormControl (this.data.row === null ? '' : this.data.row.classification_bill_id,Validators.compose([Validators.required])),
       // car_id: new FormControl (this.data.row === null ? '' : this.data.row.cars.length === 0 ? '' : this.data.row.cars[0].id ),
-      car_id: new FormControl (''), 
+      // car_id: new FormControl (''), 
+      car_id: new FormControl(
+        this.data?.row === null
+          ? ''
+          : (this.data?.row?.cars && this.data?.row?.cars.length > 0 ? this.data?.row.cars[0].id : '')
+      ),
       name: new FormControl (this.data.row === null ? '' : this.data.row.name),
       user_created: new FormControl (this._AuthService.user()?.user_id),
       payment_method_id: new FormControl ('', this.data?.row !== null ? [] : [Validators.required]),
@@ -148,8 +211,19 @@ export class BillsModalComponent {
         //this.selectedCarLabel = `${this.data.row.cars[0].make} - ${this.data.row.cars[0].model}`;
         // this.saveForm.patchValue({ car_id: this.data.row.cars[0].id});  
       }
-      
+    
     }
+
+    let aa = this.cars.filter(car => car.id === this.data.row.cars[0].id);
+
+     if (this.data.row !== null && this.data.row.cars.length !== 0) {
+        // this.saveForm.patchValue({ car_id: this.data.row.cars[0].id });
+        this.carFilterControl.setValue(this.data.row.cars[0].id);
+      }
+    
+      this.flagShow =
+        this.data?.row === null ||
+        (this.data?.row !== null && (this.data?.row?.cars?.length ?? 0) === 0);
   }
 
   toggleCarsDropdown() {
@@ -197,7 +271,7 @@ export class BillsModalComponent {
             .sort((a: any, b: any) => a.name.localeCompare(b.name));
 
           this.filteredClassification = [...this.classification];
-          if (this.data.row.classification_bill_id) {
+          if (this.data.row !== null && this.data.row.classification_bill_id) {
             const clasification = this.classification.find(c => c.id === this.data.row.classification_bill_id);
             if (clasification) {
               this.selectedClassificationLabel = `${clasification.name}`;
@@ -219,8 +293,20 @@ export class BillsModalComponent {
       next: async (response: any) => {
         if(response) {
           this.cars = response.items.map((r: any) => ({ ...r }));
-          this.filteredCars = [...this.cars];
-        }
+          /*
+          if (this.data.row !== null && this.data.row.cars.length !== 0) {
+          // this.saveForm.patchValue({ car_id: this.data.row.cars[0].id });
+          this.carFilterControl.setValue(this.data.row.cars[0].id);
+          }
+          */
+         if (this.data.row !== null && this.data.row.cars.length !== 0) {
+            const carSearch = this.cars.find(c => c.id === this.data.row.cars[0].id);
+            if (carSearch) {
+              this.selectedCarLabel = `${carSearch.make} - ${carSearch.model}`;
+            }
+          }
+            this.filteredCars = [...this.cars];
+          }
       },
       error: (err) => {
         if (err.error === "Token expired") return;
@@ -342,7 +428,16 @@ export class BillsModalComponent {
       {...filledValues, id: this.data.row.id};
 
       if (car_id !== null && car_id !== undefined) {
-        filledValues['car_id'] = [car_id]
+        /*this.carFilterControl.setValue('');
+        this.selectedCarLabel = '';
+        this.saveForm.get('car_id')?.setValue(null);
+        */
+        if (this.saveForm.get('option')?.value  === 'auto') {
+          filledValues['car_id'] = [car_id]  
+        }else {
+          delete filledValues['car_id'];
+        }
+        
       }
 
       const methodMap = {

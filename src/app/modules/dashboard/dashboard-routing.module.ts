@@ -22,6 +22,8 @@ import { LayawayComponent } from './pages/layaway/layaway.component';
 import { SalesComponent } from './pages/sales/sales.component';
 import { IncomesComponent } from './pages/incomes/incomes.component';
 import { CollectionsComponent } from './pages/collections/collections.component';
+import { PriceListReportComponent } from './pages/price-list-report/price-list-report.component';
+import { DocumentsListReportComponent } from './pages/documents-list-report/documents-list-report.component';
 
 
 const routes: Routes = [
@@ -50,6 +52,8 @@ const routes: Routes = [
       { path: 'sales', component: SalesComponent },
       { path: 'incomes', component:  IncomesComponent },
       { path: 'collections', component: CollectionsComponent },
+      { path: 'price-list', component: PriceListReportComponent },
+      { path: 'documents-list', component: DocumentsListReportComponent },
       { path: '**', redirectTo: 'errors/404' },
     ],
   },

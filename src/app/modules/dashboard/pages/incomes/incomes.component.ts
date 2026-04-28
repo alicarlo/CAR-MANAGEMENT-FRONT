@@ -17,6 +17,8 @@ import moment from 'moment';
 import { IncomeService } from 'src/app/core/services/income/income.service';
 import { IncomeAdditionalComponent } from '../../modals/income-additional/income-additional.component';
 import { HistoryIncomeModalComponent } from '../../modals/history-income-modal/history-income-modal.component';
+import { AdditionalIncomeModalComponent } from '../../modals/additional-income-modal/additional-income-modal.component';
+import { TicketPrintModalComponent } from '../../modals/ticket-print-modal/ticket-print-modal.component';
 
 @Component({
   selector: 'app-incomes',
@@ -49,7 +51,7 @@ export class IncomesComponent {
     { key: 'amount', type: 'money' },
     { key: 'source', type: 'translate-text' },
 
-    { key: 'client', type: 'text' },
+    { key: 'clientData', type: 'text' },
     { key: 'carData', type: 'text' },
     { key: 'description', type: 'text' },
     { key: 'status', type: 'status' },
@@ -72,6 +74,11 @@ export class IncomesComponent {
       show: [
         { id: 'approve', value: [2] },
       ] 
+     },
+     { key: 'statusTicket', type: '',
+      show: [
+        { id: 'ticket', value: [2] },
+      ] 
      }
   ]
 
@@ -82,6 +89,8 @@ export class IncomesComponent {
     { icon: 'check_circle',  id: 'approve',  label: 'Aprobar registro' },
     { icon: 'add',  id: 'status',  label: 'Agregar documento' },
     { icon: 'attach_file',  id: 'url',  label: 'Descargar el archivo' },
+    { icon: 'description',  id: 'ticket',  label: 'Descargar Ticket' },
+    // { icon: 'attach_money',  id: 'incomeAdditional',  label: 'Agregar cobro adicional' },
     
   ];
   items: any[] = [];
@@ -132,21 +141,34 @@ export class IncomesComponent {
           this.currentPage = response.pagination.current_page;
           this.hasNext = response.pagination.has_next;
           this.hasPrev = response.pagination.has_prev;
+
           this.inconmes = response.items.map((r: any) => (
             { 
             statusReview: r.status === 'pendiente_aprobacion' ? 1 : r.status === 'cancelado' || r.status === 'aprobado' ? 2 : 3,
             userData: r.user.full_name,
-            typeIncome: r.sale.sales_type,
+            // typeIncome: r.sale.sales_type,
+            typeIncome: r.income_type == null ? '-' : this.formatIncomeType(r.income_type),
             paymenthMethod: r.payment_method.name,
             description: r.description === null ? '-' : r.description,
-            client: r.source === 'layaway' ? r.layaway.client.full_name : r.sale.client.full_name,
-            carData: r.source === 'layaway' ? `${r.layaway.car.key} ${r.layaway.car.make} ${r.layaway.car.version} ${r.layaway.car.model} ${r.layaway.car.color}` : `${r.sale.car.key} ${r.sale.car.make} ${r.sale.car.version} ${r.sale.car.model} ${r.sale.car.color}`,
+            // client: r.source === 'layaway' ? r.layaway.client.full_name  ? r.source === 'sale' ?  r.sale.client.full_name : r.client,
+            clientData: r.source === 'layaway'
+              ? r.layaway?.client?.full_name
+              : r.source === 'sale'
+                ? r.sale?.client?.full_name
+                : r.client.full_name,
+            // carData: r.source === 'layaway' ? `${r.layaway.car.key} ${r.layaway.car.make} ${r.layaway.car.version} ${r.layaway.car.model} ${r.layaway.car.color}` : `${r.sale.car.key} ${r.sale.car.make} ${r.sale.car.version} ${r.sale.car.model} ${r.sale.car.color}`,
+            carData:
+              r.source === 'layaway'
+                ? [r.layaway?.car?.key, r.layaway?.car?.make, r.layaway?.car?.version, r.layaway?.car?.model, r.layaway?.car?.color].filter(Boolean).join(' ')
+                : r.source === 'sale'
+                  ? [r.sale?.car?.key, r.sale?.car?.make, r.sale?.car?.version, r.sale?.car?.model, r.sale?.car?.color].filter(Boolean).join(' ')
+                  : [r.car?.key, r.car?.make, r.car?.version, r.car?.model, r.car?.color].filter(Boolean).join(' '),
             amount: r.amount,
             url: Object.keys(r.document).length ? 1 : 2,
+            statusTicket: r.status === 'aprobado'  ? 1 : 2,
              ...r
           }));
           
-    
           this.total = response.pagination.total_items;
           setTimeout(() => {
             this.loading = true;  
@@ -163,11 +185,22 @@ export class IncomesComponent {
     
   }
 
+  formatIncomeType(value: string): string {
+    if (!value) return '';
+
+    return value
+      .replace(/_/g, ' ')          
+      .toLowerCase()           
+      .replace(/\b\w/g, c => c.toUpperCase()); 
+  }
+
   onRowAction(e: RowActionEvent<any>) {
     if (e.id === 'delete') this.actionModalFile(2,'delete', e.row, 'Desea cancelar el registro?');
     if (e.id === 'approve') this.actionModalFile(3,'approve', e.row, 'Desea aprobar el registro?');
     if (e.id === 'url') this.actionModalFile(1,'delete', e.row, 'Desea descargar el archivo?');
     if (e.id === 'status')  this.openAddIncomeModal(e.id,e.row);
+    if (e.id === 'incomeAdditional')  this.openShowAdditionalIncomeModal(e.id,e.row);
+    if (e.id === 'ticket')  this.openTicketModal(e.id,e.row);
   }
 
   actionModalFile(flag: number,action: string, data: any, msg: string, color: string = '!text-blue-500', icon = 'cloud_download') {
@@ -237,6 +270,24 @@ export class IncomesComponent {
     });
   }
   
+
+  openShowAdditionalIncomeModal(action: string, data: any) {
+    let dataSend = {action, row: data, flag: 1};
+    const dialogRef = this._MatDialog.open(AdditionalIncomeModalComponent, {
+      disableClose: true,
+      data: dataSend,
+      panelClass: ['custom-dialog-container', 'dialog-60'],
+      width: '90vw',
+      height: '90vh',
+      maxWidth: '90vw'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.getIncomes();
+      }
+    });
+  }
   
 
   openAddModal(action: string, data: any) {
@@ -393,5 +444,24 @@ export class IncomesComponent {
     });
     
   }
+
+  openTicketModal(action: string, data: any) {
+      let dataSend = {data, full: data, flag: 0};
+      const dialogRef = this._MatDialog.open(TicketPrintModalComponent, {
+        disableClose: true,
+        data: dataSend,
+        /// panelClass: ['custom-dialog-container', 'dialog-ticket'],
+        panelClass: ['custom-dialog-container'],
+        width: '100vw',
+        height: '75vh',
+        maxWidth: '100vw'
+      });
+  
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.getIncomes();
+        }
+      });
+    }
     
 }

@@ -90,11 +90,15 @@ export class LayawayShowModalComponent {
   }
 
   openTicketModal(data: any) {
-    let dataSend = {data, flag: 0};
+    let dataSend = {data, full: this.data.row, flag: 0};
     const dialogRef = this._MatDialog.open(TicketPrintModalComponent, {
       disableClose: true,
       data: dataSend,
-      panelClass: ['custom-dialog-container', 'dialog-ticket'],
+      /// panelClass: ['custom-dialog-container', 'dialog-ticket'],
+      panelClass: ['custom-dialog-container'],
+      width: '100vw',
+      height: '75vh',
+      maxWidth: '100vw'
     });
 
     dialogRef.afterClosed().subscribe(result => {

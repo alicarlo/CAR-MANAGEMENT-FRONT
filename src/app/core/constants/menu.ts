@@ -32,6 +32,15 @@ export class Menu {
           ],
         },
         {
+          icon: 'assets/icons/heroicons/outline/document.svg',
+          label: 'Reportes',
+          route: '/dashboard',
+          children: [
+            { label: 'Lista de precios', route: '/layout/dashboard/price-list' },
+            { label: 'Lista de documentos', route: '/layout/dashboard/documents-list' },
+          ],
+        },
+        {
           icon: 'assets/icons/heroicons/outline/user-groups.svg',
           label: 'Inversionistas',
           route: '/layout/dashboard/investor',

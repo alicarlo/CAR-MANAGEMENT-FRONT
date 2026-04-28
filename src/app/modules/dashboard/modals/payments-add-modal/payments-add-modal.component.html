@@ -43,6 +43,19 @@
               </div>
             </div>
 
+            <div class="flex flex-col gap-2">
+              <label class="text-foreground text-[11px] font-medium">Descripcion:</label>
+              <textarea
+                class="
+                  py-2 pl-3 pr-2 min-h-[80px] rounded-md border 
+                  border-border bg-background text-foreground
+                  scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted
+                "
+                placeholder="Descripcion"
+                formControlName="descriptions">
+              </textarea>
+            </div>
+
             <div *ngIf="isUrl" class="rounded-md border border-border bg-background p-4">
               <div class="flex flex-col items-center text-center gap-2">
                 <label class="text-foreground text-[11px] font-medium">Archivo adjunto: {{ data.row.document.name }}</label>

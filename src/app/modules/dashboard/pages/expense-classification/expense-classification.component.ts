@@ -29,7 +29,7 @@ export class ExpenseClassificationComponent {
 
   readonly actions: RowAction[] = [
     { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Elimnar' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;

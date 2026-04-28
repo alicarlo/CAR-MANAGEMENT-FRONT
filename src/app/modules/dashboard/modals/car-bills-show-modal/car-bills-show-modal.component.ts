@@ -43,6 +43,8 @@ export class CarBillsShowModalComponent {
       next: async (response: any) => {
         if(response) {
           this.bills = response.items.map((r: any) => ({ ...r}));
+          // costShow
+
           this.totalBills = response.items.reduce((sum: any, item: any) => sum + item.total, 0);
           this.loadingModal = true;
         }
@@ -59,6 +61,8 @@ export class CarBillsShowModalComponent {
   }
   
   get sum() {
-    return this.totalBills + this.data.row.cost
+    const cost = Number(this.data?.row?.costShow);
+
+    return this.totalBills + (isNaN(cost) ? 0 : cost);
   }
 }

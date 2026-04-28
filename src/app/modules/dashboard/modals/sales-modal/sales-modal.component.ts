@@ -12,13 +12,13 @@ import { CarsService } from 'src/app/core/services/cars/cars.service';
 import { ClientsService } from 'src/app/core/services/clients/clients.service';
 import { LoadingComponent } from 'src/app/modules/uikit/pages/loading/loading.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { SalesService } from 'src/app/core/services/sales/sales.service';
 import { IncomeService } from 'src/app/core/services/income/income.service';
 import { TypePaymentsService } from 'src/app/core/services/typePayments/type-payments.service';
 import { environment } from 'src/environments/environment';
-import { a } from 'node_modules/@angular/material/icon-registry.d-BVwP8t9_';
+
 
 interface AttachmentItem {
   id: string;
@@ -100,7 +100,7 @@ export class SalesModalComponent {
   cars: any[] = [];
   carsSelected: any = null
   typePayments: any[] = [];
-  todayStr = new Date().toISOString().slice(0, 10); 
+  todayStr = moment().tz('America/Tijuana').format('YYYY-MM-DD');
   monthlyPayments: Array<{ month: string; year: number; amount?: number }> | any = [];
 
   attachments: AttachmentItem[] = [];
@@ -137,11 +137,35 @@ export class SalesModalComponent {
 
   ngOnInit(): void {
     this.init();
+    /*
     this.carFilterControl.valueChanges.subscribe(term => {
       const value = (term || '').toString().toLowerCase().trim();
 
       this.filteredCars = this.cars.filter(car => {
         const text = `${car.key} ${car.make} ${car.model} ${car.plate || ''}`.toLowerCase();
+        return text.includes(value);
+      });
+    });
+    */
+   this.carFilterControl.valueChanges.subscribe(term => {
+      const value = (term || '')
+        .toString()
+        .toLowerCase()
+        .trim();
+
+      this.filteredCars = this.cars.filter((car: any) => {
+
+        const text = [
+          car.key,
+          car.make,
+          car.model,
+          car.plate,
+          car.color,
+          car.version
+        ]
+          .map(v => (v || '').toString().toLowerCase())
+          .join(' ');
+
         return text.includes(value);
       });
     });
@@ -279,6 +303,15 @@ export class SalesModalComponent {
     });
 
     this.saveForm.get('qty_months')?.valueChanges.subscribe((value: any) => {
+      if (value === 0) {
+        this._ToastrService.error('La cantidad de meses debe ser mayor a 0');
+        return
+      }
+
+      if (value > 71) {
+        this._ToastrService.error('El maximo de meses no puede ser mayor a 70');
+        return;
+      }
       this.generateMonthlyPayments(value);
     });
 
@@ -351,7 +384,6 @@ export class SalesModalComponent {
     const result: any[] = [];
     let now = new Date();
     const initDay = this.saveForm.value.init_day;
-
     let startMonthIndex: number;
     let startYear: number;
 
@@ -380,7 +412,6 @@ export class SalesModalComponent {
         paid_at: ""
       });
     }
-
     this.monthlyPayments = result;
   }
 
@@ -425,8 +456,13 @@ export class SalesModalComponent {
 
     const amountToDistribute = totalAmount - amountPaid;
     const now = new Date();
+
+    const [year, month] = this.saveForm.value.init_day.split('-').map(Number);
+
     const newMonthlyPayments: any = Array.from({ length: qty }).map((_, i) => {
-      const date = new Date(now.getFullYear(), now.getMonth() + 1 + i, 1);
+      // const date = new Date(now.getFullYear(), now.getMonth() + 1 + i, 1);
+       const date = new Date(year, month - 1 + i, 1); 
+
       return {
         monthName: date.toLocaleString('default', { month: 'long' }),
         year: date.getFullYear(),

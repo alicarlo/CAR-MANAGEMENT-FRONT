@@ -7,6 +7,8 @@ import { ToastrService } from 'ngx-toastr';
 import { STATUS } from 'src/app/core/constants/global';
 import { TypeDocumentsService } from 'src/app/core/services/typeDocuments/type-documents.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import moment from 'moment-timezone';
+
 
 @Component({
   selector: 'app-type-documents-modal',
@@ -24,7 +26,7 @@ export class TypeDocumentsModalComponent {
 		],
 	}
   status = [STATUS.ACTIVE, STATUS.INACTIVE]; 
-  todayStr = new Date().toISOString().slice(0, 10); 
+  todayStr = moment().tz('America/Tijuana').format('YYYY-MM-DD');
   constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 

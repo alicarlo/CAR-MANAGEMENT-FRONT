@@ -1,0 +1,236 @@
+<div>
+  <div>
+    <div class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Listado de Precios</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full lg:flex lg:justify-end lg:items-center">
+        <div class="flex flex-col gap-2 w-full lg:w-auto">
+          <label for="sexo" class="text-foreground text-[11px] font-medium">Buscar:</label>
+          <button 
+            (click)="filterGo()"
+            class="bg-primary text-primary-foreground
+                  flex items-center justify-center
+                  rounded-md w-full lg:w-[65px] h-[34px]"
+          >
+            <mat-icon class="text-[20px] leading-none">search</mat-icon>
+          </button>
+        </div>
+
+        <div class="flex flex-col gap-2 w-full lg:w-auto">
+          <label for="sexo" class="text-foreground text-[11px] font-medium">Descargar:</label>
+          <button 
+            (click)="downloadFile()"
+            class="bg-primary text-primary-foreground
+                  flex items-center justify-center
+                  rounded-md w-full lg:w-[85px] h-[34px]"
+          >
+            <mat-icon class="text-[20px] leading-none">file_present</mat-icon>
+          </button>
+        </div>
+
+        <div class="flex flex-col gap-2 w-full lg:w-auto">
+          <label for="sexo" class="text-foreground text-[11px] font-medium">Sucursal:</label>
+          <div class="relative">
+            <select 
+              [(ngModel)]="store_id"  
+              class="w-full py-2 pl-8 pr-10 rounded-md
+                    bg-background text-foreground
+                    border border-border
+                    focus:outline-none focus:ring-2 focus:ring-primary/50
+                    appearance-none [color-scheme:dark]"
+            >
+              <option *ngIf="!store?.length" [ngValue]="null" selected disabled>
+                No hay elementos disponibles
+              </option>
+              <option [ngValue]="null" disabled>Selecciona…</option>
+              <option [ngValue]="null">Todos</option>
+              <option *ngFor="let s of store" [ngValue]="s.id">
+                {{ s.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2 w-full lg:w-auto">
+          <label for="sexo" class="text-foreground text-[11px] font-medium">Tipo de Auto:</label>
+          <div class="relative">
+            <select 
+              [(ngModel)]="car_type_id"
+              class="w-full py-2 pl-8 pr-10 rounded-md
+                    bg-background text-foreground
+                    border border-border
+                    focus:outline-none focus:ring-2 focus:ring-primary/50
+                    appearance-none [color-scheme:dark]"
+            >
+              <option *ngIf="!typeCars?.length" [ngValue]="null" selected disabled>
+                No hay elementos disponibles
+              </option>
+              <option [ngValue]="null" disabled>Selecciona…</option>
+              <option [ngValue]="null">Todos</option>
+              <option *ngFor="let s of typeCars" [ngValue]="s.id">
+                {{ s.name }}
+              </option>
+            </select>
+          </div>              
+        </div>
+
+        <div class="flex flex-col gap-2 w-full lg:w-auto">
+          <label for="sexo" class="text-foreground text-[11px] font-medium">Estatus:</label>
+          <div class="relative">
+            <select 
+              [(ngModel)]="statusSelected"
+              class="w-full py-2 pl-8 pr-10 rounded-md
+                    bg-background text-foreground
+                    border border-border
+                    focus:outline-none focus:ring-2 focus:ring-primary/50
+                    appearance-none [color-scheme:dark]"
+            >
+              <option [ngValue]="null" disabled>Selecciona…</option>
+              <option [ngValue]="null">Todos</option>
+              <option *ngFor="let s of status" [ngValue]="s">
+                {{ s }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full lg:flex lg:justify-end lg:items-center">
+        <!-- Inputs -->
+        <div class="flex flex-col gap-2 min-w-[110px]">
+          <label class="text-foreground text-[11px] font-medium">Clave:</label>
+          <input
+            type="text"
+            placeholder="Clave"
+            class="h-[32px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+            [formControl]="keyFilterControl"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2 min-w-[110px]">
+          <label class="text-foreground text-[11px] font-medium">Marca:</label>
+          <input
+            type="text"
+            placeholder="Marca"
+            class="h-[32px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+            [formControl]="makeFilterControl"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2 min-w-[110px]">
+          <label class="text-foreground text-[11px] font-medium">Modelo:</label>
+          <input
+            type="text"
+            placeholder="Modelo"
+            class="h-[32px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+            [formControl]="modelFilterControl"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2 min-w-[110px]">
+          <label class="text-foreground text-[11px] font-medium">Linea:</label>
+          <input
+            type="text"
+            placeholder="Linea"
+            class="h-[32px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+            [formControl]="versionFilterControl"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2 min-w-[120px]">
+          <label class="text-foreground text-[11px] font-medium">Color:</label>
+          <input
+            type="text"
+            placeholder="Color"
+            class="h-[32px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+            [formControl]="colorFilterControl"
+          />
+        </div>
+      </div>
+
+      <div class="border border-border/60 rounded-lg bg-card overflow-hidden">
+        <div *ngIf="!loadingModal" class="h-full flex justify-center items-center p-[30px]">
+          <app-loading></app-loading>
+        </div>
+
+        <div *ngIf="loadingModal">
+          <div class="hidden lg:block overflow-y-auto overflow-x-auto">
+            <table class="w-full table-auto">
+              <thead>
+                <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Clave</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Marca</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Linea</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Modelo</th>                
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Color</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Kilometraje</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Sucursal</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Precio de venta</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Bono</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Comision</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Estatus</th>
+                </tr>
+              </thead>
+
+              <tbody class="divide-y divide-border/40" *ngIf="list?.length">
+                <tr
+                  *ngFor="let item of list"
+                  class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition"
+                >
+                  <td class="px-3 py-2 whitespace-nowrap">{{ item.key }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap">{{ item.make }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap">{{ item.version }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap">{{ item.model }}</td>
+                  <td class="px-3 py-2">{{ item.color }}</td>
+                  <td class="px-3 py-2">{{ item.km }}</td>
+                  <td class="px-3 py-2">{{ getCheckStore(item.store) }}</td>
+                  <td class="px-3 py-2">{{ item.sale_price | currency:'MXN':'symbol':'1.2-2':'en-US' }}</td>
+                  <td class="px-3 py-2">{{ item.bono | currency:'MXN':'symbol':'1.2-2':'en-US' }}</td>
+                  <td class="px-3 py-2">{{ item.comision | currency:'MXN':'symbol':'1.2-2':'en-US' }}</td>
+                  <td class="px-3 py-2">{{ item.status }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex flex-col gap-3 lg:hidden p-3" *ngIf="list?.length">
+            <div 
+              *ngFor="let item of list"
+              class="bg-background border border-border rounded-lg p-3 flex flex-col gap-2 text-foreground text-[12px]"
+            >
+              <div class="flex justify-between"><span>Clave</span><span>{{ item.key }}</span></div>
+              <div class="flex justify-between"><span>Marca</span><span>{{ item.make }}</span></div>
+              <div class="flex justify-between"><span>Linea</span><span>{{ item.version }}</span></div>
+              <div class="flex justify-between"><span>Modelo</span><span>{{ item.model }}</span></div>
+              <div class="flex justify-between"><span>Color</span><span>{{ item.color }}</span></div>
+              <div class="flex justify-between"><span>Kilometraje</span><span>{{ item.km }}</span></div>
+              <div class="flex justify-between"><span>Sucursal</span><span>{{ getCheckStore(item.store) }}</span></div>
+              <div class="flex justify-between font-semibold">
+                <span>Precio</span>
+                <span>{{ item.sale_price | currency:'MXN':'symbol':'1.2-2':'en-US' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Bono</span>
+                <span>{{ item.bono | currency:'MXN':'symbol':'1.2-2':'en-US' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Comision</span>
+                <span>{{ item.comision | currency:'MXN':'symbol':'1.2-2':'en-US' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Estatus</span>
+                <span>{{ item.status }}</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <div class="text-foreground text-[15px] w-full flex justify-center items-center" *ngIf="list?.length === 0">
+        No hay datos
+      </div>
+
+    </div>
+  </div>
+</div>

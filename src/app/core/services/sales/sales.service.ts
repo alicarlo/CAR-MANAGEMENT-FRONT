@@ -51,4 +51,13 @@ export class SalesService {
       catchError(this.error.handleError)
     );
   }
+
+  public getContractSale(id: string): Observable<string> {
+    return this.http.get(
+      `${environment.apiUrl}/contract/sale/${id}`,
+      {
+        responseType: 'text'
+      }
+    );
+  }
 }

@@ -17,6 +17,7 @@ import { TypePaymentsService } from 'src/app/core/services/typePayments/type-pay
 import { LaywayService } from 'src/app/core/services/layway/layway.service';
 import { IncomeService } from 'src/app/core/services/income/income.service';
 import { environment } from 'src/environments/environment';
+import moment from 'moment-timezone';
 
 @Component({
   selector: 'app-layaway-modal',
@@ -66,8 +67,8 @@ error_messages={
 clients: Clients[] = []
 cars: any[] = [];
 typePayments: any[] = [];
-todayStr = new Date().toISOString().slice(0, 10); 
-
+// todayStr = new Date().toISOString().slice(0, 10); 
+todayStr = moment().tz('America/Tijuana').format('YYYY-MM-DD');
 
 maxSizeBytes = 25 * 1024 * 1024; // 25MB
 selectedFile: File | null = null;
@@ -97,6 +98,7 @@ constructor(
 
  ngOnInit(): void {
     this.init();
+    /*
     this.carFilterControl.valueChanges.subscribe(term => {
         const value = (term || '').toString().toLowerCase().trim();
 
@@ -105,6 +107,29 @@ constructor(
           return text.includes(value);
         });
       });
+    */
+   this.carFilterControl.valueChanges.subscribe(term => {
+      const value = (term || '')
+        .toString()
+        .toLowerCase()
+        .trim();
+
+      this.filteredCars = this.cars.filter((car: any) => {
+
+        const text = [
+          car.key,
+          car.make,
+          car.model,
+          car.plate,
+          car.color,
+          car.version
+        ]
+          .map(v => (v || '').toString().toLowerCase())
+          .join(' ');
+
+        return text.includes(value);
+      });
+    });
    this.getClients();
    this.getCars();
    this.getTypePayments();
@@ -129,6 +154,7 @@ constructor(
       
   	});
 
+    console.log(this.todayStr)
     this.saveForm.get('car_id')?.valueChanges.subscribe((value: any) => {
       let find = this.cars.find(x => String(x.id) === String(value));
       this.saveForm.get('sale_price')?.setValue(find.sale_price);

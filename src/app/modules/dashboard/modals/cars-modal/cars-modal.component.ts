@@ -5,7 +5,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { ToastrService } from 'ngx-toastr';
 import { CHECKS_FIELDS, CHECKS_INIT, CHECKS_INIT_FULL, STATUS } from 'src/app/core/constants/cars';
 import { Checks } from 'src/app/core/models/cars.model';
@@ -58,7 +58,7 @@ export class CarsModalComponent {
 	}
 
   carAcquisition: Array<string> = [ 'compras' ,'consigna'];
-  todayStr = new Date().toISOString().slice(0, 10); 
+  todayStr = moment().tz('America/Tijuana').format('YYYY-MM-DD');
 
   typeCars: TypeCars[] = [];
   store: Store[] = [];

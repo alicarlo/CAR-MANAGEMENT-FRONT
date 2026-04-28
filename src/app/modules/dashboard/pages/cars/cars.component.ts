@@ -13,14 +13,43 @@ import { CarDocumentsShowModalComponent } from '../../modals/car-documents-show-
 import { ArriveCheckCarModalComponent } from '../../modals/arrive-check-car-modal/arrive-check-car-modal.component';
 import { HistoryIncomeModalComponent } from '../../modals/history-income-modal/history-income-modal.component';
 import { ArrivalReviewModalComponent } from '../../modals/arrival-review-modal/arrival-review-modal.component';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { StoreService } from 'src/app/core/services/store/store.service';
+import { CommonModule, NgClass } from '@angular/common';
+import { InvestorService } from 'src/app/core/services/investors/investor.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-cars',
-  imports: [TableComponent, MatDialogModule],
+  imports: [TableComponent, MatDialogModule, FormsModule, ReactiveFormsModule, CommonModule, NgClass, MatIconModule,MatDatepickerModule, MatNativeDateModule],
   templateUrl: './cars.component.html',
   styleUrl: './cars.component.css'
 })
 export class CarsComponent {
+
+  store: any = [];
+  store_id: any = null;
+  filteredStore: any = [];
+  storeFilterControl = new FormControl('');
+  storeDropdownOpen = false;
+  selectedStoreLabel = '';
+
+  investor: any = [];
+  investor_id: any = null;
+  filteredInvestor: any = [];
+  investorFilterControl = new FormControl('');
+  investorDropdownOpen = false;
+  selectedInvestorLabel = '';
+
+  keyFilterControl = new FormControl('');
+  makeFilterControl = new FormControl('');
+  modelFilterControl = new FormControl('');
+  colorFilterControl = new FormControl('');
+  versionFilterControl = new FormControl('');
+
+  searchable: boolean = false;
   carsSelected: any;
   cars: Cars[] = [];
   carsHeader: string[] = [
@@ -80,7 +109,7 @@ export class CarsComponent {
     { icon: 'attach_money',  id: 'bill',  label: 'Visualizar Gastos' },
     { icon: 'attach_file',  id: 'documents',  label: 'Visualizar Documentos' },
     { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Elimnar' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar' },
 
   ];
   items: any[] = [];
@@ -103,14 +132,28 @@ export class CarsComponent {
 
   pages: number = 0;
   filter: string = '';
+  filterSelects: any = {};
   constructor(
     private _MatDialog: MatDialog,
     private _CarsService: CarsService,
     private _ToastrService: ToastrService,
+    private _StoreService: StoreService,
+    private _InvestorService: InvestorService
   ) {}
 
   ngOnInit() {
     this.getCars();
+    this.getStore();
+    this.getInvestor();
+
+    this.storeFilterControl.valueChanges.subscribe(term => {
+      const value = (term || '').toString().toLowerCase().trim();
+
+      this.filteredStore = this.store.filter((data: any) => {
+        const text = `${data.name}`.toLowerCase();
+        return text.includes(value);
+      });
+    });
   }
 
   onRowAction(e: RowActionEvent<any>) {
@@ -213,7 +256,7 @@ export class CarsComponent {
 
   getCars() {
     this.loading = false;
-    this._CarsService.getCarsFull(this.filter,this.pageSize, this.currentPage).subscribe({
+    this._CarsService.getCarsFull(this.filter,this.pageSize, this.currentPage,'active' ,this.filterSelects).subscribe({
       next: async (response: any) => {
         if(response) {
 
@@ -223,7 +266,18 @@ export class CarsComponent {
           this.hasPrev = response.pagination.has_prev;
           this.cars = response.items.map((r: any) => ({ ...r,
             carData:  `${r.make } ${r.version} ${r.model } ${r.color }`,
-            costShow: r.purchases.length > 0 ? (r.purchases || []).reduce((acc: number, inc: any) => acc + (Number(inc.total) || 0), 0) : r.cost
+            // costShow: r.purchases.length > 0 ? (r.purchases || []).reduce((acc: number, inc: any) => acc + (Number(inc.total) || 0), 0) : r.cost
+            costShow: r.purchases?.length > 0
+              ? r.purchases.reduce((acc: number, inc: any) => {
+                  const total = Number(inc.total) || 0;
+
+                  const extra = r.car_acquisition === 'compras'
+                    ? Number(inc.amount_by_invoice) || 0
+                    : 0;
+
+                  return acc + total + extra;
+                }, 0)
+              : r.cost
            }));
           this.total = response.pagination.total_items;
           setTimeout(() => {
@@ -328,5 +382,93 @@ export class CarsComponent {
         this.getCars();
       }
     });
+  }
+
+  getStore() {
+    this._StoreService.getStore(500, 1).subscribe({
+      next: async (response: any) => {
+        if(response) {
+          this.store = response.items.map((r: any) => ({ ...r }));
+          this.filteredStore = [...this.store];
+        }
+      },
+      error: (err) => {
+        if (err.error === "Token expired") return;
+        this._ToastrService.error(err.error, 'Error');
+      },
+    })
+  }
+
+  toggleStoreDropdown() {
+    this.storeDropdownOpen = !this.storeDropdownOpen;
+    if (this.storeDropdownOpen) {
+      this.storeFilterControl.setValue('');
+      this.filteredStore = [...this.store];
+    }
+  }
+
+   closeStoreDropdown() {
+    this.storeDropdownOpen = false;
+  }
+
+   selectStore(data: any) {
+    this.selectedStoreLabel = data !== null ? `${data.name}` : 'Todos';
+    this.store_id = data !== null ? data.id : '';
+    
+    this.closeStoreDropdown();
+  }
+
+  getInvestor() {
+    this._InvestorService.getInvestor(500, 1).subscribe({
+      next: async (response: any) => {
+        if(response) {
+          this.investor = response.items.map((r: any) => ({ ...r }));
+          this.filteredInvestor = [...this.investor];
+        }
+      },
+      error: (err) => {
+        if (err.error === "Token expired") return;
+        this._ToastrService.error(err.error, 'Error');
+      },
+    })
+  }
+
+  toggleInvestorDropdown() {
+    this.investorDropdownOpen = !this.investorDropdownOpen;
+    if (this.investorDropdownOpen) {
+      this.investorFilterControl.setValue('');
+      this.filteredInvestor = [...this.investor];
+    }
+  }
+
+   closeInvestorDropdown() {
+    this.investorDropdownOpen = false;
+  }
+
+   selectInvestor(data: any) {
+    this.selectedInvestorLabel = data !== null ? `${data.full_name}` : 'Todos';
+    this.investor_id = data !== null ? data.id : '';
+    
+    this.closeInvestorDropdown();
+  }
+
+  filterGo() {
+    const rawFilter = {
+      store_id: this.store_id,
+      investor_id: this.investor_id,
+      key: this.keyFilterControl.value,
+      make: this.makeFilterControl.value,
+      model: this.modelFilterControl.value,
+      version: this.versionFilterControl.value,
+      color: this.colorFilterControl.value
+    };
+
+    this.filterSelects = Object.fromEntries(
+      Object.entries(rawFilter).filter(([_, v]) => v != null && v !== '')
+    );
+    this.currentPage = 1
+    this.pageSize = 10;
+    this.getCars();
+   
   }
 }

@@ -29,8 +29,8 @@
             <strong>Color:</strong> {{ data.row.color }}
           </p>
 
-          <p *ngIf="data.row.cost" class="text-foreground text-[11px]">
-            <strong>Costo:</strong> ${{ data.row.cost }}
+          <p *ngIf="data.row.costShow" class="text-foreground text-[11px]">
+            <strong>Costo:</strong> ${{ data?.row?.costShow | currency }}
           </p>
 
         </div>

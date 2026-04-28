@@ -187,7 +187,7 @@ export class PaymentsAddModalComponent {
           const formData = new FormData();
           formData.append('document_type_id', this.saveForm.value.document_type_id);
           // formData.append('descriptions', this.saveForm.value.descriptions);
-          formData.append('descriptions', this.saveForm.value.descriptions);
+          // formData.append('descriptions', this.saveForm.value.descriptions);
           formData.append('file', this.saveForm.value.file);
           const token = this._AuthService.tokenValue;
           const response = await fetch(`${environment.apiUrl}/document/`, {
@@ -210,7 +210,8 @@ export class PaymentsAddModalComponent {
         }
     
       }else {
-        id = this.data.row.document.id  
+        id = this.data.row.document_id === null ? '' : this.data.row.document_id;
+ 
       }
     } catch (err: any) {
       this.loading = false;
@@ -227,20 +228,20 @@ export class PaymentsAddModalComponent {
     
     if (this.data.flag === 1) {
       // TEMP filledValues =  { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, purchase_id: this.data.row.id }
-      filledValues =  { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, bill_id: this.data.row.id}
+      filledValues =  { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, bill_id: this.data.row.id , descriptions: this.saveForm.value.descriptions}
       if (id !== '') filledValues = { ...filledValues, document_id: id };
     }else
     if(this.data.flag === 4){
-      filledValues =  { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, purchase_id: this.data.row.id }
+      filledValues =  { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, purchase_id: this.data.row.id, descriptions: this.saveForm.value.descriptions }
       if (id !== '') filledValues = { ...filledValues, document_id: id };
     }
     else
     if(this.data.flag === 0) {
-       filledValues = { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, document_id: id, bill_id: this.saveForm.value.bill_id, id: this.data.row.id };
+       filledValues = { amount: this.saveForm.value.amount, payment_method_id: this.saveForm.value.payment_method_id, bill_id: this.saveForm.value.bill_id, id: this.data.row.id, descriptions: this.saveForm.value.descriptions };
        if (id !== '') filledValues = { ...filledValues, document_id: id };
     }else{
-
-      filledValues = {...filledValues, id: this.data.row.id, document_id: id};
+      filledValues = {...filledValues, id: this.data.row.id};
+      if (id !== '') filledValues = { ...filledValues, document_id: id };
     }
 
     const methodMap = {

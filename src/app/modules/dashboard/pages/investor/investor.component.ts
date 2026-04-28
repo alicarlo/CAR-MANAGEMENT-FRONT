@@ -32,7 +32,7 @@ export class InvestorComponent {
     { icon: 'directions_car',  id: 'search',  label: 'Visualizar Autos' },
     { icon: 'credit_card',  id: 'purchase',  label: 'Visualizar Gastos' },
     { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Elimnar' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;

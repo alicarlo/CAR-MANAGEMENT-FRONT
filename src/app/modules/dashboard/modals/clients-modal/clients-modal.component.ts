@@ -10,8 +10,9 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
 import { ClientsService } from 'src/app/core/services/clients/clients.service';
 import { CreateClientError } from 'src/app/core/models/error';
 import { Clients } from 'src/app/core/models/clients.model';
-import  moment from 'moment';
+import moment from 'moment-timezone';
 import { STATUS } from 'src/app/core/constants/global';
+
 
 @Component({
   selector: 'app-clients-modal',
@@ -50,7 +51,7 @@ export class ClientsModalComponent {
 	}
 
   sexOptions = ['male', 'female'];
-  todayStr = new Date().toISOString().slice(0, 10); 
+  todayStr = moment().tz('America/Tijuana').format('YYYY-MM-DD'); 
   status = [STATUS.ACTIVE, STATUS.INACTIVE]; 
   constructor(
     private _FormBuilder: FormBuilder,                                               
@@ -68,11 +69,11 @@ export class ClientsModalComponent {
   init() {
     this.saveForm = this._FormBuilder.group({
       email: new FormControl (this.data.row === null ? '' : this.data.row.email,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60), Validators.email])),
-      full_name: new FormControl (this.data.row === null ? '' : this.data.row.full_name,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
-      phone: new FormControl (this.data.row === null ? '' : this.data.row.phone,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
+      full_name: new FormControl (this.data.row === null ? '' : this.data.row.full_name,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(100)])),
+      phone: new FormControl (this.data.row === null ? '' : this.data.row.phone,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(100)])),
       phone_mobile: new FormControl(this.data.row === null ? '' : this.data.row.phone_mobile),
       phone_work: new FormControl(this.data.row === null ? '' : this.data.row.phone_work),
-      address_street_1: new FormControl (this.data.row === null ? '' : this.data.row.address_street_1,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
+      address_street_1: new FormControl (this.data.row === null ? '' : this.data.row.address_street_1,Validators.compose([Validators.required,Validators.minLength(3)])),
       address_state: new FormControl(this.data.row === null ? '' : this.data.row.address_state),
       address_city: new FormControl(this.data.row === null ? '' : this.data.row.address_city),
       birthday: new FormControl(this.data.row === null ? '' : this.dateFormat(this.data.row.birthday),Validators.compose([Validators.required])),

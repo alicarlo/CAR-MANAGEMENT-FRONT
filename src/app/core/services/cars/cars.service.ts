@@ -104,7 +104,7 @@ export class CarsService {
     );
   }
 
-  public getCarsFull(filter: string = '', pageSize?: number, currentPage?: number, active: string = 'active'): Observable<Cars> {
+  public getCarsFull(filter: string = '', pageSize?: number, currentPage?: number, active: string = 'active', filterSelects: any = {}): Observable<Cars> {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
@@ -112,7 +112,8 @@ export class CarsService {
     let value =  `&value=${active}`;
     let column = filter.length ? 'all' : 'status';
     let filterSearch = filter.length ? filter : active;
-    return this.http.get<Cars>(`${environment.apiUrl}/car/?page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+    let filtersSend = Object.keys(filterSelects).length === 0 ? '&sort_by=updated_at' : `&filters=${JSON.stringify(filterSelects)}&sort_by=updated_at`
+    return this.http.get<Cars>(`${environment.apiUrl}/car/?page=${currentPage}&limit=${pageSize}${filtersSend}` ,httpOptions).pipe(
       retry(0),
       catchError(this.error.handleError)
     );

@@ -182,7 +182,6 @@ export class LayawayComponent {
         },
       })
     })
-    
   }
 
   async downloadDirect(url: string, filename?: string) {
