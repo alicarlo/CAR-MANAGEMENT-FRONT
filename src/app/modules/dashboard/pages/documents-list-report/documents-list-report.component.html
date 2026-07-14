@@ -286,6 +286,17 @@
             sm:grid-cols-2 
             gap-2 w-full lg:flex lg:justify-end lg:items-center">
         <div class="flex flex-col gap-2 w-full lg:w-auto">
+          <label for="key" class="text-foreground text-[11px] font-medium">Clave:</label>
+          <input
+            id="key"
+            type="text"
+            placeholder="Clave"
+            class="h-[34px] min-w-[150px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+            [formControl]="keyFilterControl"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2 w-full lg:w-auto">
           <label for="sexo" class="text-foreground text-[11px] font-medium">Buscar:</label>
           <button 
             (click)="filterGo()"
@@ -300,12 +311,17 @@
         <div class="flex flex-col gap-2 w-full lg:w-auto">
           <label for="sexo" class="text-foreground text-[11px] font-medium">Descargar:</label>
           <button 
-            
+            (click)="downloadFile()"
+            [disabled]="downloadingExcel"
             class="bg-primary text-primary-foreground
                   flex items-center justify-center
-                  rounded-md w-full lg:w-[85px] h-[34px]"
+                  rounded-md w-full lg:w-[85px] h-[34px] disabled:opacity-70"
           >
-            <mat-icon class="text-[20px] leading-none">file_present</mat-icon>
+            <span
+              *ngIf="downloadingExcel"
+              class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground"
+            ></span>
+            <mat-icon *ngIf="!downloadingExcel" class="text-[20px] leading-none">file_present</mat-icon>
           </button>
         </div>
       </div>
@@ -323,7 +339,7 @@
     <!-- 🔥 CONTENEDOR DRAG -->
     <div 
       #scrollContainer
-      class="overflow-x-auto cursor-grab active:cursor-grabbing"
+      class="overflow-x-auto lg:cursor-grab lg:active:cursor-grabbing select-none"
       (mousedown)="onMouseDown($event, scrollContainer)"
       (mouseleave)="onMouseLeave()"
       (mouseup)="onMouseUp()"
@@ -333,18 +349,18 @@
       <!-- 🖥️ DESKTOP -->
       <div class="hidden lg:block" *ngIf="list?.length">
 
-        <table class="w-full table-fixed min-w-[900px]">
+        <table class="w-full table-fixed min-w-[1080px]">
 
           <!-- HEADER -->
           <thead>
             <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
 
               <!-- 🔥 FIJAS -->
-              <th class="px-3 py-2 text-left sticky left-0 bg-card z-1 w-[100px] shadow-sm whitespace-nowrap">
+              <th class="px-3 py-2 text-left sticky left-0 bg-card z-20 w-[110px] min-w-[110px] shadow-sm whitespace-nowrap border-r border-border/60">
                 Clave
               </th>
 
-              <th class="px-3 py-2 text-left sticky left-[100px] bg-card z-1 w-[200px] shadow-sm whitespace-nowrap">
+              <th class="px-3 py-2 text-left sticky left-[110px] bg-card z-20 w-[230px] min-w-[230px] shadow-sm whitespace-nowrap border-r border-border/60">
                 Auto
               </th>
 
@@ -368,16 +384,25 @@
           <tbody class="divide-y divide-border/40" *ngIf="list?.length">
 
             <tr
-              *ngFor="let item of list"
-              class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition"
+              *ngFor="let item of list; let i = index"
+              class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition cursor-pointer"
+              [ngClass]="isSelectedRow(item, i) ? 'bg-primary/10 ring-1 ring-primary/30' : (i % 2 === 0 ? 'bg-transparent' : 'bg-muted/30')"
+              (click)="handleRowClick(item, i)"
+              (dblclick)="handleRowDoubleClick(item, i)"
             >
 
               <!-- 🔥 FIJAS -->
-              <td class="px-3 py-2 sticky left-0 bg-card z-1 whitespace-nowrap shadow-sm">
+              <td
+                class="px-3 py-2 sticky left-0 z-20 whitespace-nowrap shadow-sm border-r border-border/60"
+                [ngClass]="isSelectedRow(item, i) ? 'bg-card ring-inset ring-1 ring-primary/30' : 'bg-card'"
+              >
                 {{ item.key }}
               </td>
 
-              <td class="px-3 py-2 sticky left-[100px] bg-card z-1 max-w-[200px] break-words whitespace-normal shadow-sm">
+              <td
+                class="px-3 py-2 sticky left-[110px] z-20 w-[230px] min-w-[230px] max-w-[230px] break-words whitespace-normal shadow-sm border-r border-border/60"
+                [ngClass]="isSelectedRow(item, i) ? 'bg-card ring-inset ring-1 ring-primary/30' : 'bg-card'"
+              >
                 {{ item.carData }}
               </td>
 
@@ -430,8 +455,11 @@
     <div class="flex flex-col gap-3 lg:hidden p-3" *ngIf="list?.length">
 
       <div 
-        *ngFor="let item of list"
-        class="bg-background border border-border rounded-lg p-3 flex flex-col gap-2 text-foreground text-[12px]"
+        *ngFor="let item of list; let i = index"
+        class="bg-background border border-border rounded-lg p-3 flex flex-col gap-2 text-foreground text-[12px] cursor-pointer transition"
+        [ngClass]="isSelectedRow(item, i) ? 'bg-primary/10 border-primary/50 ring-1 ring-primary/30' : ''"
+        (click)="selectRow(item, i)"
+        (dblclick)="clearSelectedRow(item, i)"
       >
 
         <div class="flex justify-between">

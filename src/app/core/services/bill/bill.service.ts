@@ -35,13 +35,46 @@ export class BillService {
   }
 
 
-  public getBills(pageSize?: number, currentPage?: number, filter?: string): Observable<any> {
+  public getBills(
+    pageSize?: number,
+    currentPage?: number,
+    filter?: string,
+    filters: any = {},
+    dateFrom: string = '',
+    dateTo: string = ''
+  ): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
-    let filterSend = ''
-    filterSend = filter === '' ? 'column=status&value=active' : `column=name&value=${filter}`
-    return this.http.get<any>(`${environment.apiUrl}/bill/?${filterSend}&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+    const params: string[] = [];
+    const hasStructuredFilters = filters && Object.keys(filters).length > 0;
+    const hasAnyFilter = hasStructuredFilters || !!filter || !!dateFrom || !!dateTo;
+
+    if (hasStructuredFilters) {
+      params.push(`filters=${encodeURIComponent(JSON.stringify(filters))}`);
+    } else if (filter) {
+      params.push(`column=name`);
+      params.push(`value=${encodeURIComponent(filter)}`);
+    } else {
+      params.push('column=status');
+      params.push('value=active');
+    }
+
+    params.push(`page=${currentPage}`);
+    params.push(`limit=${pageSize}`);
+    params.push('sort_by=updated_at');
+
+    if (dateFrom) {
+      params.push(`date_from=${encodeURIComponent(dateFrom)}`);
+    }
+
+    if (dateTo) {
+      params.push(`date_to=${encodeURIComponent(dateTo)}`);
+    }
+
+    const endpoint = hasAnyFilter ? '/bill/all' : '/bill/';
+
+    return this.http.get<any>(`${environment.apiUrl}${endpoint}?${params.join('&')}` ,httpOptions).pipe(
       retry(0),
       catchError(this.error.handleError)
     );

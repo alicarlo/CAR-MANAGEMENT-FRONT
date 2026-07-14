@@ -48,7 +48,7 @@ export class SignUpComponent implements OnInit {
   initForm() {
     this.saveForm = this._FormBuilder.group({
       full_name:  new FormControl ('',Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60)])),
-			email:  new FormControl ('',Validators.compose([Validators.required,Validators.email, Validators.minLength(3),Validators.maxLength(60)])),
+			email:  new FormControl ('',Validators.compose([Validators.required,Validators.email, Validators.minLength(3),Validators.maxLength(100)])),
       password:  new FormControl ('',Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(20)])),
       address_street_1:  new FormControl (''),
       address_street_2: new FormControl (''),

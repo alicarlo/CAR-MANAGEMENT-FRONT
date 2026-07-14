@@ -1,0 +1,262 @@
+<div>
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+      <div class="flex flex-col gap-1">
+        <p class="text-foreground font-semibold">Reporte de comisiones</p>
+        <div class="text-muted-foreground flex flex-wrap gap-3 text-xs font-medium">
+          <div>
+            <span>Total de items:</span>
+            <span class="text-foreground ml-1">{{ comisions.length }}/{{ total }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2 w-full lg:w-auto">
+        <label class="text-foreground text-[11px] font-medium">Descargar:</label>
+        <button
+          type="button"
+          class="bg-primary text-primary-foreground flex items-center justify-center rounded-md w-full lg:w-[85px] h-[34px] disabled:opacity-70"
+          [disabled]="downloadingExcel"
+          (click)="downloadFile()"
+        >
+          <span
+            *ngIf="downloadingExcel"
+            class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground"
+          ></span>
+          <mat-icon *ngIf="!downloadingExcel" class="text-[20px] leading-none">file_present</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full lg:flex lg:justify-end lg:items-end">
+      <div class="flex flex-col gap-2 w-full lg:w-auto">
+        <label class="text-foreground text-[11px] font-medium">Buscar:</label>
+        <button
+          type="button"
+          class="bg-primary text-primary-foreground flex items-center justify-center rounded-md w-full lg:w-[65px] h-[34px]"
+          (click)="filterGo()"
+        >
+          <mat-icon class="text-[20px] leading-none">search</mat-icon>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-2 w-full lg:w-auto">
+        <label class="text-foreground text-[11px] font-medium">Limpiar:</label>
+        <button
+          type="button"
+          class="bg-primary text-primary-foreground flex items-center justify-center rounded-md w-full lg:w-[65px] h-[34px]"
+          (click)="clearFilters()"
+        >
+          <mat-icon class="text-[20px] leading-none">close</mat-icon>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-2 min-w-[190px]">
+        <label class="text-foreground text-[11px] font-medium">Sucursal:</label>
+        <div class="relative w-full">
+          <button
+            type="button"
+            class="!h-[32px] w-full py-2 pl-3 pr-10 rounded-md bg-background text-foreground border border-border text-left focus:outline-none focus:ring-2 focus:ring-primary/50 flex items-center justify-between"
+            (click)="toggleStoreDropdown()"
+          >
+            <span class="truncate text-[13px]">
+              {{ selectedStoreLabel || 'Selecciona...' }}
+            </span>
+            <mat-icon class="absolute right-2 text-[18px] opacity-70 pointer-events-none">keyboard_arrow_down</mat-icon>
+          </button>
+
+          <div
+            *ngIf="storeDropdownOpen"
+            class="absolute z-30 mt-1 w-full rounded-md bg-background border border-border shadow-lg"
+          >
+            <div class="p-2 border-b border-border">
+              <input
+                type="text"
+                placeholder="Filtrar sucursal..."
+                class="w-full py-1.5 px-3 rounded-md bg-background text-foreground border border-border text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 box-border"
+                [formControl]="storeFilterControl"
+                (keydown.escape)="closeStoreDropdown()"
+              />
+            </div>
+
+            <div class="max-h-60 overflow-y-auto">
+              <button
+                type="button"
+                class="w-full text-left px-3 py-2 text-[13px] text-foreground hover:bg-card font-medium"
+                (click)="selectStore(null)"
+              >
+                Todos
+              </button>
+
+              <button
+                type="button"
+                class="w-full text-left px-3 py-2 text-[13px] text-foreground hover:bg-card"
+                *ngFor="let s of filteredStore"
+                (click)="selectStore(s)"
+              >
+                {{ s.name }}
+              </button>
+
+              <div
+                *ngIf="filteredStore.length === 0"
+                class="px-3 py-2 text-[11px] text-muted-foreground"
+              >
+                Sin resultados
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2 min-w-[150px]">
+        <label class="text-foreground text-[11px] font-medium">Fecha de inicio:</label>
+        <div class="relative">
+          <input
+            #dateFromInput
+            type="date"
+            class="report-comisions-date-input h-[32px] w-full px-3 pr-10 rounded-md border border-border bg-background text-foreground text-[13px]"
+            [(ngModel)]="date_from"
+          />
+          <button
+            type="button"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-foreground flex items-center justify-center"
+            (click)="openPicker(dateFromInput)"
+          >
+            <mat-icon style="font-size: 20px;">calendar_month</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2 min-w-[150px]">
+        <label class="text-foreground text-[11px] font-medium">Fecha final:</label>
+        <div class="relative">
+          <input
+            #dateToInput
+            type="date"
+            class="report-comisions-date-input h-[32px] w-full px-3 pr-10 rounded-md border border-border bg-background text-foreground text-[13px]"
+            [(ngModel)]="date_to"
+          />
+          <button
+            type="button"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-foreground flex items-center justify-center"
+            (click)="openPicker(dateToInput)"
+          >
+            <mat-icon style="font-size: 20px;">calendar_month</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="border border-border/60 rounded-lg bg-card overflow-hidden">
+      <div *ngIf="!loadingModal" class="h-full flex justify-center items-center p-[30px]">
+        <app-loading></app-loading>
+      </div>
+
+      <div *ngIf="loadingModal">
+        <div class="hidden lg:block overflow-y-auto overflow-x-auto">
+          <table class="w-full table-auto">
+            <thead>
+              <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
+                <th class="px-3 py-2 text-left whitespace-nowrap">Asesor</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Ventas realizadas</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Comision total</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Bonos obtenidos</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody class="divide-y divide-border/40" *ngIf="comisions?.length">
+              <tr
+                *ngFor="let item of comisions; let i = index"
+                class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition"
+                [ngClass]="i % 2 === 0 ? 'bg-transparent' : 'bg-muted/30'"
+              >
+                <td class="px-3 py-2 whitespace-nowrap">{{ item.full_name }}</td>
+                <td class="px-3 py-2 whitespace-nowrap">{{ item.ventas_realizadas }}</td>
+                <td class="px-3 py-2 whitespace-nowrap">
+                  {{ item.comision_total != null ? (item.comision_total | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}
+                </td>
+                <td class="px-3 py-2 whitespace-nowrap">{{ item.bonos_obtenidos }}</td>
+                <td class="px-3 py-2 whitespace-nowrap">
+                  <button
+                    type="button"
+                    class="text-muted-foreground hover:bg-card hover:text-foreground inline-flex h-8 w-8 items-center justify-center rounded-md transition"
+                    matTooltip="Ver autos"
+                    matTooltipPosition="above"
+                    matTooltipClass="bg-background text-foreground"
+                    (click)="openAutosModal(item)"
+                  >
+                    <mat-icon class="text-[20px] leading-none">search</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex flex-col gap-3 lg:hidden p-3" *ngIf="comisions?.length">
+          <div
+            *ngFor="let item of comisions; let i = index"
+            class="bg-background border border-border rounded-lg p-3 flex flex-col gap-2 text-foreground text-[12px] transition"
+            [ngClass]="i % 2 === 0 ? 'bg-background' : 'bg-muted/30'"
+          >
+            <div class="flex justify-between gap-3"><span>Asesor</span><span class="text-right">{{ item.full_name }}</span></div>
+            <div class="flex justify-between gap-3"><span>Ventas realizadas</span><span>{{ item.ventas_realizadas }}</span></div>
+            <div class="flex justify-between gap-3 font-semibold">
+              <span>Comision total</span>
+              <span>{{ item.comision_total != null ? (item.comision_total | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</span>
+            </div>
+            <div class="flex justify-between gap-3"><span>Bonos obtenidos</span><span>{{ item.bonos_obtenidos }}</span></div>
+            <div class="flex justify-end">
+              <button
+                type="button"
+                class="text-muted-foreground hover:bg-card hover:text-foreground inline-flex h-8 w-8 items-center justify-center rounded-md transition"
+                matTooltip="Ver autos"
+                matTooltipPosition="above"
+                matTooltipClass="bg-background text-foreground"
+                (click)="openAutosModal(item)"
+              >
+                <mat-icon class="text-[20px] leading-none">search</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-foreground text-[15px] w-full flex justify-center items-center" *ngIf="loadingModal && comisions?.length === 0">
+      No hay datos
+    </div>
+  </div>
+</div>
+
+<div
+  *ngIf="loadingModal && hasMorePages"
+  class="sticky bottom-0 z-10 bg-background/95 border-t border-border/60 px-5 py-3 flex flex-wrap justify-center gap-3"
+>
+  <button
+    type="button"
+    class="bg-primary text-primary-foreground flex items-center justify-center gap-2 rounded-md min-w-[120px] h-[38px] px-4 text-xs font-semibold disabled:opacity-70"
+    [disabled]="loadingMore || loadingAll || downloadingExcel"
+    (click)="loadMore()"
+  >
+    <span
+      *ngIf="loadingMore"
+      class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground"
+    ></span>
+    {{ loadingMore ? 'Cargando...' : 'Cargar mas' }}
+  </button>
+
+  <button
+    type="button"
+    class="bg-primary text-primary-foreground flex items-center justify-center gap-2 rounded-md min-w-[120px] h-[38px] px-4 text-xs font-semibold disabled:opacity-70"
+    [disabled]="loadingMore || loadingAll || downloadingExcel"
+    (click)="loadAll()"
+  >
+    <span
+      *ngIf="loadingAll"
+      class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground"
+    ></span>
+    {{ loadingAll ? 'Cargando...' : 'Cargar todo' }}
+  </button>
+</div>

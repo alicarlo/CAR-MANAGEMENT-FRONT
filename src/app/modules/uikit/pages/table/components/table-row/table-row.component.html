@@ -1,5 +1,5 @@
 <ng-container>
- <td class="text-center">
+ <td [ngClass]="tableDensityService.classes().actionCell">
     <input
       [(ngModel)]="selected"
       [ngModelOptions]="{ standalone: true }"
@@ -8,7 +8,7 @@
   </td>
 
   <ng-container *ngFor="let val of  dataFilterColumns; trackBy: trackByCol">
-    <td [ngClass]="val.class" [ngSwitch]="val.type" class="max-w-[250px] break-words whitespace-normal">
+    <td [ngClass]="[tableDensityService.classes().td, val.class || '']" [ngSwitch]="val.type">
 
       <ng-container *ngSwitchCase="'status'">
         <span *ngIf="getValue(val.key) === 'pendiente_aprobacion'">
@@ -109,17 +109,12 @@
     </td>
   </ng-container>
 
-  <td 
-    class="text-center"
-     [ngClass]="stickyActions
-          ? 'sticky right-0 z-2  bg-background ]'
-          : ''"
-    >
-    <div class="flex gap-2">
+  <td [ngClass]="[tableDensityService.classes().actionCell, stickyActions ? 'sticky right-0 z-2  bg-background ]' : '']">
+    <div [ngClass]="tableDensityService.classes().rowActions">
       <ng-container *ngFor="let a of actions; trackBy: trackByAction">
         <button
-          *ngIf="canShowActionForRow(a.id, data)"
-          class="text-muted-foreground hover:bg-card hover:text-foreground flex h-7 w-7 items-center justify-center rounded-md"
+          *ngIf="canShowActionByScope(a) && canShowActionForRow(a.id, data)"
+          [ngClass]="[tableDensityService.classes().actionButton, 'text-muted-foreground hover:bg-card hover:text-foreground']"
           (click)="emitAction(a)"
           [attr.aria-label]="a.label || a.id"
           [matTooltip]="a.label"

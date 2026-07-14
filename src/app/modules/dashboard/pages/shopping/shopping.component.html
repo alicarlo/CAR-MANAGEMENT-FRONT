@@ -8,11 +8,223 @@
   </div>
   <div class="inline-block space-x-4">
     <button 
+      [hidden]="!permissionsService.hasScope('PURCHASE.ADD')"
       class="bg-primary text-primary-foreground flex-none rounded-md px-4 py-2.5 text-xs font-semibold"
       (click)="openModal('new', null)"
     >
       Nuevo
     </button>
+  </div>
+</div>
+
+<div class="mb-4 flex flex-wrap gap-3 justify-end items-end w-full">
+  <div class="flex flex-col gap-2">
+    <label class="text-foreground text-[11px] font-medium">Buscar:</label>
+    <button
+      type="button"
+      class="bg-primary text-primary-foreground flex items-center justify-center rounded-md h-[34px] w-[40px] min-w-[40px]"
+      (click)="filterGo()"
+    >
+      <mat-icon class="text-[20px] leading-none">search</mat-icon>
+    </button>
+  </div>
+
+  <div class="flex flex-col gap-2 min-w-[180px]">
+    <label class="text-foreground text-[11px] font-medium">Sucursal:</label>
+    <div class="relative w-full">
+      <button
+        type="button"
+        class="!h-[32px] w-full py-2 pl-8 pr-10 rounded-md bg-background text-foreground border border-border text-left focus:outline-none focus:ring-2 focus:ring-primary/50 flex items-center justify-between"
+        (click)="toggleStoreDropdown()"
+      >
+        <span class="truncate text-[13px]">{{ selectedStoreLabel || 'Selecciona...' }}</span>
+        <span class="absolute right-3 text-xs opacity-70">▼</span>
+      </button>
+
+      <div
+        *ngIf="storeDropdownOpen"
+        class="absolute z-30 mt-1 w-full rounded-md bg-background border border-border shadow-lg"
+      >
+        <div class="p-2 border-b border-border">
+          <input
+            type="text"
+            placeholder="Filtrar sucursales..."
+            class="w-full py-1.5 px-3 rounded-md bg-background text-foreground border border-border text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 box-border"
+            [formControl]="storeFilterControl"
+            (keydown.escape)="closeStoreDropdown()"
+          />
+        </div>
+
+        <div class="max-h-60 overflow-y-auto">
+          <button
+            type="button"
+            class="w-full text-left px-3 py-2 text-[13px] text-foreground hover:bg-card font-medium"
+            (click)="selectStore(null)"
+          >
+            Todos
+          </button>
+
+          <button
+            type="button"
+            class="w-full text-left px-3 py-2 text-[13px] text-foreground hover:bg-card"
+            *ngFor="let s of filteredStore"
+            (click)="selectStore(s)"
+          >
+            {{ s.name }}
+          </button>
+
+          <div
+            *ngIf="filteredStore.length === 0"
+            class="px-3 py-2 text-[11px] text-muted-foreground"
+          >
+            Sin resultados
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-2 min-w-[180px]">
+    <label class="text-foreground text-[11px] font-medium">Inversionista:</label>
+    <div class="relative w-full">
+      <button
+        type="button"
+        class="!h-[32px] w-full py-2 pl-8 pr-10 rounded-md bg-background text-foreground border border-border text-left focus:outline-none focus:ring-2 focus:ring-primary/50 flex items-center justify-between"
+        (click)="toggleInvestorDropdown()"
+      >
+        <span class="truncate text-[13px]">{{ selectedInvestorLabel || 'Selecciona...' }}</span>
+        <span class="absolute right-3 text-xs opacity-70">▼</span>
+      </button>
+
+      <div
+        *ngIf="investorDropdownOpen"
+        class="absolute z-30 mt-1 w-full rounded-md bg-background border border-border shadow-lg"
+      >
+        <div class="p-2 border-b border-border">
+          <input
+            type="text"
+            placeholder="Filtrar inversionistas..."
+            class="w-full py-1.5 px-3 rounded-md bg-background text-foreground border border-border text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 box-border"
+            [formControl]="investorFilterControl"
+            (keydown.escape)="closeInvestorDropdown()"
+          />
+        </div>
+
+        <div class="max-h-60 overflow-y-auto">
+          <button
+            type="button"
+            class="w-full text-left px-3 py-2 text-[13px] text-foreground hover:bg-card font-medium"
+            (click)="selectInvestor(null)"
+          >
+            Todos
+          </button>
+
+          <button
+            type="button"
+            class="w-full text-left px-3 py-2 text-[13px] text-foreground hover:bg-card"
+            *ngFor="let s of filteredInvestor"
+            (click)="selectInvestor(s)"
+          >
+            {{ s.full_name }}
+          </button>
+
+          <div
+            *ngIf="filteredInvestor.length === 0"
+            class="px-3 py-2 text-[11px] text-muted-foreground"
+          >
+            Sin resultados
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-2 min-w-[110px]">
+    <label class="text-foreground text-[11px] font-medium">Clave:</label>
+    <input
+      type="text"
+      placeholder="Clave"
+      class="h-[32px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+      [formControl]="keyFilterControl"
+    />
+  </div>
+
+  <div class="flex flex-col gap-2 min-w-[110px]">
+    <label class="text-foreground text-[11px] font-medium">Marca:</label>
+    <input
+      type="text"
+      placeholder="Marca"
+      class="h-[32px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+      [formControl]="makeFilterControl"
+    />
+  </div>
+
+  <div class="flex flex-col gap-2 min-w-[110px]">
+    <label class="text-foreground text-[11px] font-medium">Modelo:</label>
+    <input
+      type="text"
+      placeholder="Modelo"
+      class="h-[32px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+      [formControl]="modelFilterControl"
+    />
+  </div>
+
+  <div class="flex flex-col gap-2 min-w-[110px]">
+    <label class="text-foreground text-[11px] font-medium">Linea:</label>
+    <input
+      type="text"
+      placeholder="Linea"
+      class="h-[32px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+      [formControl]="versionFilterControl"
+    />
+  </div>
+
+  <div class="flex flex-col gap-2 min-w-[120px]">
+    <label class="text-foreground text-[11px] font-medium">Color:</label>
+    <input
+      type="text"
+      placeholder="Color"
+      class="h-[32px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+      [formControl]="colorFilterControl"
+    />
+  </div>
+
+  <div class="flex flex-col gap-2 min-w-[150px]">
+    <label class="text-foreground text-[11px] font-medium">Fecha de inicio:</label>
+    <div class="relative">
+      <input
+        #dateFromInput
+        type="date"
+        class="shopping-date-input h-[32px] w-full px-3 pr-10 rounded-md border border-border bg-background text-foreground text-[13px] [color-scheme:dark]"
+        [(ngModel)]="date_from"
+      />
+      <button
+        type="button"
+        class="absolute right-2 top-1/2 -translate-y-1/2 text-foreground flex items-center justify-center"
+        (click)="openPicker(dateFromInput)"
+      >
+        <mat-icon style="font-size: 20px;">calendar_month</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-2 min-w-[150px]">
+    <label class="text-foreground text-[11px] font-medium">Fecha final:</label>
+    <div class="relative">
+      <input
+        #dateToInput
+        type="date"
+        class="shopping-date-input h-[32px] w-full px-3 pr-10 rounded-md border border-border bg-background text-foreground text-[13px] [color-scheme:dark]"
+        [(ngModel)]="date_to"
+      />
+      <button
+        type="button"
+        class="absolute right-2 top-1/2 -translate-y-1/2 text-foreground flex items-center justify-center"
+        (click)="openPicker(dateToInput)"
+      >
+        <mat-icon style="font-size: 20px;">calendar_month</mat-icon>
+      </button>
+    </div>
   </div>
 </div>
 

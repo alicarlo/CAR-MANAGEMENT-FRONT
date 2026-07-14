@@ -1,0 +1,383 @@
+<div>
+  <div>
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-1">
+        <p class="text-foreground font-semibold">Tiempo en Piso</p>
+        <div class="text-muted-foreground text-xs font-medium">
+          <span>Total de autos:</span>
+          <span class="text-foreground ml-1">{{ total }}</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full lg:flex lg:justify-end lg:items-end">
+        <div class="flex flex-col gap-2 w-full lg:w-auto">
+          <label class="text-foreground text-[11px] font-medium">Buscar:</label>
+          <button
+            (click)="filterGo()"
+            class="bg-primary text-primary-foreground flex items-center justify-center rounded-md w-full lg:w-[65px] h-[34px]"
+          >
+            <mat-icon class="text-[20px] leading-none">search</mat-icon>
+          </button>
+        </div>
+
+        <div class="flex flex-col gap-2 w-full lg:w-auto">
+          <label class="text-foreground text-[11px] font-medium">Descargar:</label>
+          <button
+            (click)="downloadFile()"
+            [disabled]="downloadingExcel"
+            class="bg-primary text-primary-foreground flex items-center justify-center rounded-md w-full lg:w-[85px] h-[34px] disabled:opacity-70"
+          >
+            <span
+              *ngIf="downloadingExcel"
+              class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground"
+            ></span>
+            <mat-icon *ngIf="!downloadingExcel" class="text-[20px] leading-none">file_present</mat-icon>
+          </button>
+        </div>
+
+        <div class="flex flex-col gap-2 w-full lg:w-auto">
+          <label class="text-foreground text-[11px] font-medium">Sucursal:</label>
+          <div class="relative min-w-[180px]">
+            <button
+              type="button"
+              class="!h-[32px] w-full py-2 pl-3 pr-10 rounded-md bg-background text-foreground border border-border text-left focus:outline-none focus:ring-2 focus:ring-primary/50 flex items-center justify-between"
+              (click)="toggleStoreDropdown()"
+            >
+              <span class="truncate text-[13px]">
+                {{ selectedStoreLabel || 'Selecciona...' }}
+              </span>
+              <span class="absolute right-3 text-xs opacity-70">▼</span>
+            </button>
+
+            <div
+              *ngIf="storeDropdownOpen"
+              class="absolute z-2 mt-1 w-full rounded-md bg-background border border-border shadow-lg"
+            >
+              <div class="p-2 border-b border-border">
+                <input
+                  type="text"
+                  placeholder="Filtrar sucursales..."
+                  class="w-full py-1.5 px-3 rounded-md bg-background text-foreground border border-border text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 box-border"
+                  [formControl]="storeFilterControl"
+                  (keydown.escape)="closeStoreDropdown()"
+                />
+              </div>
+
+              <div class="max-h-60 overflow-y-auto">
+                <button
+                  type="button"
+                  class="w-full text-left px-3 py-2 text-[13px] text-foreground hover:bg-card flex items-center gap-2 font-medium"
+                  (click)="selectStore(null)"
+                >
+                  Todos
+                </button>
+                <button
+                  type="button"
+                  class="w-full text-left px-3 py-2 text-[13px] text-foreground hover:bg-card flex items-center gap-2"
+                  *ngFor="let s of filteredStore"
+                  (click)="selectStore(s)"
+                >
+                  {{ s.name }}
+                </button>
+
+                <div
+                  *ngIf="filteredStore.length === 0"
+                  class="px-3 py-2 text-[11px] text-muted-foreground"
+                >
+                  Sin resultados
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2 w-full lg:w-auto">
+          <label class="text-foreground text-[11px] font-medium">Inversionista:</label>
+          <div class="relative min-w-[180px]">
+            <button
+              type="button"
+              class="!h-[32px] w-full py-2 pl-3 pr-10 rounded-md bg-background text-foreground border border-border text-left focus:outline-none focus:ring-2 focus:ring-primary/50 flex items-center justify-between"
+              (click)="toggleInvestorDropdown()"
+            >
+              <span class="truncate text-[13px]">
+                {{ selectedInvestorLabel || 'Selecciona...' }}
+              </span>
+              <span class="absolute right-3 text-xs opacity-70">▼</span>
+            </button>
+
+            <div
+              *ngIf="investorDropdownOpen"
+              class="absolute z-2 mt-1 w-full rounded-md bg-background border border-border shadow-lg"
+            >
+              <div class="p-2 border-b border-border">
+                <input
+                  type="text"
+                  placeholder="Filtrar inversionista..."
+                  class="w-full py-1.5 px-3 rounded-md bg-background text-foreground border border-border text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 box-border"
+                  [formControl]="investorFilterControl"
+                  (keydown.escape)="closeInvestorDropdown()"
+                />
+              </div>
+
+              <div class="max-h-60 overflow-y-auto">
+                <button
+                  type="button"
+                  class="w-full text-left px-3 py-2 text-[13px] text-foreground hover:bg-card flex items-center gap-2 font-medium"
+                  (click)="selectInvestor(null)"
+                >
+                  Todos
+                </button>
+                <button
+                  type="button"
+                  class="w-full text-left px-3 py-2 text-[13px] text-foreground hover:bg-card flex items-center gap-2"
+                  *ngFor="let s of filteredInvestor"
+                  (click)="selectInvestor(s)"
+                >
+                  {{ s.full_name }}
+                </button>
+
+                <div
+                  *ngIf="filteredInvestor.length === 0"
+                  class="px-3 py-2 text-[11px] text-muted-foreground"
+                >
+                  Sin resultados
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full lg:flex lg:justify-end lg:items-end">
+        <div class="flex flex-col gap-2 min-w-[110px]">
+          <label class="text-foreground text-[11px] font-medium">Clave:</label>
+          <input
+            type="text"
+            placeholder="Clave"
+            class="h-[32px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+            [formControl]="keyFilterControl"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2 min-w-[110px]">
+          <label class="text-foreground text-[11px] font-medium">Marca:</label>
+          <input
+            type="text"
+            placeholder="Marca"
+            class="h-[32px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+            [formControl]="makeFilterControl"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2 min-w-[110px]">
+          <label class="text-foreground text-[11px] font-medium">Modelo:</label>
+          <input
+            type="text"
+            placeholder="Modelo"
+            class="h-[32px] px-3 rounded-md border border-border bg-background text-foreground text-[13px]"
+            [formControl]="modelFilterControl"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2 min-w-[150px]">
+          <label class="text-foreground text-[11px] font-medium">Fecha de llegada:</label>
+          <div class="relative">
+            <input
+              #dateFromInput
+              type="date"
+              class="h-[32px] w-full px-3 pr-10 rounded-md border border-border bg-background text-foreground text-[13px]"
+              [(ngModel)]="date_from"
+            />
+            <button
+              type="button"
+              class="absolute right-2 top-1/2 -translate-y-1/2 text-foreground flex items-center justify-center"
+              (click)="openPicker(dateFromInput)"
+            >
+              <mat-icon style="font-size: 20px;">calendar_month</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2 min-w-[150px]">
+          <label class="text-foreground text-[11px] font-medium">Fecha de llegada fin:</label>
+          <div class="relative">
+            <input
+              #dateToInput
+              type="date"
+              class="h-[32px] w-full px-3 pr-10 rounded-md border border-border bg-background text-foreground text-[13px]"
+              [(ngModel)]="date_to"
+            />
+            <button
+              type="button"
+              class="absolute right-2 top-1/2 -translate-y-1/2 text-foreground flex items-center justify-center"
+              (click)="openPicker(dateToInput)"
+            >
+              <mat-icon style="font-size: 20px;">calendar_month</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="border border-border/60 rounded-lg bg-card overflow-hidden">
+        <div *ngIf="!loadingModal" class="h-full flex justify-center items-center p-[30px]">
+          <app-loading></app-loading>
+        </div>
+
+        <div *ngIf="loadingModal">
+          <div class="hidden lg:block overflow-y-auto overflow-x-auto">
+            <table class="w-full table-auto">
+              <thead>
+                <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Inversionista</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Sucursal</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Clave</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Auto</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Fecha de llegada</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Antiguedad</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Costo</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Venta</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Utilidad</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Margen</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Costo sin gastos</th>
+                </tr>
+              </thead>
+
+              <tbody class="divide-y divide-border/40" *ngIf="list?.length">
+                <tr
+                  *ngFor="let item of list; let i = index"
+                  class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition cursor-pointer"
+                  [ngClass]="isSelectedRow(item, i) ? 'bg-primary/10 ring-1 ring-primary/30' : (i % 2 === 0 ? 'bg-transparent' : 'bg-muted/30')"
+                  (click)="selectRow(item, i)"
+                  (dblclick)="clearSelectedRow(item, i)"
+                >
+                  <td class="px-3 py-2 whitespace-nowrap">
+                    {{ getInvestorsLabel(item.investors) }}
+                  </td>
+                  <td class="px-3 py-2 whitespace-nowrap">{{ item.store?.name ?? '-' }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap">{{ item.key ?? '-' }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap">
+                    {{ item.make || item.model || item.version || item.color ? ((item.make || '') + ' ' + (item.model || '') + ' ' + (item.version || '') + ' ' + (item.color || '')).trim() : '-' }}
+                  </td>
+                  <td class="px-3 py-2 whitespace-nowrap">{{ item.arrived_at ? (item.arrived_at | date:'dd/MM/yyyy') : '-' }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap">{{ item.days ?? '-' }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                      <button
+                        type="button"
+                        class="bg-primary/10 text-primary rounded px-2 py-0.5 text-[11px] font-medium hover:bg-primary/20 transition"
+                        (click)="openBillsModal(item); $event.stopPropagation()"
+                        (dblclick)="$event.stopPropagation()"
+                      >
+                        Ver
+                      </button>
+                      <span>{{ item.cost != null ? (item.cost | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                      <button
+                        *ngIf="canEditSalePrice"
+                        type="button"
+                        class="flex h-6 w-6 items-center justify-center rounded text-primary hover:bg-primary/10 transition"
+                        matTooltip="Editar precio"
+                        matTooltipPosition="above"
+                        matTooltipClass="bg-background text-foreground"
+                        (click)="openEditPriceModal(item); $event.stopPropagation()"
+                        (dblclick)="$event.stopPropagation()"
+                      >
+                        <mat-icon class="text-[16px] leading-none">edit</mat-icon>
+                      </button>
+                      <span>{{ item.sale_price != null ? (item.sale_price | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2 whitespace-nowrap">{{ item.utilidad != null ? (item.utilidad | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap">{{ item.margen != null ? (item.margen | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap">{{ item.cost_net != null ? (item.cost_net | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex flex-col gap-3 lg:hidden p-3" *ngIf="list?.length">
+            <div
+              *ngFor="let item of list; let i = index"
+              class="bg-background border border-border rounded-lg p-3 flex flex-col gap-2 text-foreground text-[12px] cursor-pointer transition"
+              [ngClass]="isSelectedRow(item, i) ? 'bg-primary/10 border-primary/50 ring-1 ring-primary/30' : ''"
+              (click)="selectRow(item, i)"
+              (dblclick)="clearSelectedRow(item, i)"
+            >
+              <div class="flex justify-between">
+                <span>Inversionista</span>
+                <span class="text-right max-w-[160px]">
+                  {{ getInvestorsLabel(item.investors) }}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span>Auto</span>
+                <span class="text-right max-w-[160px]">
+                  {{ item.make || item.model || item.version || item.color ? ((item.make || '') + ' ' + (item.model || '') + ' ' + (item.version || '') + ' ' + (item.color || '')).trim() : '-' }}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span>Fecha de llegada</span>
+                <span>{{ item.arrived_at ? (item.arrived_at | date:'dd/MM/yyyy') : '-' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Antiguedad</span>
+                <span>{{ item.days ?? '-' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Costo</span>
+                <span class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    class="bg-primary/10 text-primary rounded px-2 py-0.5 text-[11px] font-medium hover:bg-primary/20 transition"
+                    (click)="openBillsModal(item); $event.stopPropagation()"
+                    (dblclick)="$event.stopPropagation()"
+                  >
+                    Ver
+                  </button>
+                  <span>{{ item.cost != null ? (item.cost | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</span>
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span>Venta</span>
+                <span class="flex items-center gap-2">
+                  <button
+                    *ngIf="canEditSalePrice"
+                    type="button"
+                    class="flex h-6 w-6 items-center justify-center rounded text-primary hover:bg-primary/10 transition"
+                    matTooltip="Editar precio"
+                    matTooltipPosition="above"
+                    matTooltipClass="bg-background text-foreground"
+                    (click)="openEditPriceModal(item); $event.stopPropagation()"
+                    (dblclick)="$event.stopPropagation()"
+                  >
+                    <mat-icon class="text-[16px] leading-none">edit</mat-icon>
+                  </button>
+                  <span>{{ item.sale_price != null ? (item.sale_price | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</span>
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span>Utilidad</span>
+                <span>{{ item.utilidad != null ? (item.utilidad | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Margen</span>
+                <span>{{ item.margen != null ? (item.margen | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</span>
+              </div>
+              <div class="flex justify-between font-semibold">
+                <span>Costo sin gastos</span>
+                <span>{{ item.cost_net != null ? (item.cost_net | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-foreground text-[15px] w-full flex justify-center items-center" *ngIf="loadingModal && list?.length === 0">
+        No hay datos
+      </div>
+    </div>
+  </div>
+</div>

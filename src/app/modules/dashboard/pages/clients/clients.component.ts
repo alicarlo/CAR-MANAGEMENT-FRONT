@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Clients } from 'src/app/core/models/clients.model';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -8,14 +9,22 @@ import { RowAction, RowActionEvent } from 'src/app/core/models/actions.model';
 import { ClientsService } from 'src/app/core/services/clients/clients.service';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
 import { ToastrService } from 'ngx-toastr';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-clients',
-  imports: [TableComponent, MatDialogModule],
+  imports: [TableComponent, MatDialogModule, FormsModule, ReactiveFormsModule, CommonModule, MatIconModule],
   templateUrl: './clients.component.html',
   styleUrl: './clients.component.css'
 })
 export class ClientsComponent {
+  fullNameFilterControl = new FormControl('');
+  phoneFilterControl = new FormControl('');
+  rfcFilterControl = new FormControl('');
+  filterSelects: any = {};
+
   clientsSelected: any;
   clients: Clients[] = [];
   clientsHeader: string[] = ['Nombre', 'Direccion', 'Telefono', 'Celular', 'Telefono trabajo' ,'Fecha de nacimiento', 'Estado', 'Ciudad', 'Correo',  'Sexo', 'RFC', 'Estatus'];
@@ -35,8 +44,8 @@ export class ClientsComponent {
   ]
 
   readonly actions: RowAction[] = [
-    { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Eliminar' },
+    { icon: 'edit',  id: 'edit',  label: 'Editar', scope: 'CLIENT.UPDATE' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar', scope: 'CLIENT.DELETE' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -60,7 +69,8 @@ export class ClientsComponent {
   constructor(
     private _MatDialog: MatDialog,
     private _ClientsService: ClientsService,
-    private _ToastrService: ToastrService
+    private _ToastrService: ToastrService,
+    public permissionsService: PermissionsService
   ) {}
 
   ngOnInit() {
@@ -139,9 +149,23 @@ export class ClientsComponent {
     this.getClients();
   }
 
+  filterGo() {
+    this.filterSelects = Object.fromEntries(
+      Object.entries({
+        full_name: this.fullNameFilterControl.value,
+        phone: this.phoneFilterControl.value,
+        rfc: this.rfcFilterControl.value,
+      }).filter(([_, v]) => v != null && v !== '')
+    );
+
+    this.currentPage = 1;
+    this.pageSize = 10;
+    this.getClients();
+  }
+
   getClients() {
     this.loading = false;
-    this._ClientsService.getClient(this.pageSize, this.currentPage).subscribe({
+    this._ClientsService.getClient(this.pageSize, this.currentPage, this.filterSelects).subscribe({
       next: async (response: any) => {
         if(response) {
 

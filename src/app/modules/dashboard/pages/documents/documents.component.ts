@@ -8,11 +8,13 @@ import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-messa
 import { ToastrService } from 'ngx-toastr';
 import { DocumentsService } from 'src/app/core/services/documents/documents.service';
 import { DocumentsModalComponent } from '../../modals/documents-modal/documents-modal.component';
+import { CommonModule } from '@angular/common';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 
 @Component({
   selector: 'app-documents',
-  imports: [TableComponent, MatDialogModule],
+  imports: [TableComponent, MatDialogModule, CommonModule],
   templateUrl: './documents.component.html',
   styleUrl: './documents.component.css'
 })
@@ -30,9 +32,9 @@ export class DocumentsComponent {
   ]
 
   readonly actions: RowAction[] = [
-    { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Eliminar' },
-    { icon: 'description', id: 'contract', label: 'Descargar Documento' },
+    { icon: 'edit',  id: 'edit',  label: 'Editar', scope: 'DOCUMENTS.UPDATE' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar', scope: 'DOCUMENTS.DELETE' },
+    { icon: 'description', id: 'contract', label: 'Descargar Documento', scope: ['DOCUMENTS.GET', 'CAR.DOCUMENT.GET', 'DOCUMENTS.BILL.GET'] },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -57,7 +59,8 @@ export class DocumentsComponent {
     private _MatDialog: MatDialog,
     private _ClientsService: ClientsService,
     private _ToastrService: ToastrService,
-    private _DocumentsService: DocumentsService
+    private _DocumentsService: DocumentsService,
+    public permissionsService: PermissionsService
   ) {}
 
   ngOnInit() {

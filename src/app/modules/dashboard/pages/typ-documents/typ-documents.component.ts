@@ -8,6 +8,7 @@ import { TypeDocumentsService } from 'src/app/core/services/typeDocuments/type-d
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
 import { TypeDocumentsModalComponent } from '../../modals/type-documents-modal/type-documents-modal.component';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-typ-documents',
@@ -37,8 +38,8 @@ export class TypDocumentsComponent {
   ]
 
   readonly actions: RowAction[] = [
-    { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Eliminar' },
+    { icon: 'edit',  id: 'edit',  label: 'Editar', scope: 'CATALOGOS.DOCUMENT_TYPE.UPDATE' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar', scope: 'CATALOGOS.DOCUMENT_TYPE.DELETE' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -62,7 +63,8 @@ export class TypDocumentsComponent {
   constructor(
     private _MatDialog: MatDialog,
     private _TypeDocumentsService: TypeDocumentsService,
-    private _ToastrService: ToastrService
+    private _ToastrService: ToastrService,
+    public permissionsService: PermissionsService
   ) {}
 
   ngOnInit() {

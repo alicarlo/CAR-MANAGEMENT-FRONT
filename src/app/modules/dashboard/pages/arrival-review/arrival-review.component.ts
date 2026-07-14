@@ -28,7 +28,7 @@ export class ArrivalReviewComponent {
     { key: 'arrived_at', type: 'dob' },
   ]
   readonly actions: RowAction[] = [
-    { icon: 'add',  id: 'add',  label: 'Revision de Auto' },
+    { icon: 'add',  id: 'add',  label: 'Revision de Auto', scope: ['ARRIVAL.ADD', 'ARRIVAL.UPDATE'] },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;

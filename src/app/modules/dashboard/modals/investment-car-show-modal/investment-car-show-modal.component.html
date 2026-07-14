@@ -43,7 +43,7 @@
                 </td>
 
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.branch?.name }}
+                  {{ item.store && (item.store | json) !== '{}' ? (item.store.name ?? '-') : '-' }}
                 </td>
 
                  <td class="px-3 py-2 align-middle whitespace-nowrap">

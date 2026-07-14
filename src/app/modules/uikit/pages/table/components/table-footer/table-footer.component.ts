@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AngularSvgIconModule } from 'angular-svg-icon';
+import { TableDensityService } from 'src/app/core/services/table-density.service';
 
 @Component({
   selector: 'app-table-footer',
@@ -11,6 +12,7 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
 })
 export class TableFooterComponent {
   pageSize: number = 10;
+  @Input() pageSizeOptions: number[] = [5, 10, 20, 30, 50];
   @Input() hasNext: boolean = false;
   @Input() hasPrev: boolean = true;
   @Input() total: number = 0;
@@ -77,7 +79,7 @@ export class TableFooterComponent {
   @Output() changePageChild = new EventEmitter<{}>();
   trackByPage = (_: number, p: number) => p;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef, public tableDensityService: TableDensityService) {}
 
   onPageSizeChange(value: number) {
     this.pageSizeSelectChild.emit(value);

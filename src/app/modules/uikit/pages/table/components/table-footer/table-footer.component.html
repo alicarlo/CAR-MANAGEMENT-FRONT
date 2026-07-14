@@ -1,29 +1,22 @@
-<div [hidden]="!_activateSearch" class="text-muted-foreground flex flex-wrap items-center justify-between gap-2 py-3 px-5 text-xs">
-  <div class="order-2 flex items-center gap-2 md:order-1">
+<div [hidden]="!_activateSearch" [ngClass]="['text-muted-foreground', tableDensityService.classes().footer]">
+  <div [ngClass]="tableDensityService.classes().footerPrimary">
     Ver
-    <select class="w-16 p-2"
+    <select [ngClass]="tableDensityService.classes().footerSelect"
       [(ngModel)]="pageSize"
       [ngModelOptions]="{ standalone: true }"
       (ngModelChange)="onPageSizeChange($any($event))"
     >
-      <option [ngValue]="5">5</option>
-      <option [ngValue]="10">10</option>
-      <option [ngValue]="20">20</option>
-      <option [ngValue]="30">30</option>
-      <option [ngValue]="50">50</option>
+      <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
     </select>
     por pagina
   </div>
-  <div class="order-1 flex items-center gap-4 md:order-2">
+  <div [ngClass]="tableDensityService.classes().footerSecondary">
     <span>1-{{showItems}} of {{total}}</span>
-    <div class="inline-flex items-center gap-1">
+    <div [ngClass]="tableDensityService.classes().footerPagination">
       <button
         (click)="changePageNextPrev('prev')"
-        class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm disabled:opacity-50"
-        [disabled]="!hasPrev"   
-        [ngClass]="!hasPrev
-          ? '!cursor-not-allowed'
-          : '!cursor-pointer'">
+        [ngClass]="[tableDensityService.classes().footerIconButton, !hasPrev ? '!cursor-not-allowed' : '!cursor-pointer']"
+        [disabled]="!hasPrev">
         <svg-icon src="./assets/icons/heroicons/outline/arrow-long-left.svg" [svgClass]="'h-4 w-4'"> </svg-icon>
       </button>
       
@@ -31,20 +24,15 @@
       <button
         
         *ngFor="let p of visiblePages; trackBy: trackByPage"
-        class="hover:bg-muted-foreground/10 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm cursor-pointer"
-        (click)="goToPage(p)"
-        [ngClass]="p === currentPageSelect ? 'bg-muted-foreground/10' : 'hover:bg-muted-foreground/50'">
+        [ngClass]="[tableDensityService.classes().footerPageButton, p === currentPageSelect ? 'bg-muted-foreground/10' : 'hover:bg-muted-foreground/50']"
+        (click)="goToPage(p)">
         {{ p }}
       </button>
       
       <button
         (click)="changePageNextPrev('next')"
-        class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm disabled:opacity-50"
-        [disabled]="!hasNext"   
-        [ngClass]="!hasNext
-          ? '!cursor-not-allowed'
-          : '!cursor-pointer'"
-        >
+        [ngClass]="[tableDensityService.classes().footerIconButton, !hasNext ? '!cursor-not-allowed' : '!cursor-pointer']"
+        [disabled]="!hasNext">
         <svg-icon src="./assets/icons/heroicons/outline/arrow-long-right.svg" [svgClass]="'h-4 w-4'"> </svg-icon>
       </button>
     </div>

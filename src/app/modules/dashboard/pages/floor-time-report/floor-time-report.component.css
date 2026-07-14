@@ -1,0 +1,25 @@
+:host input[type="date"] {
+  color-scheme: light;
+}
+
+:host-context(.dark) input[type="date"] {
+  color-scheme: dark;
+}
+
+:host input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.75;
+  cursor: pointer;
+}
+
+:host-context(.dark) input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+:host input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}

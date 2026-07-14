@@ -13,6 +13,7 @@ import { TableFilterService } from './services/table-filter.service';
 import { CommonModule } from '@angular/common';
 import { RowAction, RowActionEvent } from 'src/app/core/models/actions.model';
 import { LoadingComponent } from '../loading/loading.component';
+import { TableDensityService } from 'src/app/core/services/table-density.service';
 
 @Component({
   selector: 'app-table',
@@ -55,6 +56,7 @@ export class TableComponent {
   @Output() action = new EventEmitter<RowActionEvent>();
   @Input() hasNext: boolean = false;
   @Input() hasPrev: boolean = false;
+  @Input() pageSizeOptions: number[] = [5, 10, 20, 30, 50];
   @Input() total: number = 0;
   @Input() pages: any
   @Input() totalPages: number = 0;
@@ -96,7 +98,12 @@ export class TableComponent {
   activateSearch: boolean = true;
   dataSignal = signal<any[]>([]);
   selectOptionFilter: any = null;
-  constructor(private http: HttpClient, private filterService: TableFilterService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private http: HttpClient,
+    private filterService: TableFilterService,
+    private cdr: ChangeDetectorRef,
+    public tableDensityService: TableDensityService
+  ) {}
 
   // Emiter checkbox in table header
   public toggleUsers(checked: boolean) {

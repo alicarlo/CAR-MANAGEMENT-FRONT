@@ -1,0 +1,25 @@
+<mat-dialog-content>
+  <div class="flex flex-col gap-5 text-center">
+    <div class="flex flex-col gap-2">
+      <h3 class="text-foreground text-lg font-semibold">Descargar reporte</h3>
+      <p class="text-muted-foreground text-sm">
+        Elige si quieres descargar solo lo que esta cargado en la tabla o todo el reporte.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-2 sm:flex-row">
+      <app-button class="w-full" full impact="bold" tone="primary" shape="rounded" size="medium" (click)="downloadCurrent()">
+        Descargar tabla
+      </app-button>
+      <app-button class="w-full" full impact="bold" tone="primary" shape="rounded" size="medium" (click)="downloadAll()">
+        Descargar todo
+      </app-button>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <app-button mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">
+    Cerrar
+  </app-button>
+</mat-dialog-actions>

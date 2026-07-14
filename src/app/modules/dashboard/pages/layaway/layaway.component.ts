@@ -1,5 +1,8 @@
-import { Component, model } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 import { RowAction, RowActionEvent } from 'src/app/core/models/actions.model';
@@ -14,21 +17,42 @@ import { LayawayModalComponent } from '../../modals/layaway-modal/layaway-modal.
 import { LaywayService } from 'src/app/core/services/layway/layway.service';
 import { LayawayShowModalComponent } from '../../modals/layaway-show-modal/layaway-show-modal.component';
 import { IncomeModalComponent } from '../../modals/income-modal/income-modal.component';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
+import { TicketPrintModalComponent } from '../../modals/ticket-print-modal/ticket-print-modal.component';
+import { StoreService } from 'src/app/core/services/store/store.service';
 
 
 @Component({
   selector: 'app-layaway',
-  imports: [TableComponent, MatDialogModule],
+  imports: [CommonModule, TableComponent, MatDialogModule, MatIconModule, FormsModule, ReactiveFormsModule],
   templateUrl: './layaway.component.html',
   styleUrl: './layaway.component.css'
 })
 export class LayawayComponent {
+  store: any = [];
+  store_id: any = null;
+  filteredStore: any = [];
+  storeFilterControl = new FormControl('');
+  storeDropdownOpen = false;
+  selectedStoreLabel = '';
+
+  keyFilterControl = new FormControl('');
+  makeFilterControl = new FormControl('');
+  modelFilterControl = new FormControl('');
+  colorFilterControl = new FormControl('');
+  versionFilterControl = new FormControl('');
+  fullNameFilterControl = new FormControl('');
+  phoneFilterControl = new FormControl('');
+  rfcFilterControl = new FormControl('');
+  filterSelects: any = {};
+
   layway: any[] = [];
   laywaySelected: TypeExpense | undefined;
-  laywayHeader: string[] = ['Folio', 'Cliente', 'Auto', 'Vendedor','Fecha de apartado', 'Precio pactado para venta', 'Anticipo pactado para venta', 'Monto recibido por enganche', 'Fecha compromiso de compra'];
+  laywayHeader: string[] = ['Folio', 'Cliente', 'Clave', 'Auto', 'Vendedor','Fecha de apartado', 'Precio pactado para venta', 'Anticipo pactado para venta', 'Monto recibido por enganche', 'Fecha compromiso de compra'];
   columns: any = [
     { key: 'consecutive', type: 'text' },
     { key: 'clientName', type: 'text' },
+    { key: 'carKey', type: 'text' },
     { key: 'carData', type: 'text' },
     { key: 'userName', type: 'text' },
     { key: 'date_layaway', type: 'dob' },
@@ -38,10 +62,10 @@ export class LayawayComponent {
     { key: 'date_commitment', type: 'dob' },
   ]
   readonly actions: RowAction[] = [
-    { icon: 'search',  id: 'search',  label: 'Visualizar Abonos' },
-    { icon: 'add',  id: 'add',  label: 'Agregar Abono' },
-    { icon: 'delete', id: 'delete', label: 'Eliminar Apartado' },
-    { icon: 'description', id: 'contract', label: 'Descargar Contrato' },
+    { icon: 'search',  id: 'search',  label: 'Visualizar Abonos', scope: ['INSTALLMENT', 'INSTALLMENT.GET', 'INCOME.LAYAWAY.GET', 'INCOME.GET'] },
+    { icon: 'add',  id: 'add',  label: 'Agregar Abono', scope: ['INSTALLMENT.ADD', 'INCOME.ADD'] },
+    { icon: 'delete', id: 'delete', label: 'Eliminar Apartado', scope: 'LAYAWAY.DELETE' },
+    { icon: 'description', id: 'contract', label: 'Descargar Contrato', scope: 'CONTRACT.LAYAWAY.GET' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -65,14 +89,50 @@ export class LayawayComponent {
   constructor(
     private _MatDialog: MatDialog,
     private _ToastrService: ToastrService,
-    private _LaywayService: LaywayService
+    private _LaywayService: LaywayService,
+    private _PermissionsService: PermissionsService,
+    private _StoreService: StoreService
   ) {}
 
+  get canCreateLayaway() {
+    return this._PermissionsService.hasScopes(['LAYAWAY.ADD']);
+  }
+
+  get canViewLayawayIncomes() {
+    return this._PermissionsService.hasScopes(['INSTALLMENT', 'INSTALLMENT.GET', 'INCOME.LAYAWAY.GET', 'INCOME.GET']);
+  }
+
+  get canAddLayawayIncome() {
+    return this._PermissionsService.hasScopes(['INSTALLMENT.ADD', 'INCOME.ADD']);
+  }
+
+  get canDeleteLayaway() {
+    return this._PermissionsService.hasScopes(['LAYAWAY.DELETE']);
+  }
+
+  get canDownloadLayawayContract() {
+    return this._PermissionsService.hasScopes(['CONTRACT.LAYAWAY.GET']);
+  }
+
   ngOnInit() {
+    this.getStore();
     this.getLayway();
+
+    this.storeFilterControl.valueChanges.subscribe(term => {
+      const value = (term || '').toString().toLowerCase().trim();
+
+      this.filteredStore = this.store.filter((data: any) => {
+        const text = `${data.name}`.toLowerCase();
+        return text.includes(value);
+      });
+    });
   }
 
   onRowAction(e: RowActionEvent<any>) {
+    if (e.id === 'search' && !this.canViewLayawayIncomes) return;
+    if (e.id === 'add' && !this.canAddLayawayIncome) return;
+    if (e.id === 'delete' && !this.canDeleteLayaway) return;
+    if (e.id === 'contract' && !this.canDownloadLayawayContract) return;
     if (e.id === 'search') this.openShowModal(e.id,e.row);
     if (e.id === 'edit')  this.openModal(e.id,e.row);
     if (e.id === 'delete') this.actionModal(e.id,e.row, 'Desea eliminar el registro?');
@@ -81,6 +141,7 @@ export class LayawayComponent {
   }
 
   openShowModal(action: string, data: any) {
+    if (!this.canViewLayawayIncomes) return;
     let dataSend = {action, row: data, flag: 0};
     const dialogRef = this._MatDialog.open(LayawayShowModalComponent, {
       disableClose: true,
@@ -116,6 +177,8 @@ export class LayawayComponent {
   }
 
   actionModal(action: string, data: any, msg: string, color: string = '!text-red-500', icon = 'delete') {
+    if (action === 'delete' && !this.canDeleteLayaway) return;
+    if (action === 'contract' && !this.canDownloadLayawayContract) return;
     let dataSend = {action, row: data, msg, color, icon};
     const ref: any = this._MatDialog.open(ActionMessageComponent, {
       data: dataSend,
@@ -130,7 +193,7 @@ export class LayawayComponent {
       ref.componentInstance.loading = true;
       try {
         if(dataSend.action === 'contract') {
-          await this.contratctLayaway(data.id);
+          this.openContractModal(data);
         }
         if(dataSend.action === 'delete') {
           await this.deleteLayaway(data.id);
@@ -189,6 +252,18 @@ export class LayawayComponent {
     return;
   }
 
+  openContractModal(data: any) {
+    const dataSend = { data, flag: 5 };
+    this._MatDialog.open(TicketPrintModalComponent, {
+      disableClose: true,
+      data: dataSend,
+      panelClass: ['custom-dialog-container'],
+      width: '100vw',
+      height: '75vh',
+      maxWidth: '100vw'
+    });
+  }
+
   async searchData(event: any) {
     if (!event) {
       return;
@@ -213,8 +288,74 @@ export class LayawayComponent {
     this.getLayway();
   }
 
+  getStore() {
+    this._StoreService.getStore(500, 1).subscribe({
+      next: async (response: any) => {
+        if(response) {
+          this.store = response.items.map((r: any) => ({ ...r }));
+          this.filteredStore = [...this.store];
+        }
+      },
+      error: (err) => {
+        if (err.error === "Token expired") return;
+        this._ToastrService.error(err.error, 'Error');
+      },
+    })
+  }
+
+  toggleStoreDropdown() {
+    this.storeDropdownOpen = !this.storeDropdownOpen;
+    if (this.storeDropdownOpen) {
+      this.storeFilterControl.setValue('');
+      this.filteredStore = [...this.store];
+    }
+  }
+
+  closeStoreDropdown() {
+    this.storeDropdownOpen = false;
+  }
+
+  selectStore(data: any) {
+    this.selectedStoreLabel = data !== null ? `${data.name}` : 'Todos';
+    this.store_id = data !== null ? data.id : '';
+    this.closeStoreDropdown();
+  }
+
+  filterGo() {
+    const carFilter = Object.fromEntries(
+      Object.entries({
+        store_id: this.store_id,
+        key: this.keyFilterControl.value,
+        make: this.makeFilterControl.value,
+        model: this.modelFilterControl.value,
+        version: this.versionFilterControl.value,
+        color: this.colorFilterControl.value
+      }).filter(([_, v]) => v != null && v !== '')
+    );
+
+    const clientFilter = Object.fromEntries(
+      Object.entries({
+        full_name: this.fullNameFilterControl.value,
+        phone: this.phoneFilterControl.value,
+        rfc: this.rfcFilterControl.value
+      }).filter(([_, v]) => v != null && v !== '')
+    );
+
+    this.filterSelects = Object.fromEntries(
+      Object.entries({
+        car: Object.keys(carFilter).length ? carFilter : null,
+        client: Object.keys(clientFilter).length ? clientFilter : null
+      }).filter(([_, v]) => v != null)
+    );
+
+    this.currentPage = 1;
+    this.pageSize = 10;
+    this.getLayway();
+  }
+
 
   openModal(action: string, data: any) {
+    if (action === 'new' && !this.canCreateLayaway) return;
     let dataSend = {action, row: data};
     const dialogRef = this._MatDialog.open(LayawayModalComponent, {
       disableClose: true,
@@ -231,6 +372,7 @@ export class LayawayComponent {
 
 
   openAddIncomeModal(action: string, data: any) {
+    if (!this.canAddLayawayIncome) return;
     let dataSend = {action, row: data, flag: 1};
     const dialogRef = this._MatDialog.open(IncomeModalComponent, {
       disableClose: true,
@@ -249,7 +391,7 @@ export class LayawayComponent {
 
   getLayway() {
     this.loading = false;
-    this._LaywayService.getLayaway(this.pageSize, this.currentPage).subscribe({
+    this._LaywayService.getLayaway(this.pageSize, this.currentPage, this.filterSelects).subscribe({
       next: async (response: any) => {
         if(response) {
   
@@ -262,6 +404,7 @@ export class LayawayComponent {
             userName: r.user.full_name,
             clientName: r.client.full_name,
             folio: '',
+            carKey: r.car?.key ?? '-',
             carData:  r.car  ?  `${r.car.make } ${r.car.version} ${r.car.model } ${r.car.color }` : '-',
             total: (r.incomes || []).reduce((acc: number, inc: any) => acc + (Number(inc.amount) || 0), 0),
           }));

@@ -1,7 +1,13 @@
 <div>
   <div>
     <div class="flex flex-col gap-4">
-      <p class="text-foreground font-semibold">Listado de Precios</p>
+      <div class="flex flex-col gap-1">
+        <p class="text-foreground font-semibold">Listado de Precios</p>
+        <div class="text-muted-foreground text-xs font-medium">
+          <span>Total de autos:</span>
+          <span class="text-foreground ml-1">{{ total }}</span>
+        </div>
+      </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full lg:flex lg:justify-end lg:items-center">
         <div class="flex flex-col gap-2 w-full lg:w-auto">
           <label for="sexo" class="text-foreground text-[11px] font-medium">Buscar:</label>
@@ -19,11 +25,16 @@
           <label for="sexo" class="text-foreground text-[11px] font-medium">Descargar:</label>
           <button 
             (click)="downloadFile()"
+            [disabled]="downloadingExcel"
             class="bg-primary text-primary-foreground
                   flex items-center justify-center
-                  rounded-md w-full lg:w-[85px] h-[34px]"
+                  rounded-md w-full lg:w-[85px] h-[34px] disabled:opacity-70"
           >
-            <mat-icon class="text-[20px] leading-none">file_present</mat-icon>
+            <span
+              *ngIf="downloadingExcel"
+              class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground"
+            ></span>
+            <mat-icon *ngIf="!downloadingExcel" class="text-[20px] leading-none">file_present</mat-icon>
           </button>
         </div>
 
@@ -41,7 +52,7 @@
               <option *ngIf="!store?.length" [ngValue]="null" selected disabled>
                 No hay elementos disponibles
               </option>
-              <option [ngValue]="null" disabled>Selecciona…</option>
+              <option [ngValue]="null" disabled>Seleccionaâ€¦</option>
               <option [ngValue]="null">Todos</option>
               <option *ngFor="let s of store" [ngValue]="s.id">
                 {{ s.name }}
@@ -64,7 +75,7 @@
               <option *ngIf="!typeCars?.length" [ngValue]="null" selected disabled>
                 No hay elementos disponibles
               </option>
-              <option [ngValue]="null" disabled>Selecciona…</option>
+              <option [ngValue]="null" disabled>Seleccionaâ€¦</option>
               <option [ngValue]="null">Todos</option>
               <option *ngFor="let s of typeCars" [ngValue]="s.id">
                 {{ s.name }}
@@ -84,7 +95,7 @@
                     focus:outline-none focus:ring-2 focus:ring-primary/50
                     appearance-none [color-scheme:dark]"
             >
-              <option [ngValue]="null" disabled>Selecciona…</option>
+              <option [ngValue]="null" disabled>Seleccionaâ€¦</option>
               <option [ngValue]="null">Todos</option>
               <option *ngFor="let s of status" [ngValue]="s">
                 {{ s }}
@@ -164,17 +175,22 @@
                   <th class="px-3 py-2 text-left whitespace-nowrap">Color</th>
                   <th class="px-3 py-2 text-left whitespace-nowrap">Kilometraje</th>
                   <th class="px-3 py-2 text-left whitespace-nowrap">Sucursal</th>
-                  <th class="px-3 py-2 text-left whitespace-nowrap">Precio de venta</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Precio actual</th>
+                  <th class="px-3 py-2 text-left whitespace-nowrap">Precio anterior</th>
                   <th class="px-3 py-2 text-left whitespace-nowrap">Bono</th>
                   <th class="px-3 py-2 text-left whitespace-nowrap">Comision</th>
                   <th class="px-3 py-2 text-left whitespace-nowrap">Estatus</th>
+                  <th class="sticky right-0 z-20 px-3 py-2 text-center whitespace-nowrap bg-muted/80 shadow-[-8px_0_12px_-12px_rgba(0,0,0,0.8)]">Acciones</th>
                 </tr>
               </thead>
 
               <tbody class="divide-y divide-border/40" *ngIf="list?.length">
                 <tr
-                  *ngFor="let item of list"
-                  class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition"
+                  *ngFor="let item of list; let i = index"
+                  class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition cursor-pointer"
+                  [ngClass]="isSelectedRow(item, i) ? 'bg-primary/10 ring-1 ring-primary/30' : (i % 2 === 0 ? 'bg-transparent' : 'bg-muted/30')"
+                  (click)="selectRow(item, i)"
+                  (dblclick)="clearSelectedRow(item, i)"
                 >
                   <td class="px-3 py-2 whitespace-nowrap">{{ item.key }}</td>
                   <td class="px-3 py-2 whitespace-nowrap">{{ item.make }}</td>
@@ -183,10 +199,33 @@
                   <td class="px-3 py-2">{{ item.color }}</td>
                   <td class="px-3 py-2">{{ item.km }}</td>
                   <td class="px-3 py-2">{{ getCheckStore(item.store) }}</td>
-                  <td class="px-3 py-2">{{ item.sale_price | currency:'MXN':'symbol':'1.2-2':'en-US' }}</td>
-                  <td class="px-3 py-2">{{ item.bono | currency:'MXN':'symbol':'1.2-2':'en-US' }}</td>
+                  <td class="px-3 py-2">{{ item.sale_price != null ? (item.sale_price | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</td>
+                  <td class="px-3 py-2">{{ getPreviousPrice(item) != null ? (getPreviousPrice(item) | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</td>
+                  <td class="px-3 py-2">{{ formatCurrencyOrText(item.bono) }}</td>
                   <td class="px-3 py-2">{{ item.comision | currency:'MXN':'symbol':'1.2-2':'en-US' }}</td>
                   <td class="px-3 py-2">{{ item.status }}</td>
+                  <td class="sticky right-0 z-10 px-3 py-2 bg-card shadow-[-8px_0_12px_-12px_rgba(0,0,0,0.8)]" (click)="$event.stopPropagation()" (dblclick)="$event.stopPropagation()">
+                    <div class="flex items-center justify-center gap-1">
+                      <button
+                        type="button"
+                        matTooltip="Ver documentos"
+                        matTooltipClass="bg-background text-foreground"
+                        (click)="openDocumentsModal($event, item)"
+                        class="h-7 w-7 rounded-md text-primary hover:bg-primary/10 flex items-center justify-center transition"
+                      >
+                        <mat-icon class="text-[18px] leading-none">attach_file</mat-icon>
+                      </button>
+                      <button
+                        type="button"
+                        matTooltip="Revision de llegada"
+                        matTooltipClass="bg-background text-foreground"
+                        (click)="openArriveModal($event, item)"
+                        class="h-7 w-7 rounded-md text-primary hover:bg-primary/10 flex items-center justify-center transition"
+                      >
+                        <mat-icon class="text-[18px] leading-none">check</mat-icon>
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -194,8 +233,11 @@
 
           <div class="flex flex-col gap-3 lg:hidden p-3" *ngIf="list?.length">
             <div 
-              *ngFor="let item of list"
-              class="bg-background border border-border rounded-lg p-3 flex flex-col gap-2 text-foreground text-[12px]"
+              *ngFor="let item of list; let i = index"
+              class="bg-background border border-border rounded-lg p-3 flex flex-col gap-2 text-foreground text-[12px] cursor-pointer transition"
+              [ngClass]="isSelectedRow(item, i) ? 'bg-primary/10 border-primary/50 ring-1 ring-primary/30' : ''"
+              (click)="selectRow(item, i)"
+              (dblclick)="clearSelectedRow(item, i)"
             >
               <div class="flex justify-between"><span>Clave</span><span>{{ item.key }}</span></div>
               <div class="flex justify-between"><span>Marca</span><span>{{ item.make }}</span></div>
@@ -205,12 +247,16 @@
               <div class="flex justify-between"><span>Kilometraje</span><span>{{ item.km }}</span></div>
               <div class="flex justify-between"><span>Sucursal</span><span>{{ getCheckStore(item.store) }}</span></div>
               <div class="flex justify-between font-semibold">
-                <span>Precio</span>
-                <span>{{ item.sale_price | currency:'MXN':'symbol':'1.2-2':'en-US' }}</span>
+                <span>Precio actual</span>
+                <span>{{ item.sale_price != null ? (item.sale_price | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Precio anterior</span>
+                <span>{{ getPreviousPrice(item) != null ? (getPreviousPrice(item) | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}</span>
               </div>
               <div class="flex justify-between">
                 <span>Bono</span>
-                <span>{{ item.bono | currency:'MXN':'symbol':'1.2-2':'en-US' }}</span>
+                <span>{{ formatCurrencyOrText(item.bono) }}</span>
               </div>
               <div class="flex justify-between">
                 <span>Comision</span>
@@ -220,6 +266,29 @@
                 <span>Estatus</span>
                 <span>{{ item.status }}</span>
               </div>
+              <div class="flex justify-between items-center" (click)="$event.stopPropagation()" (dblclick)="$event.stopPropagation()">
+                <span>Acciones</span>
+                <div class="flex items-center gap-1">
+                  <button
+                    type="button"
+                    matTooltip="Ver documentos"
+                    matTooltipClass="bg-background text-foreground"
+                    (click)="openDocumentsModal($event, item)"
+                    class="h-7 w-7 rounded-md text-primary hover:bg-primary/10 flex items-center justify-center transition"
+                  >
+                    <mat-icon class="text-[18px] leading-none">attach_file</mat-icon>
+                  </button>
+                  <button
+                    type="button"
+                    matTooltip="Revision de llegada"
+                    matTooltipClass="bg-background text-foreground"
+                    (click)="openArriveModal($event, item)"
+                    class="h-7 w-7 rounded-md text-primary hover:bg-primary/10 flex items-center justify-center transition"
+                  >
+                    <mat-icon class="text-[18px] leading-none">check</mat-icon>
+                  </button>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -227,7 +296,7 @@
         </div>
       </div>
 
-      <div class="text-foreground text-[15px] w-full flex justify-center items-center" *ngIf="list?.length === 0">
+      <div class="text-foreground text-[15px] w-full flex justify-center items-center" *ngIf="loadingModal && list?.length === 0">
         No hay datos
       </div>
 

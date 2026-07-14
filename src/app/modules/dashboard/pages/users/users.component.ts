@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
@@ -8,11 +9,11 @@ import { UsersService } from 'src/app/core/services/users/users.service';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
 import { UsersModalComponent } from '../../modals/users-modal/users-modal.component';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
-import { deleteUser } from 'firebase/auth';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-users',
-  imports: [TableComponent, MatDialogModule],
+  imports: [CommonModule, TableComponent, MatDialogModule],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css'
 })
@@ -26,7 +27,7 @@ export class UsersComponent {
     { key: 'address_street_1', type: 'text' },
   ]
 
-  readonly actions: RowAction[] = [
+  private readonly baseActions: RowAction[] = [
     { icon: 'edit',  id: 'edit',  label: 'Editar' },
     { icon: 'delete', id: 'delete', label: 'Eliminar' },
   ];
@@ -52,19 +53,45 @@ export class UsersComponent {
   constructor(
     private _MatDialog: MatDialog,
     private _UsersService: UsersService,
-    private _ToastrService: ToastrService
+    private _ToastrService: ToastrService,
+    private _PermissionsService: PermissionsService
   ) {}
+
+  get canCreateUser() {
+    return this._PermissionsService.hasScopes(['USER.ADD']);
+  }
+
+  get canEditUser() {
+    return this._PermissionsService.hasScopes(['USER.UPDATE']);
+  }
+
+  get canDeleteUserPermission() {
+    return this._PermissionsService.hasScopes(['USER.DELETE']);
+  }
+
+  get actions(): RowAction[] {
+    return this.baseActions.filter((action) => {
+      if (action.id === 'edit') return this.canEditUser;
+      if (action.id === 'delete') return this.canDeleteUserPermission;
+      return true;
+    });
+  }
 
   ngOnInit() {
     this.getUsers();
   }
 
   onRowAction(e: RowActionEvent<any>) {
+    if (e.id === 'edit' && !this.canEditUser) return;
+    if (e.id === 'delete' && !this.canDeleteUserPermission) return;
     if (e.id === 'edit')  this.openModal(e.id,e.row);
     if (e.id === 'delete') this.actionModal(e.id,e.row, 'Desea eliminar el registro?');
   }
 
   openModal(action: string, data: any) {
+    if (action === 'new' && !this.canCreateUser) return;
+    if (action === 'edit' && !this.canEditUser) return;
+
     let dataSend = {action, row: data};
     const dialogRef = this._MatDialog.open(UsersModalComponent, {
       disableClose: true,
@@ -83,6 +110,8 @@ export class UsersComponent {
   }
 
   actionModal(action: string, data: any, msg: string, color: string = '!text-red-500', icon = 'delete') {
+    if (action === 'delete' && !this.canDeleteUserPermission) return;
+
     let dataSend = {action, row: data, msg, color, icon};
     const ref: any = this._MatDialog.open(ActionMessageComponent, {
       data: dataSend,

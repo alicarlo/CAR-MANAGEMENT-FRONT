@@ -1,0 +1,10 @@
+.sales-date-input::-webkit-calendar-picker-indicator {
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sales-date-input::-webkit-inner-spin-button,
+.sales-date-input::-webkit-clear-button {
+  display: none;
+}

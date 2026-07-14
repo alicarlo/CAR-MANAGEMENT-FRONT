@@ -73,5 +73,46 @@ export class IncomeService {
       catchError(this.error.handleError)
     );
   }
-}
 
+  public getIncomesFiltered(
+    pageSize?: number,
+    currentPage?: number,
+    filters: any = {},
+    dateFrom: string = '',
+    dateTo: string = ''
+  ): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+
+    const params: string[] = [];
+    const hasFilters = filters && Object.keys(filters).length > 0;
+
+    if (hasFilters) {
+      params.push(`filters=${encodeURIComponent(JSON.stringify(filters))}`);
+    }
+
+    if (currentPage != null) {
+      params.push(`page=${currentPage}`);
+    }
+
+    if (pageSize != null) {
+      params.push(`limit=${pageSize}`);
+    }
+
+    params.push('sort_by=updated_at');
+
+    if (dateFrom) {
+      params.push(`date_from=${encodeURIComponent(dateFrom)}`);
+    }
+
+    if (dateTo) {
+      params.push(`date_to=${encodeURIComponent(dateTo)}`);
+    }
+
+    return this.http.get<any>(`${environment.apiUrl}/income/?${params.join('&')}` ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+}

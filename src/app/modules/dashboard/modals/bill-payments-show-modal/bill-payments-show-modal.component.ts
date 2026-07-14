@@ -10,6 +10,7 @@ import { ShopingService } from 'src/app/core/services/shoping/shoping.service';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
 import { PaymentsAddModalComponent } from '../payments-add-modal/payments-add-modal.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-bill-payments-show-modal',
@@ -32,7 +33,20 @@ loadingModal: boolean = false;
     private _ToastrService: ToastrService,
     private _ShopingService: ShopingService,
     private _MatDialog: MatDialog,
+    public permissionsService: PermissionsService
   ) { }
+
+  canDownloadPaymentDocument() {
+    return this.permissionsService.hasScope('PAYMENT.GET');
+  }
+
+  canEditPayment() {
+    return this.permissionsService.hasScope('PAYMENT.UPDATE');
+  }
+
+  canDeletePayment() {
+    return this.permissionsService.hasScope('PAYMENT.DELETE');
+  }
 
   ngOnInit(): void {
     if (this.data.flag === 0) {

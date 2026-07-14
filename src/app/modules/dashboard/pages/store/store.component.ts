@@ -8,6 +8,7 @@ import { StoreService } from 'src/app/core/services/store/store.service';
 import { StoreModalComponent } from '../../modals/store-modal/store-modal.component';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-store',
@@ -27,8 +28,8 @@ export class StoreComponent {
   ]
 
   readonly actions: RowAction[] = [
-    { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Eliminar' },
+    { icon: 'edit',  id: 'edit',  label: 'Editar', scope: 'STORE.UPDATE' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar', scope: 'STORE.DELETE' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -52,7 +53,8 @@ export class StoreComponent {
   constructor(
     private _MatDialog: MatDialog,
     private _StoreService: StoreService,
-    private _ToastrService: ToastrService
+    private _ToastrService: ToastrService,
+    public permissionsService: PermissionsService
   ) {}
 
   ngOnInit() {

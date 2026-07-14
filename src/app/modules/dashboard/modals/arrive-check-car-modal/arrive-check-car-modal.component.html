@@ -3,7 +3,7 @@
     <div  class="flex flex-col gap-4">
       <div class="flex justify-between items-center">
         <p class="text-foreground font-semibold">Revision de llegada</p>
-        <app-button *ngIf="!isArriveEmpty()" (click)="editModal()" full impact="bold" tone="primary" shape="rounded" size="small">Editar</app-button>
+        <app-button *ngIf="!data?.readOnly && !isArriveEmpty()" (click)="editModal()" full impact="bold" tone="primary" shape="rounded" size="small">Editar</app-button>
       </div>
       
       

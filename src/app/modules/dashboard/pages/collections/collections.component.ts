@@ -35,7 +35,7 @@ export class CollectionsComponent {
   ]
 
   readonly actions: RowAction[] = [
-    { icon: 'search',  id: 'search',  label: 'Visualizar Pagos por cobrar' },
+    { icon: 'search',  id: 'search',  label: 'Visualizar Pagos por cobrar', scope: 'COLLECTIONS.GET' },
   ];
 
 

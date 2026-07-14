@@ -1,0 +1,11 @@
+.shopping-date-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+  -webkit-appearance: none;
+}
+
+.shopping-date-input::-webkit-inner-spin-button,
+.shopping-date-input::-webkit-clear-button {
+  display: none;
+  -webkit-appearance: none;
+}

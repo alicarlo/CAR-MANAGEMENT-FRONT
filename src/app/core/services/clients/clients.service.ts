@@ -33,11 +33,23 @@ export class ClientsService {
     );
   }
 
-  public getClient(pageSize?: number, currentPage?: number): Observable<Clients> {
+  public getClientApart(pageSize?: number, currentPage?: number): Observable<Clients> {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
-    return this.http.get<Clients>(`${environment.apiUrl}/client/?column=status&value=active&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+
+    return this.http.get<Clients>(`${environment.apiUrl}/client/layaways?column=status&value=active&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
+  public getClient(pageSize?: number, currentPage?: number, filters: any = {}): Observable<Clients> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    const filtersSend = Object.keys(filters).length === 0 ? '' : `filters=${JSON.stringify(filters)}&`;
+    return this.http.get<Clients>(`${environment.apiUrl}/client/?${filtersSend}page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
       retry(0),
       catchError(this.error.handleError)
     );

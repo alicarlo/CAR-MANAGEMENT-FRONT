@@ -8,6 +8,7 @@ import { TypeCarsService } from 'src/app/core/services/typeCars/type-cars.servic
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
 import { TypeCarsModalComponent } from '../../modals/type-cars-modal/type-cars-modal.component';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-typ-cars',
@@ -27,8 +28,8 @@ export class TypCarsComponent {
   ]
 
   readonly actions: RowAction[] = [
-    { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Eliminar' },
+    { icon: 'edit',  id: 'edit',  label: 'Editar', scope: 'CATALOGOS.CAR_TYPE.UPDATE' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar', scope: 'CATALOGOS.CAR_TYPE.DELETE' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -52,7 +53,8 @@ export class TypCarsComponent {
   constructor(
     private _MatDialog: MatDialog,
     private _TypeCarsService: TypeCarsService,
-    private _ToastrService: ToastrService
+    private _ToastrService: ToastrService,
+    public permissionsService: PermissionsService
   ) {}
 
   ngOnInit() {

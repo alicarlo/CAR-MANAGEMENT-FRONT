@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
 import { LoginUser, UserResponse, UserSet } from 'src/app/core/models/auth.model';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({  
   selector: 'app-sign-in',
@@ -26,6 +27,7 @@ export class SignInComponent implements OnInit {
     private readonly _router: Router,
     private _ToastrService: ToastrService,
     private _AuthService: AuthService,
+    private _PermissionsService: PermissionsService,
   ) {}
 
   ngOnInit(): void {
@@ -61,7 +63,7 @@ export class SignInComponent implements OnInit {
           const { full_name, role, scope_list, user_id } = response;
           const payload: UserPayload = { full_name, role, scope_list, user_id };
           this._AuthService.setSession(response.access_token, payload);
-          this._router.navigate(['/layout']);
+          this._router.navigateByUrl(this._PermissionsService.getFirstAllowedDashboardRoute());
           this._ToastrService.success('Bienvenido', 'Exito');
         }
         this.loading = false;

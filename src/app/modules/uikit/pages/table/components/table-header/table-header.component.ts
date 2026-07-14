@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AngularSvgIconModule } from 'angular-svg-icon';
+import { TableDensityService } from 'src/app/core/services/table-density.service';
 
 @Component({
   selector: '[app-table-header]',
@@ -12,7 +13,7 @@ export class TableHeaderComponent {
   @Output() onCheck = new EventEmitter<boolean>();
   @Input() columns!: any[];
   @Input() stickyActions: boolean = true;
-  constructor() {}
+  constructor(public tableDensityService: TableDensityService) {}
   
   public toggle(event: Event) {
     const value = (event.target as HTMLInputElement).checked;

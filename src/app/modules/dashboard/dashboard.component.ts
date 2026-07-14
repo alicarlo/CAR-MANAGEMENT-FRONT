@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -7,7 +8,15 @@ import { RouterOutlet } from '@angular/router';
     imports: [RouterOutlet]
 })
 export class DashboardComponent implements OnInit {
-  constructor() {}
+  constructor(
+    private _Router: Router,
+    private _PermissionsService: PermissionsService
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    const currentUrl = this._Router.url.replace(/\/+$/, '');
+    if (currentUrl === '/layout/dashboard') {
+      this._Router.navigateByUrl(this._PermissionsService.getFirstAllowedDashboardRoute());
+    }
+  }
 }

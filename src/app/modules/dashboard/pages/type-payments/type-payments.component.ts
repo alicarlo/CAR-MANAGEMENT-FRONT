@@ -8,6 +8,7 @@ import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-messa
 import { TypePaymentsService } from 'src/app/core/services/typePayments/type-payments.service';
 import { TypePayments } from 'src/app/core/models/typePayments.model';
 import { TypePaymentsModalComponent } from '../../modals/type-payments-modal/type-payments-modal.component';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-type-payments',
@@ -27,8 +28,8 @@ export class TypePaymentsComponent {
   ]
 
   readonly actions: RowAction[] = [
-    { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Eliminar' },
+    { icon: 'edit',  id: 'edit',  label: 'Editar', scope: 'CATALOGOS.PAYMENT_METHOD.UPDATE' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar', scope: 'CATALOGOS.PAYMENT_METHOD.DELETE' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -52,7 +53,8 @@ export class TypePaymentsComponent {
   constructor(
     private _MatDialog: MatDialog,
     private _TypePaymentsService: TypePaymentsService,
-    private _ToastrService: ToastrService
+    private _ToastrService: ToastrService,
+    public permissionsService: PermissionsService
   ) {}
 
   ngOnInit() {

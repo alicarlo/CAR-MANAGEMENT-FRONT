@@ -38,7 +38,15 @@ export class Menu {
           children: [
             { label: 'Lista de precios', route: '/layout/dashboard/price-list' },
             { label: 'Lista de documentos', route: '/layout/dashboard/documents-list' },
+            { label: 'Tiempo en Piso', route: '/layout/dashboard/floor-time' },
+            { label: 'Reporte de ventas', route: '/layout/dashboard/report-sales' },
+            { label: 'Reporte de comisiones', route: '/layout/dashboard/report-comisions' },
           ],
+        },
+        {
+          icon: 'assets/icons/heroicons/outline/cog.svg',
+          label: 'Configuracion',
+          route: '/layout/dashboard/configuration',
         },
         {
           icon: 'assets/icons/heroicons/outline/user-groups.svg',

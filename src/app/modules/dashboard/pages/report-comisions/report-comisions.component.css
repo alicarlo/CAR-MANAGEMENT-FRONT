@@ -1,0 +1,10 @@
+.report-comisions-date-input::-webkit-calendar-picker-indicator {
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.report-comisions-date-input::-webkit-inner-spin-button,
+.report-comisions-date-input::-webkit-clear-button {
+  display: none;
+}

@@ -1,5 +1,8 @@
+import { CommonModule } from '@angular/common';
 import { Component, model } from '@angular/core';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 import { RowAction, RowActionEvent } from 'src/app/core/models/actions.model';
@@ -15,15 +18,35 @@ import { SalesModalComponent } from '../../modals/sales-modal/sales-modal.compon
 import { SalesService } from 'src/app/core/services/sales/sales.service';
 import moment from 'moment';
 import { TicketPrintModalComponent } from '../../modals/ticket-print-modal/ticket-print-modal.component';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
+import { StoreService } from 'src/app/core/services/store/store.service';
 
 @Component({
   selector: 'app-sales',
-  imports: [TableComponent, MatDialogModule],
+  imports: [TableComponent, MatDialogModule, CommonModule, FormsModule, ReactiveFormsModule, MatIconModule],
   templateUrl: './sales.component.html',
   styleUrl: './sales.component.css'
 })
 export class SalesComponent {
   sales: any[] = [];
+  store: any[] = [];
+  filteredStore: any[] = [];
+  storeFilterControl = new FormControl('');
+  storeDropdownOpen = false;
+  selectedStoreLabel = '';
+  store_id: any = null;
+
+  clientNameFilterControl = new FormControl('');
+  clientPhoneFilterControl = new FormControl('');
+  clientRfcFilterControl = new FormControl('');
+  keyFilterControl = new FormControl('');
+  makeFilterControl = new FormControl('');
+  modelFilterControl = new FormControl('');
+  versionFilterControl = new FormControl('');
+  colorFilterControl = new FormControl('');
+  date_from: string = '';
+  date_to: string = '';
+  filterSelects: any = {};
   laywaySelected: TypeExpense | undefined;
   salesHeader: string[] = ['Asesor','Cliente', 'Auto','Fecha de entrega', 'Hora de entrega', 'Precio de venta'];
   columns: any = [
@@ -47,11 +70,12 @@ export class SalesComponent {
     
   ]
   readonly actions: RowAction[] = [
-    { icon: 'delete', id: 'delete', label: 'Eliminar venta' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar venta', scope: 'SALE.DELETE' },
     // { icon: 'file_copy', id: 'contract', label: 'Descargar contrato' },
     // { icon: 'print', id: 'print', label: 'Imprimir ticket' },
-    { icon: 'description',  id: 'ticketContado',  label: 'Contrato de venta a contado' },
-    { icon: 'file_copy',  id: 'ticketCredito',  label: 'Contrato de venta a credito' },
+    { icon: 'receipt_long', id: 'saleTicket', label: 'Descargar ticket', scope: 'SALE.GET' },
+    { icon: 'description',  id: 'ticketContado',  label: 'Contrato de venta a contado', scope: 'SALE.GET' },
+    { icon: 'file_copy',  id: 'ticketCredito',  label: 'Contrato de venta a credito', scope: 'SALE.GET' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -75,17 +99,29 @@ export class SalesComponent {
   constructor(
     private _MatDialog: MatDialog,
     private _ToastrService: ToastrService,
-    private _SalesService : SalesService 
+    private _SalesService : SalesService,
+    private _StoreService: StoreService,
+    public permissionsService: PermissionsService
   ) {}
 
   ngOnInit() {
+    this.getStore();
     this.getSale();
+
+    this.storeFilterControl.valueChanges.subscribe(term => {
+      const value = (term || '').toString().toLowerCase().trim();
+
+      this.filteredStore = this.store.filter((data: any) =>
+        `${data.name}`.toLowerCase().includes(value)
+      );
+    });
   }
 
   onRowAction(e: RowActionEvent<any>) {
     if (e.id === 'search') this.openShowModal(e.id,e.row);
     if (e.id === 'delete') this.actionModal(e.id,e.row, 'Desea eliminar el registro?');
     // if (e.id === 'contract') this.actionModal(e.id,e.row, 'Desea descargar el contrato?', '!text-blue-500', 'description');
+    if (e.id === 'saleTicket')  this.openTicketModal(e.id,e.row,6);
     if (e.id === 'ticketContado')  this.openTicketModal(e.id,e.row,3);
     if (e.id === 'ticketCredito')  this.openTicketModal(e.id,e.row,4);
   }
@@ -198,6 +234,97 @@ export class SalesComponent {
     this.getSale();
   }
 
+  getStore() {
+    this._StoreService.getStore(500, 1).subscribe({
+      next: async (response: any) => {
+        if (response) {
+          this.store = response.items.map((r: any) => ({ ...r }));
+          this.filteredStore = [...this.store];
+        }
+      },
+      error: (err) => {
+        if (err.error === 'Token expired') return;
+        this._ToastrService.error(err.error, 'Error');
+      },
+    });
+  }
+
+  toggleStoreDropdown() {
+    this.storeDropdownOpen = !this.storeDropdownOpen;
+    if (this.storeDropdownOpen) {
+      this.storeFilterControl.setValue('');
+      this.filteredStore = [...this.store];
+    }
+  }
+
+  closeStoreDropdown() {
+    this.storeDropdownOpen = false;
+  }
+
+  selectStore(data: any) {
+    this.selectedStoreLabel = data !== null ? `${data.name}` : 'Todos';
+    this.store_id = data !== null ? data.id : '';
+    this.closeStoreDropdown();
+  }
+
+  openPicker(input: HTMLInputElement) {
+    if (typeof input.showPicker === 'function') {
+      input.showPicker();
+      return;
+    }
+    input.focus();
+    input.click();
+  }
+
+  filterGo() {
+    const carFilter = Object.fromEntries(
+      Object.entries({
+        store_id: this.store_id,
+        key: this.keyFilterControl.value,
+        make: this.makeFilterControl.value,
+        model: this.modelFilterControl.value,
+        version: this.versionFilterControl.value,
+        color: this.colorFilterControl.value,
+      }).filter(([_, v]) => v != null && v !== '')
+    );
+
+    const clientFilter = Object.fromEntries(
+      Object.entries({
+        full_name: this.clientNameFilterControl.value,
+        phone: this.clientPhoneFilterControl.value,
+        rfc: this.clientRfcFilterControl.value,
+      }).filter(([_, v]) => v != null && v !== '')
+    );
+
+    this.filterSelects = Object.fromEntries(
+      Object.entries({
+        car: Object.keys(carFilter).length ? carFilter : null,
+        client: Object.keys(clientFilter).length ? clientFilter : null,
+      }).filter(([_, v]) => v != null)
+    );
+
+    this.currentPage = 1;
+    this.getSale();
+  }
+
+  clearFilters() {
+    this.store_id = null;
+    this.selectedStoreLabel = '';
+    this.clientNameFilterControl.setValue('');
+    this.clientPhoneFilterControl.setValue('');
+    this.clientRfcFilterControl.setValue('');
+    this.keyFilterControl.setValue('');
+    this.makeFilterControl.setValue('');
+    this.modelFilterControl.setValue('');
+    this.versionFilterControl.setValue('');
+    this.colorFilterControl.setValue('');
+    this.date_from = '';
+    this.date_to = '';
+    this.filterSelects = {};
+    this.currentPage = 1;
+    this.getSale();
+  }
+
   openModal(action: string, data: any) {
     let dataSend = {action, row: data};
     const dialogRef = this._MatDialog.open(SalesModalComponent, {
@@ -215,7 +342,7 @@ export class SalesComponent {
 
   getSale() {
     this.loading = false;
-    this._SalesService.getSale(this.pageSize, this.currentPage).subscribe({
+    this._SalesService.getSalesFiltered(this.pageSize, this.currentPage, this.filterSelects, this.date_from, this.date_to).subscribe({
       next: async (response: any) => {
         if(response) {
           

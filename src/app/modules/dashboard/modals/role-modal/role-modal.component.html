@@ -1,23 +1,23 @@
-<mat-dialog-content>
-  <div class="p-[20px]">
-    <div  class="flex flex-col gap-4">
+<mat-dialog-content class="!max-h-none h-full">
+  <div class="h-full p-[20px]">
+    <div class="flex h-full flex-col gap-4">
       <p class="text-foreground font-semibold">Roles</p>
 
-      <div>
-        <form  [formGroup]="saveForm" class="flex flex-col gap-6">
-          <div class="flex flex-col">
+      <div class="min-h-0 flex-1">
+        <form [formGroup]="saveForm" class="flex h-full flex-col gap-6">
+          <div class="flex min-h-0 flex-1 flex-col">
             <div class="flex flex-col gap-2">
               <p class="text-foreground text-[11px] font-medium">Nombre:</p>
               <input
                 class="py-2 pl-8 pr-2"
                 placeholder="Nombre"
                 type="text"
-                formControlName="name" 
+                formControlName="name"
               />
               <div class="error-messages">
                 <ng-container *ngFor="let error of error_messages.name">
                   <div class="error-message" *ngIf="saveForm.get('name').hasError(error.type) && (saveForm.get('name').dirty || saveForm.get('name').touched)">
-                    {{error.message}}
+                    {{ error.message }}
                   </div>
                 </ng-container>
               </div>
@@ -29,52 +29,277 @@
                 class="py-2 pl-8 pr-2"
                 placeholder="Descripcion"
                 type="text"
-                formControlName="descriptions" 
+                formControlName="descriptions"
               />
               <div class="error-messages">
                 <ng-container *ngFor="let error of error_messages.descriptions">
                   <div class="error-message" *ngIf="saveForm.get('descriptions').hasError(error.type) && (saveForm.get('descriptions').dirty || saveForm.get('descriptions').touched)">
-                    {{error.message}}
+                    {{ error.message }}
                   </div>
                 </ng-container>
               </div>
             </div>
 
-            <div class="flex flex-col gap-2">
-              <label class="text-foreground text-[11px] font-medium">Scopes:</label>
+            <div class="flex min-h-0 flex-1 flex-col gap-3">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-col gap-1">
+                  <label class="text-foreground text-[11px] font-medium">Scopes:</label>
+                  <span class="text-muted-foreground text-[11px]">{{ selectedLabel() }}</span>
+                </div>
 
-              <div class="relative" (click)="$event.stopPropagation()">
-                <button type="button"
-                  (click)="open = !open"
-                  class="w-full py-1 pl-8 pr-2 rounded-md
-                    bg-background text-foreground
-                    border border-border
-                    focus:outline-none focus:ring-2 focus:ring-primary/50
-                    appearance-none [color-scheme:dark] relative text-left"
-                >
-                  <span class="truncate text-[12px]">{{ selectedLabel() }}</span>
-                  <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">▾</span>
-                </button>
+                <div class="flex rounded-md border border-border bg-background p-1">
+                  <button
+                    type="button"
+                    class="rounded px-3 py-1.5 text-[11px] font-medium transition"
+                    [ngClass]="permissionsViewMode === 'modules' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'"
+                    (click)="setPermissionsViewMode('modules')"
+                  >
+                    Por modulo
+                  </button>
+                  <button
+                    type="button"
+                    class="rounded px-3 py-1.5 text-[11px] font-medium transition"
+                    [ngClass]="permissionsViewMode === 'components' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'"
+                    (click)="setPermissionsViewMode('components')"
+                  >
+                    Por componente
+                  </button>
+                </div>
+              </div>
 
-                <div *ngIf="open" class="fixed inset-0 z-40" (click)="open = false"></div>
+              <div *ngIf="permissionsViewMode === 'modules'" class="grid min-h-0 flex-1 gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
+                <div class="border border-border rounded-md bg-background p-2 h-full overflow-auto">
+                  <div class="flex flex-col gap-2">
+                    <button
+                      *ngFor="let module of scopeModules; trackBy: trackByModule"
+                      type="button"
+                      (click)="setActiveModule(module.key)"
+                      class="w-full rounded-md border px-3 py-2 text-left transition"
+                      [ngClass]="activeModuleKey === module.key ? 'border-primary bg-primary/10' : 'border-border hover:bg-muted/30'"
+                    >
+                      <div class="flex flex-col gap-1">
+                        <div class="flex items-center justify-between gap-2">
+                          <span class="text-foreground text-[12px] font-medium">{{ module.label }}</span>
+                          <span
+                            class="rounded-full px-2 py-[2px] text-[10px]"
+                            [ngClass]="getSelectedCount(module.scopeIds) > 0 ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'"
+                          >
+                            {{ getSelectedCount(module.scopeIds) }}/{{ module.scopeIds.length }}
+                          </span>
+                        </div>
 
-                <div *ngIf="open"
-                    class="absolute z-50 mt-1 w-full max-h-60 overflow-auto
-                            rounded-md bg-background border border-border shadow">
-                  <ul class="py-1">
-                    <li *ngFor="let s of scopes; trackBy: trackById" class="px-2 py-1 hover:bg-muted/30">
-                      <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox"
-                              class="accent-primary"
-                              [checked]="isChecked(s.id)"
-                              (change)="toggleScope(s.id)">
-                        <span class="text-foreground text-[12px]">{{ s.name }}</span>
-                      </label>
-                    </li>
-                  </ul>
-                  <div class="p-2 border-t border-border flex justify-end">
-                    <app-button (click)="open = false" impact="bold" tone="primary" shape="rounded" size="small">Aceptar</app-button>
+                        <span *ngIf="module.usageLabels.length" class="text-muted-foreground text-[10px] leading-tight">
+                          Se usa en: {{ getUsageText(module.usageLabels) }}
+                        </span>
+                      </div>
+                    </button>
                   </div>
+                </div>
+
+                <div class="border border-border rounded-md bg-background p-4 h-full overflow-auto">
+                  <ng-container *ngIf="getActiveModule() as activeModule; else emptyState">
+                    <div class="flex items-start justify-between gap-4 border-b border-border pb-3">
+                      <div class="flex flex-col gap-1">
+                        <p class="text-foreground font-semibold">{{ activeModule.label }}</p>
+                        <p class="text-muted-foreground text-[12px]">
+                          {{ getSelectedCount(activeModule.scopeIds) }} de {{ activeModule.scopeIds.length }} permisos seleccionados
+                        </p>
+                        <p *ngIf="activeModule.usageLabels.length" class="text-muted-foreground text-[11px] leading-tight">
+                          Se usa en: {{ getUsageText(activeModule.usageLabels) }}
+                        </p>
+                      </div>
+
+                      <label class="flex items-center gap-2 text-[12px] text-foreground cursor-pointer">
+                        <input
+                          type="checkbox"
+                          class="accent-primary"
+                          [checked]="isAllChecked(activeModule.scopeIds)"
+                          [indeterminate]="isIndeterminate(activeModule.scopeIds)"
+                          (change)="toggleScopeGroup(activeModule.scopeIds)"
+                        />
+                        <span>Seleccionar modulo</span>
+                      </label>
+                    </div>
+
+                    <div class="mt-4 flex flex-col gap-4">
+                      <div *ngIf="activeModule.directScopes.length" class="rounded-md border border-border p-3">
+                        <div class="mb-3 flex items-center justify-between gap-3">
+                          <p class="text-foreground text-[12px] font-semibold">Permisos principales</p>
+                          <label class="flex items-center gap-2 text-[11px] text-muted-foreground cursor-pointer">
+                            <input
+                              type="checkbox"
+                              class="accent-primary"
+                              [checked]="isAllChecked(getDirectScopeIds(activeModule))"
+                              [indeterminate]="isIndeterminate(getDirectScopeIds(activeModule))"
+                              (change)="toggleScopeGroup(getDirectScopeIds(activeModule))"
+                            />
+                            <span>Todo</span>
+                          </label>
+                        </div>
+
+                        <div class="grid gap-2 md:grid-cols-2">
+                          <label
+                            *ngFor="let scope of activeModule.directScopes; trackBy: trackById"
+                            class="flex items-start gap-3 rounded-md border border-border px-3 py-2 hover:bg-muted/20"
+                            [ngClass]="isMissingScope(scope) ? 'cursor-not-allowed opacity-55' : 'cursor-pointer'"
+                          >
+                            <input
+                              type="checkbox"
+                              class="mt-1 accent-primary"
+                              [disabled]="isMissingScope(scope)"
+                              [checked]="isChecked(scope.id)"
+                              (change)="toggleScope(scope.id)"
+                            />
+                            <span class="flex flex-col">
+                              <span class="text-foreground text-[12px] font-medium">{{ scope.permissionLabel }}</span>
+                              <span class="text-muted-foreground text-[11px]">{{ getScopeStatusLabel(scope) }}</span>
+                              <span class="text-primary text-[10px] font-semibold tracking-wide">{{ scope.name }}</span>
+                              <span *ngIf="scope.usageLabels.length" class="mt-2 text-muted-foreground text-[10px] leading-tight">
+                                Se usa en: {{ getUsageText(scope.usageLabels) }}
+                              </span>
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div
+                        *ngFor="let submodule of activeModule.submodules; trackBy: trackBySubmodule"
+                        class="rounded-md border border-border p-3"
+                      >
+                        <div class="mb-3 flex items-center justify-between gap-3">
+                          <div>
+                            <p class="text-foreground text-[12px] font-semibold">{{ submodule.label }}</p>
+                            <p class="text-muted-foreground text-[11px]">
+                              {{ getSelectedCount(submodule.scopeIds) }} de {{ submodule.scopeIds.length }} permisos seleccionados
+                            </p>
+                          </div>
+
+                          <label class="flex items-center gap-2 text-[11px] text-muted-foreground cursor-pointer">
+                            <input
+                              type="checkbox"
+                              class="accent-primary"
+                              [checked]="isAllChecked(submodule.scopeIds)"
+                              [indeterminate]="isIndeterminate(submodule.scopeIds)"
+                              (change)="toggleScopeGroup(submodule.scopeIds)"
+                            />
+                            <span>Todo</span>
+                          </label>
+                        </div>
+
+                        <div class="grid gap-2 md:grid-cols-2">
+                          <label
+                            *ngFor="let scope of submodule.scopes; trackBy: trackById"
+                            class="flex items-start gap-3 rounded-md border border-border px-3 py-2 hover:bg-muted/20"
+                            [ngClass]="isMissingScope(scope) ? 'cursor-not-allowed opacity-55' : 'cursor-pointer'"
+                          >
+                            <input
+                              type="checkbox"
+                              class="mt-1 accent-primary"
+                              [disabled]="isMissingScope(scope)"
+                              [checked]="isChecked(scope.id)"
+                              (change)="toggleScope(scope.id)"
+                            />
+                            <span class="flex flex-col">
+                              <span class="text-foreground text-[12px] font-medium">{{ scope.permissionLabel }}</span>
+                              <span class="text-muted-foreground text-[11px]">{{ getScopeStatusLabel(scope) }}</span>
+                              <span class="text-primary text-[10px] font-semibold tracking-wide">{{ scope.name }}</span>
+                              <span *ngIf="scope.usageLabels.length" class="mt-2 text-muted-foreground text-[10px] leading-tight">
+                                Se usa en: {{ getUsageText(scope.usageLabels) }}
+                              </span>
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+
+                  <ng-template #emptyState>
+                    <div class="flex h-full min-h-[360px] items-center justify-center">
+                      <p class="text-muted-foreground text-[12px]">No hay scopes disponibles.</p>
+                    </div>
+                  </ng-template>
+                </div>
+              </div>
+
+              <div *ngIf="permissionsViewMode === 'components'" class="grid min-h-0 flex-1 gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
+                <div class="border border-border rounded-md bg-background p-2 h-full overflow-auto">
+                  <div class="flex flex-col gap-2">
+                    <button
+                      *ngFor="let component of componentScopeGroups; trackBy: trackByComponent"
+                      type="button"
+                      (click)="setActiveComponent(component.key)"
+                      class="w-full rounded-md border px-3 py-2 text-left transition"
+                      [ngClass]="activeComponentKey === component.key ? 'border-primary bg-primary/10' : 'border-border hover:bg-muted/30'"
+                    >
+                      <div class="flex items-center justify-between gap-2">
+                        <span class="text-foreground text-[12px] font-medium">{{ component.label }}</span>
+                        <span
+                          class="rounded-full px-2 py-[2px] text-[10px]"
+                          [ngClass]="getSelectedCount(component.scopeIds) > 0 ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'"
+                        >
+                          {{ getSelectedCount(component.scopeIds) }}/{{ component.scopeIds.length }}
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="border border-border rounded-md bg-background p-4 h-full overflow-auto">
+                  <ng-container *ngIf="getActiveComponent() as activeComponent; else emptyComponentState">
+                    <div class="flex items-start justify-between gap-4 border-b border-border pb-3">
+                      <div class="flex flex-col gap-1">
+                        <p class="text-foreground font-semibold">{{ activeComponent.label }}</p>
+                        <p class="text-muted-foreground text-[12px]">
+                          {{ getSelectedCount(activeComponent.scopeIds) }} de {{ activeComponent.scopeIds.length }} permisos seleccionados
+                        </p>
+                      </div>
+
+                      <label class="flex items-center gap-2 text-[12px] text-foreground cursor-pointer">
+                        <input
+                          type="checkbox"
+                          class="accent-primary"
+                          [checked]="isAllChecked(activeComponent.scopeIds)"
+                          [indeterminate]="isIndeterminate(activeComponent.scopeIds)"
+                          (change)="toggleScopeGroup(activeComponent.scopeIds)"
+                        />
+                        <span>Seleccionar componente</span>
+                      </label>
+                    </div>
+
+                    <div class="mt-4 grid gap-2 md:grid-cols-2">
+                      <label
+                        *ngFor="let scope of getComponentScopes(activeComponent); trackBy: trackById"
+                        class="flex items-start gap-3 rounded-md border border-border px-3 py-2 hover:bg-muted/20"
+                        [ngClass]="isMissingScope(scope) ? 'cursor-not-allowed opacity-55' : 'cursor-pointer'"
+                      >
+                        <input
+                          type="checkbox"
+                          class="mt-1 accent-primary"
+                          [disabled]="isMissingScope(scope)"
+                          [checked]="isChecked(scope.id)"
+                          (change)="toggleScope(scope.id)"
+                        />
+                        <span class="flex flex-col">
+                          <span class="text-foreground text-[12px] font-medium">{{ getComponentPermissionLabel(activeComponent.label, scope) }}</span>
+                          <span class="text-muted-foreground text-[11px]">
+                            {{ scope.moduleLabel }}<ng-container *ngIf="scope.submoduleLabel"> / {{ scope.submoduleLabel }}</ng-container>
+                          </span>
+                          <span class="text-muted-foreground text-[11px]">{{ getScopeStatusLabel(scope) }}</span>
+                          <span class="text-primary text-[10px] font-semibold tracking-wide">{{ scope.name }}</span>
+                          <span *ngIf="scope.usageLabels.length" class="mt-2 text-muted-foreground text-[10px] leading-tight">
+                            Se usa en: {{ getUsageText(scope.usageLabels) }}
+                          </span>
+                        </span>
+                      </label>
+
+                    </div>
+                  </ng-container>
+
+                  <ng-template #emptyComponentState>
+                    <div class="flex h-full min-h-[360px] items-center justify-center">
+                      <p class="text-muted-foreground text-[12px]">No hay componentes disponibles.</p>
+                    </div>
+                  </ng-template>
                 </div>
               </div>
             </div>
@@ -88,6 +313,6 @@
 <mat-dialog-actions align="end">
   <div class="flex gap-2 p-[20px]">
     <app-button [loading]="loading" (click)="save()" full impact="bold" tone="primary" shape="rounded" size="medium">Guardar</app-button>
-    <app-button [disabled]="loading"  mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
+    <app-button [disabled]="loading" mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">Cerrar</app-button>
   </div>
 </mat-dialog-actions>

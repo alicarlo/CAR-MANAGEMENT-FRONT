@@ -1,0 +1,131 @@
+<mat-dialog-content class="!p-0">
+  <div class="p-[15px]">
+    <div class="flex flex-col gap-4">
+      <p class="text-foreground font-semibold">Gastos</p>
+
+      <div class="mx-[25px]">
+        <label class="text-foreground text-[12px] font-medium">
+          InformaciÃ³n del Auto:
+        </label>
+
+        <div class="border border-border/60 rounded-lg bg-card p-2 flex flex-wrap gap-2">
+          <p class="text-foreground text-[11px]">
+            <strong>Clave:</strong> {{ data?.auto?.key || '-' }}
+          </p>
+
+          <p class="text-foreground text-[11px]">
+            <strong>Modelo:</strong> {{ data?.auto?.model || '-' }}
+          </p>
+
+          <p class="text-foreground text-[11px]">
+            <strong>Marca:</strong> {{ data?.auto?.make || '-' }}
+          </p>
+
+          <p class="text-foreground text-[11px]">
+            <strong>LÃ­nea:</strong> {{ data?.auto?.version || '-' }}
+          </p>
+
+          <p class="text-foreground text-[11px]">
+            <strong>Color:</strong> {{ data?.auto?.color || '-' }}
+          </p>
+
+          <p class="text-foreground text-[11px]">
+            <strong>Km:</strong> {{ data?.auto?.km ?? '-' }}
+          </p>
+
+          <p *ngIf="data?.auto?.cost_net != null" class="text-foreground text-[11px]">
+            <strong>Costo:</strong> {{ data?.auto?.cost_net | currency }}
+          </p>
+        </div>
+      </div>
+
+      <div *ngIf="totalBills > 0" class="ml-[25px]">
+        <p class="text-foreground font-semibold text-[12px]">Total de gastos:{{ totalBills | currency }}</p>
+        <p class="text-foreground font-semibold text-[12px]">Costo total:{{ sum | currency }}</p>
+      </div>
+
+      <div
+        class="
+          border
+          border-border/60
+          rounded-lg
+          bg-card m-[25px]
+          max-h-[310px]
+          overflow-y-auto
+          overflow-x-auto
+        "
+      >
+        <div class="">
+          <table class="w-full table-auto">
+            <thead>
+              <tr class="bg-muted/20 text-foreground/70 text-[11px] uppercase tracking-wide">
+                <th class="px-3 py-2 text-left whitespace-nowrap">Fecha</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Usuario</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Clasificacion de gasto</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Concepto</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Total</th>
+                <th class="px-3 py-2 text-left whitespace-nowrap">Estatus</th>
+              </tr>
+            </thead>
+
+            <tbody class="divide-y divide-border/40" *ngIf="bills?.length">
+              <tr
+                *ngFor="let item of bills"
+                class="text-foreground text-[12px] leading-tight hover:bg-background/60 transition"
+              >
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item.bill_date ? (item.bill_date | date:'dd/MM/yyyy':'UTC') : '-' }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item?.user?.full_name || '-' }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item?.classification_bill?.name || '-' }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  {{ item?.name || item?.description || '-' }}
+                </td>
+
+                <td class="px-3 py-2 align-middle text-left">
+                  {{ item?.total != null ? (item.total | currency:'MXN':'symbol':'1.2-2':'en-US') : '-' }}
+                </td>
+
+                <td class="px-3 py-2 align-middle whitespace-nowrap">
+                  <ng-container [ngSwitch]="item.status">
+                    <span *ngSwitchCase="'active'"
+                          class="inline-flex items-center rounded px-1.5 py-0.5 text-[11px] bg-green-500/10 text-green-600">
+                      Activo
+                    </span>
+                    <span *ngSwitchCase="'inactive'"
+                          class="inline-flex items-center rounded px-1.5 py-0.5 text-[11px] bg-rose-500/10 text-rose-600">
+                      Inactivo
+                    </span>
+                    <span *ngSwitchDefault
+                          class="inline-flex items-center rounded px-1.5 py-0.5 text-[11px] bg-muted/30 text-foreground/70">
+                      â€”
+                    </span>
+                  </ng-container>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="text-foreground text-[15px] w-full flex justify-center items-center" *ngIf="bills?.length === 0">
+        No hay Gastos
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <div class="flex gap-2 p-[20px]">
+    <app-button mat-dialog-close full impact="bold" tone="primary" shape="rounded" size="medium">
+      Cerrar
+    </app-button>
+  </div>
+</mat-dialog-actions>

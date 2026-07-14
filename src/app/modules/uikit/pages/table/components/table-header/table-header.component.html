@@ -1,15 +1,10 @@
 <ng-container>
-  <th class="w-[50px]">
+  <th [ngClass]="tableDensityService.classes().checkboxHead">
     <input (change)="toggle($event)" class="checkbox checkbox-sm" data-datatable-check="true" type="checkbox" />
   </th>
 
   <ng-container *ngFor="let col of columns">
-    <th class="px-4 py-2 whitespace-nowrap">{{ col }}</th>
+    <th [ngClass]="tableDensityService.classes().th">{{ col }}</th>
   </ng-container>
-  <th 
-    class="w-[60px]"
-    [ngClass]="stickyActions
-          ? 'sticky right-0 z-10 bg-card ]'
-          : ''"
-    ></th> 
+  <th [ngClass]="[tableDensityService.classes().checkboxHead, stickyActions ? 'sticky right-0 z-10 bg-card ]' : '']"></th> 
 </ng-container>

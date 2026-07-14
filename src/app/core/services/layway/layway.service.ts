@@ -32,11 +32,12 @@ export class LaywayService {
     );
   }
 
-  public getLayaway(pageSize?: number, currentPage?: number): Observable<any> {
+  public getLayaway(pageSize?: number, currentPage?: number, filters: any = {}): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
-    return this.http.get<any>(`${environment.apiUrl}/layaway/?column=status&value=apartado&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+    const filtersSend = Object.keys(filters).length === 0 ? '' : `filters=${JSON.stringify(filters)}&`;
+    return this.http.get<any>(`${environment.apiUrl}/layaway/all?${filtersSend}page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
       retry(0),
       catchError(this.error.handleError)
     );

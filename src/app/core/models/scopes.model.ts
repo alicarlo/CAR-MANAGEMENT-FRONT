@@ -1,7 +1,7 @@
 export interface Scopes {
   id: number,
-  name: number,
-  descriptions: string,
-  scope_parent: number,
+  name: string,
+  descriptions: string | null,
+  scope_parent: number | null,
   status: string
 }

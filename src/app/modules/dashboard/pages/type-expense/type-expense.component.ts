@@ -8,6 +8,7 @@ import { TypeExpenseService } from 'src/app/core/services/typeExpense/type-expen
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
 import { TypeExpenseModalComponent } from '../../modals/type-expense-modal/type-expense-modal.component';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-type-expense',
@@ -26,8 +27,8 @@ export class TypeExpenseComponent {
   ]
 
   readonly actions: RowAction[] = [
-    { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Eliminar' },
+    { icon: 'edit',  id: 'edit',  label: 'Editar', scope: 'CATALOGOS.BILL_TYPE.UPDATE' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar', scope: 'CATALOGOS.BILL_TYPE.DELETE' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -51,7 +52,8 @@ export class TypeExpenseComponent {
   constructor(
     private _MatDialog: MatDialog,
     private _TypeExpenseService: TypeExpenseService,
-    private _ToastrService: ToastrService
+    private _ToastrService: ToastrService,
+    public permissionsService: PermissionsService
   ) {}
 
   ngOnInit() {

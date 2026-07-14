@@ -8,6 +8,7 @@
   </div>
   <div class="inline-block space-x-4">
     <button 
+      [hidden]="!permissionsService.hasScope('CATALOGOS.DOCUMENT_TYPE.ADD')"
       class="bg-primary text-primary-foreground flex-none rounded-md px-4 py-2.5 text-xs font-semibold"
       (click)="openModal('new', null)"
     >

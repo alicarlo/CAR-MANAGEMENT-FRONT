@@ -7,6 +7,8 @@ import { RowAction } from 'src/app/core/models/actions.model';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CapitalizePipe } from 'src/app/core/pipes/capitalize.pipe';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
+import { TableDensityService } from 'src/app/core/services/table-density.service';
 
 type ShowRule = {
   id: string;        
@@ -41,9 +43,10 @@ export class TableRowComponent {
 
   selected: boolean = false;
   dataValues: any[] = [];
-  constructor() {
-    
-  }
+  constructor(
+    private _PermissionsService: PermissionsService,
+    public tableDensityService: TableDensityService
+  ) {}
 
   public toggle(event: Event) {
     const value = (event.target as HTMLInputElement).checked;
@@ -83,6 +86,15 @@ isFiniteNumber(val: any): val is number {
 
   private getByPath(obj: any, path: string) {
     return path.split('.').reduce((acc, k) => (acc == null ? acc : acc[k]), obj);
+  }
+
+  canShowActionByScope(action: RowAction): boolean {
+    if (!action.scope) {
+      return true;
+    }
+
+    const scopes = Array.isArray(action.scope) ? action.scope : [action.scope];
+    return this._PermissionsService.hasScopes(scopes, 'any');
   }
 
 

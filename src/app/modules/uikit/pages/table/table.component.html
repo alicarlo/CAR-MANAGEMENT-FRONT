@@ -18,7 +18,10 @@
   </div>
 </div>
 
-<div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+<div
+  [ngClass]="['border-muted/20 bg-background flex min-w-full flex-col', tableDensityService.classes().wrapper]"
+  [ngStyle]="tableDensityService.variables()"
+>
   <app-table-action 
     [labelName]="labelName" 
     [select]="select"
@@ -33,18 +36,18 @@
   ></app-table-action>
   <div
     *ngIf="loading === true && error === false"
-    class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted grow overflow-x-auto px-5">
+    [ngClass]="['scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted', tableDensityService.classes().scroll]">
     <table
-      class="text-muted-foreground table table-auto w-max border-collapse text-left align-middle leading-5"
+      [ngClass]="['text-muted-foreground leading-5', tableDensityService.classes().table]"
       ><!--class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5"-->
-      <thead class="border-muted/20 text-muted-foreground border text-xs">
+      <thead [ngClass]="['border-muted/20 text-muted-foreground', tableDensityService.classes().thead]">
         <tr app-table-header [columns]="headers"  (onCheck)="toggleUsers($event)"></tr>
       </thead>
       <tbody>
         @for (item of filteredData(); track $index) {
           <tr 
             app-table-row 
-            class="hover:bg-card/50" 
+            [ngClass]="tableDensityService.classes().row"
             [data]="item"  
             [dataFilterColumns]="dataFilterColumns"
             [actions]="actions"
@@ -88,6 +91,7 @@
     [totalPages]="totalPages"
     [anchorsNext]="anchorsNextArray"
     [currentPage]="currentPageSelect"
+    [pageSizeOptions]="pageSizeOptions"
     [activateSearch]="activateSearch" 
     ></app-table-footer>
 </div>

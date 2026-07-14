@@ -4,7 +4,7 @@
       <p class="text-foreground font-semibold">Gastos</p>
       <div class="mx-[25px]">
         <label class="text-foreground text-[12px] font-medium">
-          Información del Auto:
+          InformaciÃ³n del Auto:
         </label>
 
         <div class="border border-border/60 rounded-lg bg-card p-2 flex flex-wrap gap-2">
@@ -22,11 +22,15 @@
           </p>
 
           <p class="text-foreground text-[11px]">
-            <strong>Línea:</strong> {{ data.row.version }}
+            <strong>LÃ­nea:</strong> {{ data.row.version }}
           </p>
 
           <p class="text-foreground text-[11px]">
             <strong>Color:</strong> {{ data.row.color }}
+          </p>
+
+          <p class="text-foreground text-[11px]">
+            <strong>Km:</strong> {{ data?.row?.km ?? '-' }}
           </p>
 
           <p *ngIf="data.row.costShow" class="text-foreground text-[11px]">
@@ -110,7 +114,7 @@
                     </span>
                     <span *ngSwitchDefault
                           class="inline-flex items-center rounded px-1.5 py-0.5 text-[11px] bg-muted/30 text-foreground/70">
-                      —
+                      â€”
                     </span>
                   </ng-container>
                 </td>

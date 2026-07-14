@@ -8,6 +8,7 @@ import { TableComponent } from 'src/app/modules/uikit/pages/table/table.componen
 import { ExpenseClasificationModalComponent } from '../../modals/expense-clasification-modal/expense-clasification-modal.component';
 import { ExpenseClasificationService } from 'src/app/core/services/expenseClasification/expense-clasification.service';
 import { ExpenseClasification } from 'src/app/core/models/expenseClasification';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-expense-classification',
@@ -28,8 +29,8 @@ export class ExpenseClassificationComponent {
   ]
 
   readonly actions: RowAction[] = [
-    { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Eliminar' },
+    { icon: 'edit',  id: 'edit',  label: 'Editar', scope: 'CATALOGOS.CLASSIFICATION_BILL.UPDATE' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar', scope: 'CATALOGOS.CLASSIFICATION_BILL.DELETE' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -53,7 +54,8 @@ export class ExpenseClassificationComponent {
   constructor(
     private _MatDialog: MatDialog,
     private _ExpenseClasificationService: ExpenseClasificationService,
-    private _ToastrService: ToastrService
+    private _ToastrService: ToastrService,
+    public permissionsService: PermissionsService
   ) {}
 
   ngOnInit() {

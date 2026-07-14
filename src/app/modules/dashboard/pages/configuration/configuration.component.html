@@ -1,0 +1,93 @@
+<div class="flex flex-col gap-6">
+  <div class="flex items-start gap-4">
+    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 text-primary">
+      <mat-icon>settings</mat-icon>
+    </div>
+
+    <div class="inline-block">
+      <h3 class="text-foreground text-[28px] font-semibold leading-none">Configuracion</h3>
+      <div class="text-muted-foreground mt-2 text-sm font-medium">
+        <span class="text-muted-foreground">Configura valores globales del sistema.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="rounded-lg border border-border bg-card/40 p-3">
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        class="rounded-md px-5 py-2 text-sm font-semibold transition"
+        [ngClass]="activeSection === 'table-density'
+          ? 'bg-primary text-primary-foreground'
+          : 'bg-transparent text-foreground hover:bg-muted/30'"
+        (click)="setActiveSection('table-density')"
+      >
+        Densidad de tablas
+      </button>
+
+      <button
+        type="button"
+        class="rounded-md px-5 py-2 text-sm font-semibold transition"
+        [ngClass]="activeSection === 'report-density'
+          ? 'bg-primary text-primary-foreground'
+          : 'bg-transparent text-foreground hover:bg-muted/30'"
+        (click)="setActiveSection('report-density')"
+      >
+        Densidad de reportes
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="activeSection === 'table-density'" class="rounded-xl border border-border bg-card p-6">
+    <div class="flex flex-col gap-2">
+      <h4 class="text-foreground text-[18px] font-semibold">Densidad de tablas</h4>
+      <p class="text-muted-foreground text-sm">
+        Cambia el estilo global de las tablas entre vista normal, normal-compacta, compacta y super compacta.
+      </p>
+    </div>
+
+    <div class="mt-6 rounded-lg border border-border bg-background p-2">
+      <div class="flex flex-wrap gap-2">
+        <button
+          *ngFor="let option of tableDensityService.options"
+          type="button"
+          class="rounded-md px-5 py-2 text-sm font-semibold transition"
+          [ngClass]="tableDensityService.density() === option.id
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-transparent text-foreground hover:bg-muted/30'"
+          (click)="applyTableDensity(option.id)"
+        >
+          {{ option.label }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="activeSection === 'report-density'" class="rounded-xl border border-border bg-card p-6">
+    <div class="flex flex-col gap-2">
+      <h4 class="text-foreground text-[18px] font-semibold">Densidad de reportes</h4>
+      <p class="text-muted-foreground text-sm">
+        Ajusta la densidad visual de reportes entre vista normal y normal-compacta.
+      </p>
+      <p class="text-muted-foreground text-xs">
+        Reportes afectados: Contrato de apartado
+      </p>
+    </div>
+
+    <div class="mt-6 rounded-lg border border-border bg-background p-2">
+      <div class="flex flex-wrap gap-2">
+        <button
+          *ngFor="let option of reportDensityOptions"
+          type="button"
+          class="rounded-md px-5 py-2 text-sm font-semibold transition"
+          [ngClass]="reportDensityService.density() === option.id
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-transparent text-foreground hover:bg-muted/30'"
+          (click)="applyReportDensity(option.id)"
+        >
+          {{ option.label }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

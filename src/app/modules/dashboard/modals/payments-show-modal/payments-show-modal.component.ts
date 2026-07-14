@@ -9,6 +9,7 @@ import { ShopingService } from 'src/app/core/services/shoping/shoping.service';
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
 import { PaymentsAddModalComponent } from '../payments-add-modal/payments-add-modal.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-payments-show-modal',
@@ -24,6 +25,7 @@ export class PaymentsShowModalComponent {
   payments: any[] = [];
   totalPayments: any = 0;
   localRow: any = null;
+  hasChanges: boolean = false;
   constructor(
     private dialog: MatDialog,                                 
     @Optional() public dialogRef: MatDialogRef<PaymentsShowModalComponent> | null, 
@@ -31,7 +33,20 @@ export class PaymentsShowModalComponent {
     private _ToastrService: ToastrService,
     private _ShopingService: ShopingService,
     private _MatDialog: MatDialog,
+    public permissionsService: PermissionsService
   ) {}
+
+  canDownloadPaymentDocument() {
+    return this.permissionsService.hasScope('PAYMENT.GET');
+  }
+
+  canEditPayment() {
+    return this.permissionsService.hasScope('PAYMENT.UPDATE');
+  }
+
+  canDeletePayment() {
+    return this.permissionsService.hasScope('PAYMENT.DELETE');
+  }
 
   ngOnInit(): void {
     this.localRow = structuredClone(this.data.row);
@@ -103,6 +118,7 @@ export class PaymentsShowModalComponent {
           ref.close(true);
 
           if (flag === 2) {
+            this.hasChanges = true;
             if (this.data.flag === 0) {
               this.getPaymentsBills();
             } else {
@@ -150,6 +166,7 @@ export class PaymentsShowModalComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        this.hasChanges = true;
          if (this.data.flag === 0) {
           this.getPaymentsBills();
         } else {
@@ -157,5 +174,9 @@ export class PaymentsShowModalComponent {
         }
       }
     });
+  }
+
+  close(flag: boolean = false) {
+    this.dialogRef?.close(flag || this.hasChanges);
   }
 }

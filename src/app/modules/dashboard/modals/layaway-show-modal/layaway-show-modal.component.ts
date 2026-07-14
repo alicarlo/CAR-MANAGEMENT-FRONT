@@ -13,6 +13,7 @@ import { LaywayService } from 'src/app/core/services/layway/layway.service';
 import { IncomeModalComponent } from '../income-modal/income-modal.component';
 import { IncomeService } from 'src/app/core/services/income/income.service';
 import { TicketPrintModalComponent } from '../ticket-print-modal/ticket-print-modal.component';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-layaway-show-modal',
@@ -36,7 +37,8 @@ export class LayawayShowModalComponent {
     private _ShopingService: ShopingService,
     private _MatDialog: MatDialog,
     private _LaywayService: LaywayService,
-    private _IncomeService: IncomeService
+    private _IncomeService: IncomeService,
+    private _PermissionsService: PermissionsService
   ) { 
   }
 
@@ -44,8 +46,31 @@ export class LayawayShowModalComponent {
     this.getIncomes();
   }
 
+  get canViewLayawayIncomes() {
+    return this._PermissionsService.hasScopes(['INSTALLMENT', 'INSTALLMENT.GET', 'INCOME.LAYAWAY.GET', 'INCOME.GET']);
+  }
+
+  get canEditIncome() {
+    return this._PermissionsService.hasScopes(['INSTALLMENT.UPDATE', 'INCOME.UPDATE']);
+  }
+
+  get canDeleteIncome() {
+    return this._PermissionsService.hasScopes(['INSTALLMENT.DELETE', 'INCOME.DELETE']);
+  }
+
+  get canDownloadIncomeSupport() {
+    return this._PermissionsService.hasScopes(['INSTALLMENT', 'INSTALLMENT.GET', 'INCOME.LAYAWAY.GET', 'INCOME.GET']);
+  }
+
 
   getIncomes() {
+    if (!this.canViewLayawayIncomes) {
+      this.loadingModal = true;
+      this.income = [];
+      this.totalLayaway = 0;
+      return;
+    }
+
     this.loadingModal = false;
     this._LaywayService.getIncomeByLayawayId(this.data.row.id,500, 1).subscribe({
       next: async (response: any) => {
@@ -73,6 +98,7 @@ export class LayawayShowModalComponent {
   }
 
   openAddModal(action: string, data: any) {
+    if (!this.canEditIncome) return;
     let dataSend = {action, row: data, flag: 0};
     const dialogRef = this._MatDialog.open(IncomeModalComponent, {
       disableClose: true,
@@ -90,6 +116,7 @@ export class LayawayShowModalComponent {
   }
 
   openTicketModal(data: any) {
+    if (!this.canDownloadIncomeSupport) return;
     let dataSend = {data, full: this.data.row, flag: 0};
     const dialogRef = this._MatDialog.open(TicketPrintModalComponent, {
       disableClose: true,
@@ -109,6 +136,7 @@ export class LayawayShowModalComponent {
   }
 
   actionModal(action: string, data: any, msg: string, color: string = '!text-red-500', icon = 'delete') {
+    if (!this.canDeleteIncome) return;
     let dataSend = {action, row: data, msg, color, icon};
     const ref: any = this._MatDialog.open(ActionMessageComponent, {
       data: dataSend,
@@ -152,6 +180,7 @@ export class LayawayShowModalComponent {
   }
 
   actionModalFile(flag: number,action: string, data: any, msg: string, color: string = '!text-blue-500', icon = 'cloud_download') {
+    if (flag === 1 && !this.canDownloadIncomeSupport) return;
     color = flag === 1 ? '!text-blue-500' : '!text-red-500';  
     icon = flag === 1 ? 'cloud_download' : 'delete';
     let dataSend = {action, row: data, msg, color, icon};

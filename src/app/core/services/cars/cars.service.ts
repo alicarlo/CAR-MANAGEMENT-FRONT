@@ -54,6 +54,16 @@ export class CarsService {
     );
   }
 
+  public patchCar(id: string | number, bodyData: Partial<Cars>): Observable<Cars> {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http.patch<Cars>(`${environment.apiUrl}/car/${id}`, bodyData, httpOptions).pipe(
+      retry(0),
+      catchError(this.error.handleError)
+    );
+  }
+
   public getCars(filter: string = '', pageSize?: number, currentPage?: number, active: string = 'active'): Observable<Cars> {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),

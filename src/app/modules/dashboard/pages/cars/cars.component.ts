@@ -20,6 +20,7 @@ import { InvestorService } from 'src/app/core/services/investors/investor.servic
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-cars',
@@ -104,13 +105,12 @@ export class CarsComponent {
   ]
 
   readonly actions: RowAction[] = [
-    { icon: 'history',  id: 'history',  label: 'Historial' },
-    { icon: 'check',  id: 'checkArrive',  label: 'Revision de llegada' },
-    { icon: 'attach_money',  id: 'bill',  label: 'Visualizar Gastos' },
-    { icon: 'attach_file',  id: 'documents',  label: 'Visualizar Documentos' },
-    { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Eliminar' },
-
+    { icon: 'history',  id: 'history',  label: 'Historial', scope: 'CAR_HISTORY.GET' },
+    { icon: 'check',  id: 'checkArrive',  label: 'Revision de llegada', scope: ['ARRIVAL.ADD', 'ARRIVAL.UPDATE', 'ARRIVAL.GET'] },
+    { icon: 'attach_money',  id: 'bill',  label: 'Visualizar Gastos', scope: ['BILL.CAR.GET', 'BILL.GET'] },
+    { icon: 'attach_file',  id: 'documents',  label: 'Visualizar Documentos', scope: ['CAR.DOCUMENT.GET', 'DOCUMENTS.GET'] },
+    { icon: 'edit',  id: 'edit',  label: 'Editar', scope: 'CAR.UPDATE' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar', scope: 'CAR.DELETE' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -138,8 +138,13 @@ export class CarsComponent {
     private _CarsService: CarsService,
     private _ToastrService: ToastrService,
     private _StoreService: StoreService,
-    private _InvestorService: InvestorService
+    private _InvestorService: InvestorService,
+    private _PermissionsService: PermissionsService
   ) {}
+
+  get canCreateCar() {
+    return this._PermissionsService.hasScopes(['CAR.ADD']);
+  }
 
   ngOnInit() {
     this.getCars();
@@ -267,7 +272,7 @@ export class CarsComponent {
           this.cars = response.items.map((r: any) => ({ ...r,
             carData:  `${r.make } ${r.version} ${r.model } ${r.color }`,
             // costShow: r.purchases.length > 0 ? (r.purchases || []).reduce((acc: number, inc: any) => acc + (Number(inc.total) || 0), 0) : r.cost
-            costShow: r.purchases?.length > 0
+            /*costShow: r.purchases?.length > 0
               ? r.purchases.reduce((acc: number, inc: any) => {
                   const total = Number(inc.total) || 0;
 
@@ -278,6 +283,8 @@ export class CarsComponent {
                   return acc + total + extra;
                 }, 0)
               : r.cost
+              */
+              costShow: r.cost
            }));
           this.total = response.pagination.total_items;
           setTimeout(() => {

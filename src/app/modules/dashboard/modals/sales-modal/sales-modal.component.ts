@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, Optional } from '@angular/core';
+import { Component, HostListener, Inject, Optional } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -100,6 +100,8 @@ export class SalesModalComponent {
   cars: any[] = [];
   carsSelected: any = null
   typePayments: any[] = [];
+  clientsLoading: boolean = false;
+  carsLoading: boolean = false;
   todayStr = moment().tz('America/Tijuana').format('YYYY-MM-DD');
   monthlyPayments: Array<{ month: string; year: number; amount?: number }> | any = [];
 
@@ -121,6 +123,11 @@ export class SalesModalComponent {
   filteredCars: any[] = [];
   carsDropdownOpen = false;
   selectedCarLabel = '';
+
+  get hasSelectedClient() {
+    const clientId = this.saveForm?.get('client_id')?.value;
+    return clientId !== null && clientId !== undefined && String(clientId).trim() !== '';
+  }
   constructor(
     private _FormBuilder: FormBuilder,                                               
     private dialog: MatDialog,                                 
@@ -169,7 +176,7 @@ export class SalesModalComponent {
         return text.includes(value);
       });
     });
-    this.getClients();
+    // this.getClients();
     this.getTypePayments();
     this.getTypeDocument();
   }
@@ -209,11 +216,36 @@ export class SalesModalComponent {
   	});
 
     this.saveForm.get('sales_type')?.valueChanges.subscribe((value: any) => {
+      this.clients = [];
+      this.cars = [];
+      this.filteredCars = [];
+      this.selectedCarLabel = '';
+      this.carsSelected = null;
+      this.carsDropdownOpen = false;
+      this.saveForm.get('client_id')?.setValue(null);
+      this.saveForm.get('car_id')?.setValue('');
+      this.saveForm.get('car_id')?.disable();
       this.saveForm.get('client_id')?.enable();
+      if (value === 'apartado') {
+        this.getClientsApart();
+      }
+
+      if (value === 'normal') {
+        this.getClients();
+      }
+
     });
 
     this.saveForm.get('client_id')?.valueChanges.subscribe((value: any) => {
-      if (value  === null) return;
+      this.cars = [];
+      this.filteredCars = [];
+      this.selectedCarLabel = '';
+      this.carsSelected = null;
+      this.carsDropdownOpen = false;
+      this.saveForm.get('car_id')?.setValue('');
+      this.saveForm.get('car_id')?.disable();
+
+      if (value  === null || value === undefined || value === '') return;
       if (this.saveForm.get('sales_type')?.value === 'apartado') {
         this.getCarByUserId();
       }else{
@@ -341,6 +373,9 @@ export class SalesModalComponent {
   }
 
   toggleCarsDropdown() {
+    if (this.carsLoading) {
+      return;
+    }
     this.carsDropdownOpen = !this.carsDropdownOpen;
     if (this.carsDropdownOpen) {
       this.carFilterControl.setValue('');
@@ -353,7 +388,9 @@ export class SalesModalComponent {
   }
 
   selectCar(car: any) {
-    this.selectedCarLabel = `${car.make} - ${car.model}`;
+    this.selectedCarLabel = [car.make, car.model, car.version]
+      .filter(Boolean)
+      .join(' - ');
     this.saveForm.patchValue({ car_id: car.id });
     this.closeCarsDropdown();
   }
@@ -363,6 +400,37 @@ export class SalesModalComponent {
     if (!('showPicker' in (HTMLInputElement.prototype as any))) {
       input.focus();
     }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement | null;
+    if (!target?.closest('[data-cars-dropdown="true"]')) {
+      this.closeCarsDropdown();
+    }
+  }
+
+  private resolveInstallmentStartDate() {
+    const initDay = String(this.saveForm?.value?.init_day ?? '').trim();
+    const now = new Date();
+
+    if (initDay) {
+      const [yearRaw, monthRaw] = initDay.split('-');
+      const year = Number(yearRaw);
+      const month = Number(monthRaw);
+
+      if (!isNaN(year) && !isNaN(month) && month >= 1 && month <= 12) {
+        return {
+          startYear: year,
+          startMonthIndex: month - 1,
+        };
+      }
+    }
+
+    return {
+      startYear: now.getFullYear(),
+      startMonthIndex: now.getMonth(),
+    };
   }
 
   clear() {
@@ -382,19 +450,7 @@ export class SalesModalComponent {
 
   generateMonthlyPayments(qty: number) {
     const result: any[] = [];
-    let now = new Date();
-    const initDay = this.saveForm.value.init_day;
-    let startMonthIndex: number;
-    let startYear: number;
-
-    if (initDay) {
-      const [year, month] = initDay.split('-').map(Number);
-      startMonthIndex = month - 1;
-      startYear = year;
-    } else {
-      startMonthIndex = now.getMonth() + 1; 
-      startYear = now.getFullYear();
-    }
+    const { startMonthIndex, startYear } = this.resolveInstallmentStartDate();
 
     for (let i = 0; i < qty; i++) {
       const date = new Date(startYear, startMonthIndex + i, 1);
@@ -419,7 +475,7 @@ export class SalesModalComponent {
 
   syncManualAmounts() {
     this.monthlyPayments = this.monthlyPayments.map((p: any, i: number) => {
-      let parsedAmount: any = parseFloat(p.amount);
+      let parsedAmount: any = this.parseMoneyValue(p.amount);
       parsedAmount = !isNaN(parsedAmount) ? parsedAmount : null;
       return {
         ...p,
@@ -428,20 +484,41 @@ export class SalesModalComponent {
     });
   }
 
+  parseMoneyValue(value: any): number {
+    if (value === null || value === undefined || value === '') return 0;
+    if (typeof value === 'number') return value;
+
+    const normalized = String(value).replace(/,/g, '').trim();
+    const parsed = parseFloat(normalized);
+
+    return isNaN(parsed) ? 0 : parsed;
+  }
+
+  private hasEmptyValue(value: any): boolean {
+    return value === null || value === undefined || String(value).trim() === '';
+  }
+
   generatePayments() {
     let totalAmount;
-    let amountPaid
+    let amountPaid;
+    const rawAdvanceValue = this.saveForm.get('desired_advance')?.value;
+
+    if (this.hasEmptyValue(rawAdvanceValue)) {
+      this._ToastrService.error('Verifica los valores de venta, anticipo y meses');
+      return;
+    }
+
     if (this.saveForm.value.sales_type === 'apartado') {
       if (this.saveForm.get('desired_advance')?.value >= this.carsSelected.total) {
         totalAmount = this.carsSelected.amount_sale;
-        amountPaid =  parseFloat(this.saveForm.get('desired_advance')?.value || 0);
+        amountPaid = this.parseMoneyValue(rawAdvanceValue);
       }else{
          this._ToastrService.error('Anticipo deseado debe de ser igual o mas que el enganche');
         return;
       }
     }else{
-      totalAmount = parseFloat(this.saveForm.get('sale_price')?.value || 0);
-      amountPaid =  parseFloat(this.saveForm.get('desired_advance')?.value || 0);
+      totalAmount = this.parseMoneyValue(this.saveForm.get('sale_price')?.value);
+      amountPaid = this.parseMoneyValue(rawAdvanceValue);
       let amountCheck =  totalAmount - amountPaid;
       if (amountCheck <= 0) {
         this._ToastrService.error('El Anticipio deseado debe ser menor al precio de venta, si va a liquidar seleccione la opcion liquidar');
@@ -449,19 +526,16 @@ export class SalesModalComponent {
       }
     }
     const qty = parseInt(this.saveForm.get('qty_months')?.value || 0);
-    if (!totalAmount || !amountPaid || !qty || qty <= 0) {
+    if (!totalAmount || !qty || qty <= 0) {
       this._ToastrService.error('Verifica los valores de venta, anticipo y meses');
       return;
     }
 
     const amountToDistribute = totalAmount - amountPaid;
-    const now = new Date();
-
-    const [year, month] = this.saveForm.value.init_day.split('-').map(Number);
+    const { startMonthIndex, startYear } = this.resolveInstallmentStartDate();
 
     const newMonthlyPayments: any = Array.from({ length: qty }).map((_, i) => {
-      // const date = new Date(now.getFullYear(), now.getMonth() + 1 + i, 1);
-       const date = new Date(year, month - 1 + i, 1); 
+       const date = new Date(startYear, startMonthIndex + i, 1); 
 
       return {
         monthName: date.toLocaleString('default', { month: 'long' }),
@@ -475,13 +549,7 @@ export class SalesModalComponent {
     const manualIndexes = new Set<number>();
 
     for (let i = 0; i < qty; i++) {
-      let rawAmount = this.monthlyPayments?.[i]?.amount ?? null;
-
-      if (typeof rawAmount === 'string') {
-        rawAmount = rawAmount.replace(/,/g, '');
-      }
-
-      const parsed = parseFloat(rawAmount);
+      const parsed = this.parseMoneyValue(this.monthlyPayments?.[i]?.amount ?? null);
 
       if (!isNaN(parsed) && parsed > 0) {
         newMonthlyPayments[i].amount = parsed;
@@ -497,25 +565,59 @@ export class SalesModalComponent {
       return;
     }
 
-    const remainingSlots = qty - manualIndexes.size;
-    const amountPerSlot = remainingSlots > 0 ? parseFloat((remaining / remainingSlots).toFixed(2)) : 0;
-    for (let i = 0; i < qty; i++) {
-      if (!manualIndexes.has(i)) {
-        newMonthlyPayments[i].amount = amountPerSlot;
+    const remainingIndexes = Array.from({ length: qty }, (_, i) => i).filter((i) => !manualIndexes.has(i));
+    const remainingSlots = remainingIndexes.length;
+
+    if (remainingSlots === 1) {
+      const targetIndex = remainingIndexes[0];
+      newMonthlyPayments[targetIndex].amount = parseFloat(remaining.toFixed(2));
+    } else if (remainingSlots > 1) {
+      const firstIndex = remainingIndexes[0];
+      const roundedAmount = Math.floor(remaining / remainingSlots);
+      let assignedToOthers = 0;
+
+      for (let i = 1; i < remainingIndexes.length; i++) {
+        const targetIndex = remainingIndexes[i];
+        newMonthlyPayments[targetIndex].amount = roundedAmount;
+        assignedToOthers += roundedAmount;
       }
+
+      newMonthlyPayments[firstIndex].amount = parseFloat((remaining - assignedToOthers).toFixed(2));
     }
+
     this.monthlyPayments = newMonthlyPayments;
     const totalFinal = this.monthlyPayments.reduce((acc: any, p: { amount: any; }) => acc + (p.amount || 0), 0);
   }
+  getClientsApart() {
+    this.clientsLoading = true;
+    this.clients = [];
+    this._ClientsService.getClientApart(200, 1).subscribe({
+      next: async (response: any) => {
+        if(response) {
+          this.clients = response.items.map((r: any) => ({ ...r }));
+        }
+        this.clientsLoading = false;
+      },
+      error: (err) => {
+        this.clientsLoading = false;
+        if (err.error === "Token expired") return;
+        this._ToastrService.error(err.error, 'Error');
+      },
+    })
+  }
 
    getClients() {
+    this.clientsLoading = true;
+    this.clients = [];
     this._ClientsService.getClient(200, 1).subscribe({
       next: async (response: any) => {
         if(response) {
           this.clients = response.items.map((r: any) => ({ ...r }));
         }
+        this.clientsLoading = false;
       },
       error: (err) => {
+        this.clientsLoading = false;
         if (err.error === "Token expired") return;
         this._ToastrService.error(err.error, 'Error');
       },
@@ -523,6 +625,11 @@ export class SalesModalComponent {
   }
 
   getCarByUserId() {
+    this.carsLoading = true;
+    this.cars = [];
+    this.filteredCars = [];
+    this.selectedCarLabel = '';
+    this.carsDropdownOpen = false;
     this._CarsService.getCarByUserId(200, 1, this.saveForm.get('client_id')?.value).subscribe({
       next: async (response: any) => {
         if(response) {
@@ -542,8 +649,10 @@ export class SalesModalComponent {
           this.saveForm.get('car_id')?.enable();
 
         }
+        this.carsLoading = false;
       },
       error: (err) => {
+        this.carsLoading = false;
         if (err.error === "Token expired") return;
         this._ToastrService.error(err.error, 'Error');
       },
@@ -551,6 +660,11 @@ export class SalesModalComponent {
   }
 
   getCarFull() {
+    this.carsLoading = true;
+    this.cars = [];
+    this.filteredCars = [];
+    this.selectedCarLabel = '';
+    this.carsDropdownOpen = false;
     this._CarsService.getCars('',500, 1, 'venta').subscribe({
       next: async (response: any) => {
         if(response) {
@@ -558,8 +672,10 @@ export class SalesModalComponent {
           this.filteredCars = [...this.cars];
           this.saveForm.get('car_id')?.enable();
         }
+        this.carsLoading = false;
       },
       error: (err) => {
+        this.carsLoading = false;
         if (err.error === "Token expired") return;
         this._ToastrService.error(err.error, 'Error');
       },

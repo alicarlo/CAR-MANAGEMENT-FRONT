@@ -10,6 +10,7 @@ import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-messa
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
 import { InvestmentCarShowModalComponent } from '../../modals/investment-car-show-modal/investment-car-show-modal.component';
 import { InvestmentShoppingShowModalComponent } from '../../modals/investment-shopping-show-modal/investment-shopping-show-modal.component';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-investor',
@@ -29,10 +30,10 @@ export class InvestorComponent {
   ]
 
   readonly actions: RowAction[] = [
-    { icon: 'directions_car',  id: 'search',  label: 'Visualizar Autos' },
-    { icon: 'credit_card',  id: 'purchase',  label: 'Visualizar Gastos' },
-    { icon: 'edit',  id: 'edit',  label: 'Editar' },
-    { icon: 'delete', id: 'delete', label: 'Eliminar' },
+    { icon: 'directions_car',  id: 'search',  label: 'Visualizar Autos', scope: ['INVESTOR.GET', 'INVESTOR.CAR.GET'] },
+    { icon: 'credit_card',  id: 'purchase',  label: 'Visualizar Gastos', scope: ['INVESTOR.GET', 'BILL.INVESTOR.GET'] },
+    { icon: 'edit',  id: 'edit',  label: 'Editar', scope: 'INVESTOR.UPDATE' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar', scope: 'INVESTOR.DELETE' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -56,7 +57,8 @@ export class InvestorComponent {
   constructor(
     private _MatDialog: MatDialog,
     private _InvestorService: InvestorService,
-    private _ToastrService: ToastrService
+    private _ToastrService: ToastrService,
+    public permissionsService: PermissionsService
   ) {}
 
   ngOnInit() {

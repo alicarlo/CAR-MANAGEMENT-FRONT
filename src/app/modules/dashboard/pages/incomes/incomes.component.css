@@ -1,0 +1,10 @@
+.incomes-date-input::-webkit-calendar-picker-indicator {
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.incomes-date-input::-webkit-inner-spin-button,
+.incomes-date-input::-webkit-clear-button {
+  display: none;
+}

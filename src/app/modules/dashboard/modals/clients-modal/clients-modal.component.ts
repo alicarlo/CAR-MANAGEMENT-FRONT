@@ -68,7 +68,7 @@ export class ClientsModalComponent {
 
   init() {
     this.saveForm = this._FormBuilder.group({
-      email: new FormControl (this.data.row === null ? '' : this.data.row.email,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(60), Validators.email])),
+      email: new FormControl (this.data.row === null ? '' : this.data.row.email,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(100), Validators.email])),
       full_name: new FormControl (this.data.row === null ? '' : this.data.row.full_name,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(100)])),
       phone: new FormControl (this.data.row === null ? '' : this.data.row.phone,Validators.compose([Validators.required,Validators.minLength(3),Validators.maxLength(100)])),
       phone_mobile: new FormControl(this.data.row === null ? '' : this.data.row.phone_mobile),

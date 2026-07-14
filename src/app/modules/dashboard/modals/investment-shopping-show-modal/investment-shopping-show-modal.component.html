@@ -5,9 +5,29 @@
 
       <div class="mx-[25px]">
         <label for="sexo" class="text-foreground text-[12px] font-medium">Información del Inversionista:</label>
-        <div class="border border-border/60 rounded-lg bg-card p-2 flex gap-2">
-          <p class="text-foreground text-[11px]"><strong>Nombre:</strong> {{ data.row.full_name }}</p>
-          <p *ngIf="totalCars" class="text-foreground text-[11px]"><strong>Total gastos:</strong> {{ totalCars | currency }}</p>
+        <div class="border border-border/60 rounded-lg bg-card p-2 flex items-center justify-between gap-3">
+          <div class="flex flex-wrap gap-2">
+            <p class="text-foreground text-[11px]"><strong>Nombre:</strong> {{ data.row.full_name }}</p>
+            <p *ngIf="totalCars" class="text-foreground text-[11px]"><strong>Total gastos:</strong> {{ totalCars | currency }}</p>
+          </div>
+
+          <app-button
+            *ngIf="hasMorePages"
+            impact="bold"
+            tone="primary"
+            shape="rounded"
+            size="small"
+            [disabled]="loadingMore"
+            (click)="loadMoreBills()"
+          >
+            <span class="flex items-center justify-center gap-2">
+              <span
+                *ngIf="loadingMore"
+                class="h-3 w-3 rounded-full border-2 border-white/40 border-t-white animate-spin"
+              ></span>
+              {{ loadingMore ? 'Cargando...' : 'Cargar mas' }}
+            </span>
+          </app-button>
         </div>
       </div>
       
@@ -41,25 +61,25 @@
                 </td>
 
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.cars[0].key }}
+                  {{ item.cars?.[0]?.key ?? '-' }}
                 </td>
 
-                 {{ item.make }} {{ item.version }} {{ item.model }} {{ item.color }}
-
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.cars[0].make }} {{ item.cars[0].version }} {{ item.cars[0].model }} {{ item.cars[0].color }}
+                  {{ item.cars?.[0]?.make || item.cars?.[0]?.version || item.cars?.[0]?.model || item.cars?.[0]?.color
+                    ? ((item.cars?.[0]?.make || '') + ' ' + (item.cars?.[0]?.version || '') + ' ' + (item.cars?.[0]?.model || '') + ' ' + (item.cars?.[0]?.color || '')).trim()
+                    : '-' }}
                 </td>
 
                  <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.name }}
+                  {{ item.name ?? '-' }}
                 </td>
 
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.classification_bill.name }}
+                  {{ item.classification_bill?.name ?? '-' }}
                 </td>
 
                 <td class="px-3 py-2 align-middle whitespace-nowrap">
-                  {{ item.classification_bill.bill_type.name }}
+                  {{ item.classification_bill?.bill_type?.name ?? '-' }}
                 </td>
 
                  <td class="px-3 py-2 align-middle whitespace-nowrap">

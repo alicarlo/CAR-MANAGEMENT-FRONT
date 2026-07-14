@@ -24,6 +24,11 @@ import { IncomesComponent } from './pages/incomes/incomes.component';
 import { CollectionsComponent } from './pages/collections/collections.component';
 import { PriceListReportComponent } from './pages/price-list-report/price-list-report.component';
 import { DocumentsListReportComponent } from './pages/documents-list-report/documents-list-report.component';
+import { scopeGuard } from 'src/app/core/guards/scope/scope.guard';
+import { FloorTimeReportComponent } from './pages/floor-time-report/floor-time-report.component';
+import { ConfigurationComponent } from './pages/configuration/configuration.component';
+import { ReportSalesComponent } from './pages/report-sales/report-sales.component';
+import { ReportComisionsComponent } from './pages/report-comisions/report-comisions.component';
 
 
 const routes: Routes = [
@@ -31,29 +36,33 @@ const routes: Routes = [
     path: '',
     component: DashboardComponent,
     children: [
-      { path: '', redirectTo: 'clients', pathMatch: 'full' },
-      { path: 'clients', component: ClientsComponent },
-      { path: 'users', component: UsersComponent },
-      { path: 'roles', component: RolesComponent },
-      { path: 'scopes', component: ScopesComponent },
-      { path: 'cars', component: CarsComponent },
-      { path: 'type-cars', component: TypCarsComponent },
-      { path: 'typ-documents', component: TypDocumentsComponent },
-      { path: 'typ-expense', component: TypeExpenseComponent },
-      { path: 'store', component: StoreComponent },
-      { path: 'expense-classification', component: ExpenseClassificationComponent },
-      { path: 'investor', component: InvestorComponent },
-      { path: 'shopping', component: ShoppingComponent },
-      { path: 'type-payments', component: TypePaymentsComponent },
-      { path: 'documents', component: DocumentsComponent },
-      { path: 'arrival-review', component: ArrivalReviewComponent },
-      { path: 'bills', component: BillsComponent },
-      { path: 'layaway', component:  LayawayComponent },
-      { path: 'sales', component: SalesComponent },
-      { path: 'incomes', component:  IncomesComponent },
-      { path: 'collections', component: CollectionsComponent },
-      { path: 'price-list', component: PriceListReportComponent },
-      { path: 'documents-list', component: DocumentsListReportComponent },
+      { path: 'clients', component: ClientsComponent, canActivate: [scopeGuard], data: { scopes: ['CLIENT', 'CLIENT.GET'] } },
+      { path: 'users', component: UsersComponent, canActivate: [scopeGuard], data: { scopes: ['USER', 'USER.GET'] } },
+      { path: 'roles', component: RolesComponent, canActivate: [scopeGuard], data: { scopes: ['ROLE', 'ROLE.GET'] } },
+      { path: 'scopes', component: ScopesComponent, canActivate: [scopeGuard], data: { scopes: ['SCOPE', 'SCOPE.GET'] } },
+      { path: 'cars', component: CarsComponent, canActivate: [scopeGuard], data: { scopes: ['CAR', 'CAR.GET'] } },
+      { path: 'type-cars', component: TypCarsComponent, canActivate: [scopeGuard], data: { scopes: ['CATALOGOS', 'CATALOGOS.CAR_TYPE.GET'] } },
+      { path: 'typ-documents', component: TypDocumentsComponent, canActivate: [scopeGuard], data: { scopes: ['CATALOGOS', 'CATALOGOS.DOCUMENT_TYPE.GET'] } },
+      { path: 'typ-expense', component: TypeExpenseComponent, canActivate: [scopeGuard], data: { scopes: ['CATALOGOS', 'CATALOGOS.BILL_TYPE.GET'] } },
+      { path: 'store', component: StoreComponent, canActivate: [scopeGuard], data: { scopes: ['STORE', 'STORE.GET'] } },
+      { path: 'expense-classification', component: ExpenseClassificationComponent, canActivate: [scopeGuard], data: { scopes: ['CATALOGOS', 'CATALOGOS.CLASSIFICATION_BILL.GET'] } },
+      { path: 'investor', component: InvestorComponent, canActivate: [scopeGuard], data: { scopes: ['INVESTOR', 'INVESTOR.GET'] } },
+      { path: 'shopping', component: ShoppingComponent, canActivate: [scopeGuard], data: { scopes: ['PURCHASE', 'PURCHASE.GET'] } },
+      { path: 'type-payments', component: TypePaymentsComponent, canActivate: [scopeGuard], data: { scopes: ['CATALOGOS', 'CATALOGOS.PAYMENT_METHOD.GET'] } },
+      { path: 'documents', component: DocumentsComponent, canActivate: [scopeGuard], data: { scopes: ['DOCUMENTS', 'DOCUMENTS.GET'] } },
+      { path: 'arrival-review', component: ArrivalReviewComponent, canActivate: [scopeGuard], data: { scopes: ['ARRIVAL', 'ARRIVAL.GET'] } },
+      { path: 'bills', component: BillsComponent, canActivate: [scopeGuard], data: { scopes: ['BILL', 'BILL.GET'] } },
+      { path: 'layaway', component:  LayawayComponent, canActivate: [scopeGuard], data: { scopes: ['LAYAWAY', 'LAYAWAY.GET'] } },
+      { path: 'sales', component: SalesComponent, canActivate: [scopeGuard], data: { scopes: ['SALE', 'SALE.GET'] } },
+      { path: 'incomes', component:  IncomesComponent, canActivate: [scopeGuard], data: { scopes: ['INCOME', 'INCOME.GET'] } },
+      { path: 'collections', component: CollectionsComponent, canActivate: [scopeGuard], data: { scopes: ['COLLECTIONS', 'COLLECTIONS.GET'] } },
+      { path: 'price-list', component: PriceListReportComponent, canActivate: [scopeGuard], data: { scopes: ['REPORTS.LISTADO_PRECIOS.GET'] } },
+      { path: 'documents-list', component: DocumentsListReportComponent, canActivate: [scopeGuard], data: { scopes: ['REPORTS.LISTADO_DOCUMENTOS.GET'] } },
+      { path: 'floor-time', component: FloorTimeReportComponent, canActivate: [scopeGuard], data: { scopes: ['REPORTS.TIEMPO_PISO.GET'] } },
+      { path: 'report-sales', component: ReportSalesComponent, canActivate: [scopeGuard], data: { scopes: ['REPORTS.REPORTE_VENTAS.GET'] } },
+      { path: 'report-comisions', component: ReportComisionsComponent, canActivate: [scopeGuard], data: { scopes: ['REPORTS.COMISIONES.GET'] } },
+      { path: 'configuration', component: ConfigurationComponent },
+      
       { path: '**', redirectTo: 'errors/404' },
     ],
   },

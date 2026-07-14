@@ -1,5 +1,8 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 import { RowAction, RowActionEvent } from 'src/app/core/models/actions.model';
@@ -10,14 +13,40 @@ import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-messa
 import { ShoppingModalComponent } from '../../modals/shopping-modal/shopping-modal.component';
 import { PaymentsAddModalComponent } from '../../modals/payments-add-modal/payments-add-modal.component';
 import { PaymentsShowModalComponent } from '../../modals/payments-show-modal/payments-show-modal.component';
+import { StoreService } from 'src/app/core/services/store/store.service';
+import { InvestorService } from 'src/app/core/services/investors/investor.service';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-shopping',
-  imports: [TableComponent, MatDialogModule],
+  imports: [TableComponent, MatDialogModule, MatIconModule, CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './shopping.component.html',
   styleUrl: './shopping.component.css'
 })
 export class ShoppingComponent {
+  store: any = [];
+  store_id: any = null;
+  filteredStore: any = [];
+  storeFilterControl = new FormControl('');
+  storeDropdownOpen = false;
+  selectedStoreLabel = '';
+
+  investor: any = [];
+  investor_id: any = null;
+  filteredInvestor: any = [];
+  investorFilterControl = new FormControl('');
+  investorDropdownOpen = false;
+  selectedInvestorLabel = '';
+
+  keyFilterControl = new FormControl('');
+  makeFilterControl = new FormControl('');
+  modelFilterControl = new FormControl('');
+  colorFilterControl = new FormControl('');
+  versionFilterControl = new FormControl('');
+  date_from: string = '';
+  date_to: string = '';
+  filterSelects: any = {};
+
   purchaseSelected: TypeExpense | undefined;
   purchase: TypeExpense[] = [];
   purchaseHeader: string[] = ['Inversionista','Clave','Auto','Tipo de auto', 'Fecha de llegada','Total',];
@@ -30,10 +59,10 @@ export class ShoppingComponent {
     { key: 'total', type: 'money' },
   ]
   readonly actions: RowAction[] = [
-    { icon: 'search',  id: 'search',  label: 'Visualizar Pagos' },
-    { icon: 'add',  id: 'add',  label: 'Agregar Pagos' },
-    { icon: 'edit',  id: 'edit',  label: 'Editar Compra' },
-    { icon: 'delete', id: 'delete', label: 'Eliminar Compra' },
+    { icon: 'search',  id: 'search',  label: 'Visualizar Pagos', scope: 'PAYMENT.GET' },
+    { icon: 'add',  id: 'add',  label: 'Agregar Pagos', scope: 'PAYMENT.ADD' },
+    { icon: 'edit',  id: 'edit',  label: 'Editar Compra', scope: 'PURCHASE.UPDATE' },
+    { icon: 'delete', id: 'delete', label: 'Eliminar Compra', scope: 'PURCHASE.DELETE' },
   ];
   items: any[] = [];
   nextCursor: { name: string; idDocStudent: string } | null | undefined = null;
@@ -57,11 +86,34 @@ export class ShoppingComponent {
   constructor(
     private _MatDialog: MatDialog,
     private _TypeExpenseService: TypeExpenseService,
-    private _ToastrService: ToastrService
+    private _ToastrService: ToastrService,
+    private _StoreService: StoreService,
+    private _InvestorService: InvestorService,
+    public permissionsService: PermissionsService
   ) {}
 
   ngOnInit() {
+    this.getStore();
+    this.getInvestor();
     this.getPurchase();
+
+    this.storeFilterControl.valueChanges.subscribe(term => {
+      const value = (term || '').toString().toLowerCase().trim();
+
+      this.filteredStore = this.store.filter((data: any) => {
+        const text = `${data.name}`.toLowerCase();
+        return text.includes(value);
+      });
+    });
+
+    this.investorFilterControl.valueChanges.subscribe(term => {
+      const value = (term || '').toString().toLowerCase().trim();
+
+      this.filteredInvestor = this.investor.filter((data: any) => {
+        const text = `${data.full_name}`.toLowerCase();
+        return text.includes(value);
+      });
+    });
   }
   
   onRowAction(e: RowActionEvent<any>) {
@@ -173,9 +225,120 @@ export class ShoppingComponent {
     this.getPurchase();
   }
 
+  getStore() {
+    this._StoreService.getStore(500, 1).subscribe({
+      next: async (response: any) => {
+        if(response) {
+          this.store = response.items.map((r: any) => ({ ...r }));
+          this.filteredStore = [...this.store];
+        }
+      },
+      error: (err) => {
+        if (err.error === "Token expired") return;
+        this._ToastrService.error(err.error, 'Error');
+      },
+    })
+  }
+
+  getInvestor() {
+    this._InvestorService.getInvestor(500, 1).subscribe({
+      next: async (response: any) => {
+        if(response) {
+          this.investor = response.items.map((r: any) => ({ ...r }));
+          this.filteredInvestor = [...this.investor];
+        }
+      },
+      error: (err) => {
+        if (err.error === "Token expired") return;
+        this._ToastrService.error(err.error, 'Error');
+      },
+    })
+  }
+
+  toggleStoreDropdown() {
+    this.storeDropdownOpen = !this.storeDropdownOpen;
+    if (this.storeDropdownOpen) {
+      this.storeFilterControl.setValue('');
+      this.filteredStore = [...this.store];
+    }
+  }
+
+  closeStoreDropdown() {
+    this.storeDropdownOpen = false;
+  }
+
+  selectStore(data: any) {
+    this.selectedStoreLabel = data !== null ? `${data.name}` : 'Todos';
+    this.store_id = data !== null ? data.id : '';
+    this.closeStoreDropdown();
+  }
+
+  toggleInvestorDropdown() {
+    this.investorDropdownOpen = !this.investorDropdownOpen;
+    if (this.investorDropdownOpen) {
+      this.investorFilterControl.setValue('');
+      this.filteredInvestor = [...this.investor];
+    }
+  }
+
+  closeInvestorDropdown() {
+    this.investorDropdownOpen = false;
+  }
+
+  selectInvestor(data: any) {
+    this.selectedInvestorLabel = data !== null ? `${data.full_name}` : 'Todos';
+    this.investor_id = data !== null ? data.id : '';
+    this.closeInvestorDropdown();
+  }
+
+  filterGo() {
+    const carFilter = Object.fromEntries(
+      Object.entries({
+        key: this.keyFilterControl.value,
+        make: this.makeFilterControl.value,
+        model: this.modelFilterControl.value,
+        version: this.versionFilterControl.value,
+        color: this.colorFilterControl.value
+      }).filter(([_, v]) => v != null && v !== '')
+    );
+
+    const storeFilter = Object.fromEntries(
+      Object.entries({
+        id: this.store_id
+      }).filter(([_, v]) => v != null && v !== '')
+    );
+
+    const purchaseFilter = Object.fromEntries(
+      Object.entries({
+        investor_id: this.investor_id
+      }).filter(([_, v]) => v != null && v !== '')
+    );
+
+    this.filterSelects = Object.fromEntries(
+      Object.entries({
+        car: Object.keys(carFilter).length ? carFilter : null,
+        store: Object.keys(storeFilter).length ? storeFilter : null,
+        purchase: Object.keys(purchaseFilter).length ? purchaseFilter : null
+      }).filter(([_, v]) => v != null)
+    );
+
+    this.currentPage = 1;
+    this.pageSize = 10;
+    this.getPurchase();
+  }
+
+  openPicker(input: HTMLInputElement) {
+    if (typeof input.showPicker === 'function') {
+      input.showPicker();
+      return;
+    }
+    input.focus();
+    input.click();
+  }
+
   getPurchase() {
     this.loading = false;
-    this._TypeExpenseService.getPurchase(this.pageSize, this.currentPage).subscribe({
+    this._TypeExpenseService.getPurchase(this.pageSize, this.currentPage, this.filterSelects, this.date_from, this.date_to).subscribe({
       next: async (response: any) => {
         if(response) {
   

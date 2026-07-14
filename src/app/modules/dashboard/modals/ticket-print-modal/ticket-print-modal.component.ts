@@ -9,6 +9,7 @@ import { NgxPrintDirective, NgxPrintService } from 'ngx-print';
 import moment from 'moment';
 import 'moment/locale/es';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { ReportDensityService } from 'src/app/core/services/report-density.service';
 
 @Component({
   selector: 'app-ticket-print-modal',
@@ -34,22 +35,38 @@ export class TicketPrintModalComponent {
     @Optional() public dialogRef: MatDialogRef<TicketPrintModalComponent> | null, 
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
     private _printerService: NgxPrintService,
-    private _AuthService: AuthService
+    private _AuthService: AuthService,
+    public reportDensityService: ReportDensityService
   ) {
     moment.locale('es');
     this.user = this._AuthService.user();
+    // console.log(this.data);
     if (this.data.flag === 0) {
+
       this.file = 2;
-      if (Object.keys(this.data.data.layaway).length > 0) {
+      if (Object.keys(this.data.data?.layaway ?? {}).length > 0) {
         this.dataTicket = this.data.data;
         this.dataTicket['full'] = this.dataTicket.layaway
-        this.dataTicket.full['incomeTotal'] =  this.dataTicket.layaway.incomes.reduce((a: any, b: any) => a + b.amount, 0);
+        this.dataTicket.full['incomeTotal'] = this.data.data.amount
+        // this.dataTicket.full['incomeTotal'] =  this.dataTicket.layaway.incomes.reduce((a: any, b: any) => a + b.amount, 0);
+        // console.log(this.dataTicket.full.incomeTotal);
       }
 
-      if (Object.keys(this.data.data.sale).length > 0) {
+      if (Object.keys(this.data.data?.sale ?? {}).length > 0) {
         this.dataTicket = this.data.data;
         this.dataTicket['full'] = this.dataTicket.sale
-        this.dataTicket.full['incomeTotal'] =  this.dataTicket.sale.incomes.reduce((a: any, b: any) => a + b.amount, 0);
+        this.dataTicket.full['incomeTotal'] = this.data.data.amount
+
+        // this.dataTicket.full['incomeTotal'] =  this.dataTicket.sale.incomes.reduce((a: any, b: any) => a + b.amount, 0);
+        // console.log(this.dataTicket.full.incomeTotal);
+      }
+
+      if (!this.dataTicket) {
+        this.dataTicket = this.data.data;
+        this.dataTicket['full'] = {
+          client: this.data.data.client ?? {},
+          incomeTotal: this.data.data.amount ?? 0,
+        };
       }
     }
 
@@ -61,6 +78,22 @@ export class TicketPrintModalComponent {
     if (this.data.flag === 4) { 
       this.contractData = this.data.data;
       this.file = 4;
+    }
+
+    if (this.data.flag === 5) {
+      this.contractData = this.data.data;
+      this.file = 5;
+    }
+
+    if (this.data.flag === 6) {
+      this.file = 2;
+      this.dataTicket = this.data.data;
+      this.dataTicket['full'] = {
+        client: this.data.data?.client ?? {},
+        incomeTotal: this.saleTicketPaymentsTotal,
+      };
+      this.dataTicket['income_type'] = 'venta';
+      this.dataTicket['paymenthMethod'] = this.saleTicketPaymentMethods;
     }
   }
 
@@ -158,10 +191,44 @@ export class TicketPrintModalComponent {
       .format('MMMM')
       .toUpperCase();
   }
+
+  formatTicketDate(date: any) {
+    return date ? moment(date).format('DD/MM/YYYY') : '-';
+  }
+
+  moneyValue(value: any) {
+    const amount = Number(value ?? 0);
+    return Number.isFinite(amount) ? amount : 0;
+  }
+
+  get isSaleTicket() {
+    return this.data?.flag === 6;
+  }
+
+  get saleTicketPayments() {
+    const incomes = Array.isArray(this.data?.data?.incomes) ? this.data.data.incomes : [];
+    return incomes.filter((income: any) => ['sale', 'layaway'].includes((income?.source ?? '').toString().toLowerCase()));
+  }
+
+  get saleTicketPaymentsTotal() {
+    return this.saleTicketPayments.reduce((total: number, income: any) => total + this.moneyValue(income?.amount ?? income?.income ?? income?.total), 0);
+  }
+
+  get saleTicketPaymentMethods() {
+    const methods = this.saleTicketPayments
+      .map((income: any) => income?.payment_method?.name ?? income?.paymenthMethod ?? income?.paymentMethod ?? income?.payment_method_name)
+      .filter((method: any) => !!method);
+
+    return methods.length ? Array.from(new Set(methods)).join(', ') : '-';
+  }
+
+  get saleTicketClientName() {
+    return this.data?.data?.client?.full_name ?? this.dataTicket?.full?.client?.full_name ?? '';
+  }
   get date() {
     return moment()
       .locale('es')
-      .format('DD [DE] MMMM')
+      .format('DD [DE] MMMM [DE] YYYY')
       .toUpperCase();
   }
 
@@ -359,6 +426,74 @@ export class TicketPrintModalComponent {
 
   adeudo(installments_data: any) {
     return installments_data.reduce((a: any, b: any) => a + b.amount, 0);
+  }
+
+  get modalTitle() {
+    if (this.file === 2 && this.isSaleTicket) {
+      return 'Ticket de Venta';
+    }
+
+    if (this.file === 5) {
+      return 'Contrato de Apartado';
+    }
+
+    if (this.file === 3) {
+      return 'Contrato de Venta de Contado';
+    }
+
+    if (this.file === 4) {
+      return 'Contrato de Venta a Credito';
+    }
+
+    return 'Ticket';
+  }
+
+  get layawayDepositAmount() {
+    const receivedAmount = Number(this.contractData?.total ?? 0);
+    if (receivedAmount > 0) {
+      return receivedAmount;
+    }
+
+    return Number(this.contractData?.amount_layaway ?? 0);
+  }
+
+  get layawayPendingAmount() {
+    const saleAmount = Number(this.contractData?.amount_sale ?? 0);
+    const depositAmount = Number(this.layawayDepositAmount ?? 0);
+    return saleAmount - depositAmount;
+  }
+
+  get layawayContractDate() {
+    return this.contractData?.date_layaway ?? null;
+  }
+
+  get layawayBuyerSectionFontSize() {
+    return this.reportDensityService.density() === 'normal-compact' ? '11px' : '12px';
+  }
+
+  get layawayCommitmentDate() {
+    return this.contractData?.date_commitment ?? null;
+  }
+
+  get layawayClientAddress() {
+    const client = this.contractData?.client ?? {};
+    return [
+      client.address_street_1,
+      client.address_street_2,
+      client.address_city,
+      client.address_state,
+      client.address_zip
+    ]
+      .filter(Boolean)
+      .join(' ') || '-';
+  }
+
+  get layawayClientPhone() {
+    return this.contractData?.client?.phone || this.contractData?.client?.phone_mobile || '-';
+  }
+
+  get layawayClientCellphone() {
+    return this.contractData?.client?.phone_mobile || this.contractData?.client?.phone || '-';
   }
 
 }

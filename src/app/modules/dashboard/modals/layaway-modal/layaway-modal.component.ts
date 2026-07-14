@@ -154,7 +154,6 @@ constructor(
       
   	});
 
-    console.log(this.todayStr)
     this.saveForm.get('car_id')?.valueChanges.subscribe((value: any) => {
       let find = this.cars.find(x => String(x.id) === String(value));
       this.saveForm.get('sale_price')?.setValue(find.sale_price);

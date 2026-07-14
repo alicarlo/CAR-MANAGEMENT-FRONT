@@ -43,6 +43,7 @@ export interface Checks {
   ceniceros: Boolean;
   botones_interiores: Boolean;
   manijas_interiores: Boolean;
+  molduras_completas: Boolean;
   tapetes: Boolean;
   vestiduras: Boolean;
   gato:Boolean;

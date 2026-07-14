@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
@@ -8,10 +9,11 @@ import { RoleModalComponent } from '../../modals/role-modal/role-modal.component
 import { ActionMessageComponent } from 'src/app/modules/uikit/pages/action-message/action-message.component';
 import { TableComponent } from 'src/app/modules/uikit/pages/table/table.component';
 import { RolesService } from 'src/app/core/services/roles/roles.service';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Component({
   selector: 'app-roles',
-  imports: [TableComponent, MatDialogModule],
+  imports: [CommonModule, TableComponent, MatDialogModule],
   templateUrl: './roles.component.html',
   styleUrl: './roles.component.css'
 })
@@ -25,7 +27,7 @@ export class RolesComponent {
     { key: 'scope_id', type: 'text' },
   ]
 
-  readonly actions: RowAction[] = [
+  private readonly baseActions: RowAction[] = [
     { icon: 'edit',  id: 'edit',  label: 'Editar' },
     { icon: 'delete', id: 'delete', label: 'Eliminar' },
   ];
@@ -51,27 +53,54 @@ export class RolesComponent {
   constructor(
     private _MatDialog: MatDialog,
     private _RolesService: RolesService,
-    private _ToastrService: ToastrService
+    private _ToastrService: ToastrService,
+    private _PermissionsService: PermissionsService
   ) {}
+
+  get canCreateRole() {
+    return this._PermissionsService.hasScopes(['ROLE.ADD']);
+  }
+
+  get canEditRole() {
+    return this._PermissionsService.hasScopes(['ROLE.UPDATE']);
+  }
+
+  get canDeleteRolePermission() {
+    return this._PermissionsService.hasScopes(['ROLE.DELETE']);
+  }
+
+  get actions(): RowAction[] {
+    return this.baseActions.filter((action) => {
+      if (action.id === 'edit') return this.canEditRole;
+      if (action.id === 'delete') return this.canDeleteRolePermission;
+      return true;
+    });
+  }
 
   ngOnInit() {
     this.getRoles();
   }
   
   onRowAction(e: RowActionEvent<any>) {
+    if (e.id === 'edit' && !this.canEditRole) return;
+    if (e.id === 'delete' && !this.canDeleteRolePermission) return;
     if (e.id === 'edit')  this.openModal(e.id,e.row);
     if (e.id === 'delete') this.actionModal(e.id,e.row, 'Desea eliminar el registro?');
   }
 
   openModal(action: string, data: any) {
+    if (action === 'new' && !this.canCreateRole) return;
+    if (action === 'edit' && !this.canEditRole) return;
+
     let dataSend = {action, row: data};
     const dialogRef = this._MatDialog.open(RoleModalComponent, {
       disableClose: true,
       panelClass: ['custom-dialog-container'],
       data: dataSend,
-      minHeight: '55vh',
-      width: '50vw',
-      maxWidth: '90vw'
+      minHeight: '70vh',
+      width: '82vw',
+      maxWidth: '96vw',
+      height: '88vh'
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -82,6 +111,8 @@ export class RolesComponent {
   }
 
   actionModal(action: string, data: any, msg: string, color: string = '!text-red-500', icon = 'delete') {
+    if (action === 'delete' && !this.canDeleteRolePermission) return;
+
     let dataSend = {action, row: data, msg, color, icon};
     const ref: any = this._MatDialog.open(ActionMessageComponent, {
       data: dataSend,

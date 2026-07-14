@@ -171,8 +171,8 @@ export class CarsModalComponent {
 
     if (this.data.row !== null && this.data.row.purchases.length > 0) {
       this.saveForm.get('cost')?.disable();
-      let amount = (this.data.row.purchases || []).reduce((acc: number, inc: any) => acc + (Number(inc.total) || 0), 0);
-      this.saveForm.get('cost')?.setValue(amount);
+      //let amount = (this.data.row.purchases || []).reduce((acc: number, inc: any) => acc + (Number(inc.total) || 0), 0);
+      // this.saveForm.get('cost')?.setValue(amount);
     }
   }
 

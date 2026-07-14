@@ -21,8 +21,12 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
 })
 export class InvestmentShoppingShowModalComponent {
   loadingModal: boolean = false;
+  loadingMore: boolean = false;
   purchases: any[] = [];
   totalCars: any = null;
+  currentPage: number = 1;
+  pageSize: number = 20;
+  hasMorePages: boolean = false;
   constructor(
     private dialog: MatDialog,                                 
     @Optional() public dialogRef: MatDialogRef<InvestmentShoppingShowModalComponent> | null, 
@@ -41,7 +45,7 @@ export class InvestmentShoppingShowModalComponent {
 
   getInvestorPurchases() {
     this.loadingModal = false;
-    this._ShopingService.getInvestorPurchase(this.data.row.id,500, 1).subscribe({
+    this._ShopingService.getInvestorPurchase(this.data.row.id, this.pageSize, 1).subscribe({
       next: async (response: any) => {
         if(response) {
 
@@ -58,21 +62,53 @@ export class InvestmentShoppingShowModalComponent {
     })
   }
 
-   getInvestorBills() {
-    this.loadingModal = false;
-    this._BillService.getBillsInvestor(this.data.row.id,500, 1).subscribe({
+  getInvestorBills(reset: boolean = true) {
+    if (reset) {
+      this.loadingModal = false;
+      this.currentPage = 1;
+      this.purchases = [];
+      this.totalCars = null;
+      this.hasMorePages = false;
+    } else {
+      this.loadingMore = true;
+    }
+
+    this._BillService.getBillsInvestor(this.data.row.id, this.pageSize, this.currentPage).subscribe({
       next: async (response: any) => {
         if(response) {
-          this.purchases = response.items.map((r: any) => ({ ...r}));
-          this.totalCars = response.items.reduce((sum: any, item: any) => sum + item.total, 0);
+          const items = response.items?.map((r: any) => ({ ...r})) ?? [];
+          this.purchases = reset ? items : [...this.purchases, ...items];
+          this.totalCars = this.purchases.reduce((sum: any, item: any) => sum + (Number(item.total) || 0), 0);
+          this.hasMorePages = this.hasNextPage(response);
           this.loadingModal = true;
+          this.loadingMore = false;
         }
       },
       error: (err) => {
         this.loadingModal = true;
+        this.loadingMore = false;
         if (err.error === "Token expired") return;
         this._ToastrService.error(err.error, 'Error');
       },
     })
+  }
+
+  loadMoreBills() {
+    if (this.loadingMore || !this.hasMorePages) return;
+    this.currentPage += 1;
+    this.getInvestorBills(false);
+  }
+
+  private hasNextPage(response: any): boolean {
+    const pagination = response?.pagination;
+    if (!pagination) return false;
+
+    if (typeof pagination.has_next === 'boolean') return pagination.has_next;
+    if (typeof pagination.hasNext === 'boolean') return pagination.hasNext;
+
+    const currentPage = Number(pagination.current_page ?? pagination.currentPage ?? this.currentPage);
+    const totalPages = Number(pagination.total_pages ?? pagination.totalPages ?? pagination.pages);
+
+    return Number.isFinite(currentPage) && Number.isFinite(totalPages) && currentPage < totalPages;
   }
 }

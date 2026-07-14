@@ -1,8 +1,9 @@
-import { Injectable, OnDestroy, signal } from '@angular/core';
+import { effect, Injectable, OnDestroy, signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Menu } from 'src/app/core/constants/menu';
 import { MenuItem, SubMenuItem } from 'src/app/core/models/menu.model';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,9 +14,11 @@ export class MenuService implements OnDestroy {
   private _pagesMenu = signal<MenuItem[]>([]);
   private _subscription = new Subscription();
 
-  constructor(private router: Router) {
-    /** Set dynamic menu */
-    this._pagesMenu.set(Menu.pages);
+  constructor(private router: Router, private permissionsService: PermissionsService) {
+    effect(() => {
+      this.permissionsService.currentUser;
+      this._pagesMenu.set(this.filterMenuByPermissions(Menu.pages));
+    });
 
     let sub = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
@@ -66,6 +69,47 @@ export class MenuService implements OnDestroy {
 
   public toggleSubMenu(submenu: SubMenuItem) {
     submenu.expanded = !submenu.expanded;
+  }
+
+  private filterMenuByPermissions(menuGroups: MenuItem[]): MenuItem[] {
+    return menuGroups
+      .map((group) => ({
+        ...group,
+        items: this.filterSubMenuItems(group.items),
+      }))
+      .filter((group) => group.items.length > 0);
+  }
+
+  private filterSubMenuItems(items: SubMenuItem[]): SubMenuItem[] {
+    return items
+      .map((item): SubMenuItem | null => {
+        const filteredChildren: SubMenuItem[] | undefined = item.children
+          ? this.filterSubMenuItems(item.children)
+          : undefined;
+        const hasRouteAccess = item.route ? this.permissionsService.canAccessRoute(item.route) : true;
+        const hasVisibleChildren = !!filteredChildren?.length;
+
+        if (item.children?.length) {
+          if (!hasVisibleChildren) {
+            return null;
+          }
+
+          return {
+            ...item,
+            children: filteredChildren,
+          };
+        }
+
+        if (!hasRouteAccess && !hasVisibleChildren) {
+          return null;
+        }
+
+        return {
+          ...item,
+          children: filteredChildren,
+        };
+      })
+      .filter((item): item is SubMenuItem => item !== null);
   }
 
   private expand(items: Array<any>) {

@@ -15,8 +15,12 @@
       <div *ngIf="totalLayaway > 0" >
         <p class="text-foreground font-semibold text-[12px]">Total de abonos:{{ totalLayaway | currency }}</p>
       </div>
+      <div *ngIf="!canViewLayawayIncomes" class="text-muted-foreground text-[12px]">
+        No tienes permisos para visualizar los abonos de este apartado.
+      </div>
       <div
-        class="border border-border/60 rounded-lg bg-card 
+        *ngIf="canViewLayawayIncomes"
+        class="border border-border/60 rounded-lg bg-card
               max-h-[310px] overflow-y-auto overflow-x-auto"
       >
         <table class="w-full table-fixed">
@@ -46,7 +50,7 @@
                 </div>
               </td>
 
-              
+
                <td class="px-3 py-2 align-middle">
                 <div class="min-w-0 whitespace-normal break-words [hyphens:auto] text-left">
                   {{ item.dateIncome | date:'dd/MM/yyyy':'UTC' }}
@@ -77,41 +81,49 @@
 
               <td class="px-2 py-1 align-middle">
                 <div class="flex items-center justify-start gap-1">
-                  <button 
+                  <!-- Ticket de abono oculto temporalmente.
+
+                  <button
+                    *ngIf="canDownloadIncomeSupport"
                     (click)="openTicketModal(item)"
                     mat-icon-button aria-label="Descargar"
                     matTooltip="Descargar Ticket"
                     matTooltipPosition="above"
-                    matTooltipClass="bg-background text-foreground"        
+                    matTooltipClass="bg-background text-foreground"
                   >
                     <mat-icon class="!text-foreground/80 text-[18px] leading-none">confirmation_number</mat-icon>
                   </button>
-    
-                  <button mat-icon-button aria-label="Editar" 
+                  -->
+
+                  <button
+                    *ngIf="canEditIncome"
+                    mat-icon-button aria-label="Editar"
                     (click)="openAddModal('edit', item)"
                     matTooltip="Editar Abono"
                     matTooltipPosition="above"
-                    matTooltipClass="bg-background text-foreground" 
+                    matTooltipClass="bg-background text-foreground"
                   >
                     <mat-icon class="!text-foreground/80 text-[18px] leading-none">edit</mat-icon>
                   </button>
-                  <button mat-icon-button color="warn" aria-label="Eliminar"
+                  <button
+                    *ngIf="canDeleteIncome"
+                    mat-icon-button color="warn" aria-label="Eliminar"
                     (click)="actionModal('edit', item, 'Desea  eliminar el registro?')"
                     matTooltip="Eliminar Abono"
                     matTooltipPosition="above"
-                    matTooltipClass="bg-background text-foreground" 
+                    matTooltipClass="bg-background text-foreground"
                           >
                     <mat-icon class="!text-foreground/80 text-[18px] leading-none">delete</mat-icon>
                   </button>
 
 
-                  <button 
-                    *ngIf="item.document && objectKeys(item.document).length > 0"
-                     mat-icon-button 
+                  <button
+                    *ngIf="canDownloadIncomeSupport && item.document && objectKeys(item.document).length > 0"
+                    mat-icon-button
                     aria-label="Descargar"
                     matTooltip="Descargar Archivo"
                     matTooltipPosition="above"
-                    matTooltipClass="bg-background text-foreground"        
+                    matTooltipClass="bg-background text-foreground"
                     (click)="actionModalFile(1,'delete', item, 'Desea descargar el archivo?')"
                   >
                     <mat-icon class="!text-foreground/80 text-[18px] leading-none">attach_file</mat-icon>

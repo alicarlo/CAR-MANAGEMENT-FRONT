@@ -1,7 +1,7 @@
 <mat-dialog-content>
   <div class="p-[20px]">
     <div  class="flex flex-col gap-4">
-      <p class="text-foreground font-semibold">Ticket</p>
+      <p class="text-foreground font-semibold">{{ modalTitle }}</p>
 
       <div style="display: flex; width: 100%; justify-content: center;" *ngIf="file === 1">
         <div id="print-section" style="width: 80mm; ">
@@ -28,7 +28,7 @@
               <span class="strong" style="font-weight:700;"># Abono:</span> {{ data.data.idIncome }}
             </p>
             <p  class="text-foreground" style="margin:0;padding:0;font-family:Roboto,'Helvetica Neue',sans-serif;font-size:12px;">
-              <span class="strong" style="font-weight:700;">Importe Abono:</span> {{ data.data.income | currency }}
+              <span class="strong" style="font-weight:700;">Importe Abono:</span> {{ data.data.income | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}
             </p>
             <p  class="text-foreground" style="margin:0;padding:0;font-family:Roboto,'Helvetica Neue',sans-serif;font-size:12px;">
               <span class="strong" style="font-weight:700;">Fecha Abono:</span> {{ data.data.date_income | date:'dd/MM/yyyy':'UTC' }}
@@ -104,6 +104,40 @@
             <p style="font-size:12px; background-color: black; color: white; width: 75px;">CONCEPTO:</p>
             <p style="font-size:12px;">TIPO DE PAGO: {{ formatIncomeType(dataTicket.income_type) }}</p>
             <p style="font-size:12px;">FORMA DE PAGO: {{ dataTicket.paymenthMethod }}</p>
+            <p *ngIf="isSaleTicket" style="font-size:12px;">
+              AUTO:
+              {{
+                data?.data?.car
+                  ? ((data.data.car.make || '') + ' ' + (data.data.car.model || '') + ' ' + (data.data.car.version || '') + ' ' + (data.data.car.color || '')).trim()
+                  : '-'
+              }}
+            </p>
+          </div>
+
+          <div style="margin-bottom:20px;" *ngIf="isSaleTicket && saleTicketPayments.length">
+            <p style="font-size:12px; background-color: black; color: white; width: 55px;">PAGOS:</p>
+            <div style="width:100%; border:1px solid #111; margin-top:8px;">
+              <div style="display:grid; grid-template-columns: 90px 130px 130px 1fr 110px; background:#111; color:white; font-size:11px; font-weight:700;">
+                <p style="margin:0; padding:6px;">FECHA</p>
+                <p style="margin:0; padding:6px;">TIPO</p>
+                <p style="margin:0; padding:6px;">FORMA</p>
+                <p style="margin:0; padding:6px;">DESCRIPCION</p>
+                <p style="margin:0; padding:6px; text-align:right;">IMPORTE</p>
+              </div>
+              <div
+                *ngFor="let payment of saleTicketPayments"
+                style="display:grid; grid-template-columns: 90px 130px 130px 1fr 110px; border-top:1px solid #111; font-size:11px;">
+                <p style="margin:0; padding:6px;">{{ formatTicketDate(payment.date_income || payment.created_at) }}</p>
+                <p style="margin:0; padding:6px;">{{ formatIncomeType(payment.income_type) || '-' }}</p>
+                <p style="margin:0; padding:6px;">{{ payment.payment_method?.name || payment.paymenthMethod || payment.paymentMethod || '-' }}</p>
+                <p style="margin:0; padding:6px;">{{ payment.description || payment.comments || '-' }}</p>
+                <p style="margin:0; padding:6px; text-align:right;">{{ moneyValue(payment.amount || payment.income || payment.total) | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}</p>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:20px; margin-top:10px;">
+              <p style="font-size:12px; font-weight:700; margin:0;">TOTAL PAGOS:</p>
+              <p style="font-size:12px; margin:0;">{{ saleTicketPaymentsTotal | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}</p>
+            </div>
           </div>
 
           <div style="margin-bottom:20px;">
@@ -112,12 +146,12 @@
     
             <div style="display: flex; gap: 20px;">
               <p style="font-size:12px; width: 80px;">SUBTOTAL:</p>
-              <p style="font-size:12px;">{{ dataTicket.full.incomeTotal| currency }}</p>
+              <p style="font-size:12px;">{{ dataTicket.full.incomeTotal | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}</p>
             </div>
 
             <div style="display: flex; gap: 20px;">
               <p style="font-size:12px; width: 80px;">TOTAL:</p>
-              <p style="font-size:12px;">{{ dataTicket.full.incomeTotal | currency }}</p>
+              <p style="font-size:12px;">{{ dataTicket.full.incomeTotal | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}</p>
             </div>
            
           </div>
@@ -131,6 +165,13 @@
             <p style="font-size:12px; background-color: black; color: white; width: 55px;">RECIBE:</p>
             <br>
             <p style="font-size:12px;">{{ user.full_name }}</p>
+          </div>
+
+          <div *ngIf="isSaleTicket" style="display:flex; justify-content:center; margin-top:80px;">
+            <div style="width:280px; text-align:center; border-top:1px solid black; padding-top:8px;">
+              <p style="font-size:12px; margin:0; font-weight:700;">{{ saleTicketClientName }}</p>
+              <p style="font-size:12px; margin:4px 0 0 0;">FIRMA DEL CLIENTE</p>
+            </div>
           </div>
         </div>
       </div>
@@ -183,7 +224,7 @@
               CONTRATO DE COMPRA-VENTA DE VEHÍCULOS AUTOMOTORES USADOS QUE CELEBRAN POR UNA PARTE
               <b>MACHUCAS AUTOMOTRIZ S. DE R.L.</b>, A QUIEN EN LO SUCESIVO SE LE DENOMINARÁ
               <b>“EL VENDEDOR”</b> Y POR OTRA PARTE
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:260px;">{{ contractData.clientName }}</span>
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:260px; font-weight:700;">{{ contractData.clientName }}</span>
               A QUIEN EN LO SUCESIVO SE LE DENOMINARÁ <b>“EL COMPRADOR”</b> AL TENOR DE LAS SIGUIENTES
               DECLARACIONES Y CLÁUSULAS.
             </p>
@@ -224,7 +265,7 @@
             <p style="margin:0 0 6px 0; text-align:justify;">
               d) TENER SU DOMICILIO EN CALZADA INDEPENDENCIA 1375, COLONIA BENITO JUÁREZ, C.P. 21250,
               CON R.F.C. MAU000519-AG0, TELÉFONO (686) 565-72-72, HORARIO DE ATENCIÓN DE LUNES A VIERNES
-              DE 9:00 A 19:00 HORAS, SÁBADO DE 9:00 A 18:00 HORAS Y DOMINGO PERMANECE CERRADO.
+              DE 9:00 A 19:00 HORAS, SÁBADO DE 9:00 A 16:00 HORAS Y DOMINGO PERMANECE CERRADO.
             </p>
 
             <p style="margin:0 0 6px 0; text-align:justify;">
@@ -242,26 +283,22 @@
 
             <p style="margin:0 0 6px 0; text-align:justify;">
               I.- LLAMARSE COMO HA QUEDADO EXPRESADO, TENER SU DOMICILIO EN:
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:280px;">
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:280px; font-weight:700;">
                 {{ contractData?.client.address_street_1 }}, 
                 {{ contractData?.client.address_zip }}
               </span>,
               CON REGISTRO FEDERAL DE CAUSANTES:
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:100px;">
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:100px; font-weight:700;">
                 {{ contractData?.client.rfc }}
               </span>
               Y TELÉFONO DE CASA:
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px;">
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px; font-weight:700;">
                 {{ contractData?.client.phone }}
               </span>
               TELÉFONO CELULAR:
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px;">
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px; font-weight:700;">
                 {{ contractData?.client.phone_mobile}}
               </span>
-              TELÉFONO DE TRABAJO:
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px;">
-                {{ contractData?.client.phone_work }}
-              </span>.
             </p>
 
             <p style="margin:0 0 10px 0; text-align:justify;">
@@ -285,18 +322,21 @@
               <p style="margin:0;">COLOR <span style="border-bottom:1px solid black; display:inline-block; min-width:175px;">{{ contractData?.car?.color || dataTicket?.full?.car?.color || '' }}</span></p>
 
               <p style="margin:0;">No. DE SERIE <span style="border-bottom:1px solid black; display:inline-block; min-width:140px;">{{ contractData?.car?.vin || dataTicket?.full?.car?.vin || '' }}</span></p>
-              <p style="margin:0;">TIPO <span style="border-bottom:1px solid black; display:inline-block; min-width:190px;">{{ contractData?.car?.type || '' }}</span></p>
+              <p style="margin:0;">TIPO <span style="border-bottom:1px solid black; display:inline-block; min-width:190px;">{{ contractData?.car?.car_type?.name || '' }}</span></p>
 
-              <p style="margin:0;">No. DE PEDIMENTO <span style="border-bottom:1px solid black; display:inline-block; min-width:120px;">{{ contractData?.car?.pedimento || '' }}</span></p>
+              <!--<p style="margin:0;">No. DE PEDIMENTO <span style="border-bottom:1px solid black; display:inline-block; min-width:120px;">{{ contractData?.car?.pedimento || '' }}</span></p>-->
               <p style="margin:0;">CILINDROS <span style="border-bottom:1px solid black; display:inline-block; min-width:150px;">{{ contractData?.car?.cylinders || '' }}</span></p>
 
-              <p style="margin:0;">KM O MILLAS RECORRIDAS <span style="border-bottom:1px solid black; display:inline-block; min-width:100px;">{{ contractData?.car?.km  || dataTicket?.full?.car?.mileage || '' }}</span></p>
+              <p style="margin:0;">KM RECORRIDOS <span style="border-bottom:1px solid black; display:inline-block; min-width:100px;">{{ contractData?.car?.km  || dataTicket?.full?.car?.mileage || '' }}</span></p>
+              <p style="margin:0;">CLAVE <span style="border-bottom:1px solid black; display:inline-block; min-width:155px;">{{ contractData?.car?.key || '' }}</span></p>
               <p style="margin:0;">No. DE MOTOR <span style="border-bottom:1px solid black; display:inline-block; min-width:145px;">{{ contractData?.car?.engine_number || '' }}</span></p>
             </div>
 
             <p style="margin:0 0 8px 0;">
               EL VEHÍCULO ANTES DESCRITO SE DESIGNARÁ AL SERVICIO
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:180px;"></span>,
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:180px;">
+                {{ contractData?.contract.car_sector.toUpperCase() }}
+              </span>,
               MISMO QUE CUENTA CON EL SIGUIENTE INVENTARIO:
             </p>
           </div>
@@ -426,14 +466,14 @@
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 24px;">
               <p style="margin:0;">A) TIPO DE VENTA <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">
-                {{ contractData?.sales_type }}
+                {{ contractData?.sales_type | uppercase }}
               </span></p>
-              <p style="margin:0;">B) PRECIO DE LA UNIDAD SIN IVA $ <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">
-                {{ contractData?.amount_sale }}
+              <p style="margin:0;">B) PRECIO DE LA UNIDAD SIN IVA <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">
+                {{ contractData?.amount_sale | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}
               </span></p>
 
               <p style="margin:0;">C) FORMA DE PAGO <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">
-                 {{ contractData?.contract.payment_method }}
+                 {{ contractData?.contract.payment_method | uppercase }}
               </span></p>
               <p style="margin:0;">D) FECHA DE ENTREGA <span style="border-bottom:1px solid black; display:inline-block; min-width:150px;">
                 {{ contractData?.date_delivery | date:'dd/MM/yyyy' }}
@@ -441,9 +481,9 @@
             </div>
 
             <p style="margin:10px 0 0 0;">
-              EL PRECIO DE CONTADO DEL PRESENTE VEHÍCULO ES DE $
+              EL PRECIO DE CONTADO DEL PRESENTE VEHÍCULO ES DE
               <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">
-                {{ contractData?.amount_sale }}
+                {{ contractData?.amount_sale | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}
               </span>
               (
               <span>
@@ -564,7 +604,7 @@
           <div style="margin-top:30px; font-size:10px; text-align:center; line-height:1.35;">
             <p style="margin:0;">QUEJAS Y RECLAMACIONES AL TELÉFONO (686) 565-72-72</p>
             <p style="margin:0;">CALZ. INDEPENDENCIA #1375 COL. BENITO JUÁREZ, MEXICALI, B.C.</p>
-            <p style="margin:0;">HORARIO DE LUNES A SÁBADO DE 9:00 A.M. A 6:00 P.M.</p>
+            <p style="margin:0;">HORARIO DE LUNES A SÁBADO DE 9:00 A.M. A 4:00 P.M.</p>
             <p style="margin:0;">
               CONTRATO REGISTRADO ANTE LA PROCURADURÍA FEDERAL DEL CONSUMIDOR BAJO EL No. DE REGISTRO 571-2007
               DE FECHA 26 DE FEBRERO DEL 2007
@@ -630,7 +670,7 @@
               CONTRATO DE COMPRA-VENTA CON RESERVA DE DOMINIO DE VEHÍCULOS AUTOMOTORES USADOS QUE CELEBRAN POR UNA PARTE
               <b>MACHUCAS AUTOMOTRIZ S. DE R.L.</b>, A QUIEN EN LOS SUCESIVO SE LE DENOMINARA
               <b>“EL VENDEDOR”</b> Y POR OTRA PARTE
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:260px;">
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:260px; font-weight:700;">
                 {{ contractData.clientName }}
               </span>
               A QUIEN EN LOS SUCESIVO SE LE DENOMINARA <b>“EL COMPRADOR”</b> AL TENOR DE LAS SIGUIENTES
@@ -661,7 +701,7 @@
             </p>
 
             <p style="margin:0 0 6px 0; text-align:justify;">
-              d) TENER SU DOMICILIO EN CALZADA INDEPENDENCIA 1375 COLONIA BENITO JUÁREZ C.P. 21250, CON REGISTRO FEDERAL DE CONTRIBUYENTES MAU000519-AG0, TELÉFONO (686) 565-72-72, HORARIO DE ATENCIÓN DE LUNES A VIERNES DE 9:00 A 19:00 HORAS, SÁBADO DE 9:00 A 18:00 HORAS Y DOMINGO PERMANECE CERRADO.
+              d) TENER SU DOMICILIO EN CALZADA INDEPENDENCIA 1375 COLONIA BENITO JUÁREZ C.P. 21250, CON REGISTRO FEDERAL DE CONTRIBUYENTES MAU000519-AG0, TELÉFONO (686) 565-72-72, HORARIO DE ATENCIÓN DE LUNES A VIERNES DE 9:00 A 19:00 HORAS, SÁBADO DE 9:00 A 16:00 HORAS Y DOMINGO PERMANECE CERRADO.
             </p>
 
             <p style="margin:0 0 6px 0; text-align:justify;">
@@ -676,24 +716,20 @@
 
             <p style="margin:0 0 6px 0; text-align:justify;">
               I.- LLAMARSE COMO HA QUEDADO EXPRESADO, TENER SU DOMICILIO EN:
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:280px;">
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:280px; font-weight:700;">
                 {{ contractData?.client.address_street_1 }}, {{ contractData?.client.address_zip }}
               </span>,
               CON REGISTRO FEDERAL DE CAUSANTES:
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:100px;">
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:100px; font-weight:700;">
                 {{ contractData?.client.rfc }}
               </span>
               Y TELÉFONO DE CASA:
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px;">
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px; font-weight:700;">
                 {{ contractData?.client.phone }}
               </span>
               TELÉFONO CELULAR:
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px;">
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px; font-weight:700;">
                 {{ contractData?.client.phone_mobile }}
-              </span>
-              TELÉFONO DE TRABAJO:
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:90px;">
-                {{ contractData?.client.phone_work }}
               </span>
               CAPACIDAD JURÍDICA PARA OBLIGARSE Y MANIFIESTA QUE ANTES DE FIRMAR HE LEÍDO EL CLAUSULADO DE ESTE CONTRATO.
             </p>
@@ -719,18 +755,21 @@
               <p style="margin:0;">COLOR <span style="border-bottom:1px solid black; display:inline-block; min-width:175px;">{{ contractData?.car?.color }}</span></p>
 
               <p style="margin:0;">No. DE SERIE <span style="border-bottom:1px solid black; display:inline-block; min-width:140px;">{{ contractData?.car?.vin }}</span></p>
-              <p style="margin:0;">TIPO <span style="border-bottom:1px solid black; display:inline-block; min-width:190px;">{{ contractData?.car?.type }}</span></p>
+              <p style="margin:0;">TIPO <span style="border-bottom:1px solid black; display:inline-block; min-width:190px;">{{ contractData?.car?.car_type?.name || '' }}</span></p>
 
-              <p style="margin:0;">No. DE PEDIMENTO <span style="border-bottom:1px solid black; display:inline-block; min-width:120px;">{{ contractData?.car?.pedimento }}</span></p>
+              <!--<p style="margin:0;">No. DE PEDIMENTO <span style="border-bottom:1px solid black; display:inline-block; min-width:120px;">{{ contractData?.car?.pedimento }}</span></p>-->
               <p style="margin:0;">CILINDROS <span style="border-bottom:1px solid black; display:inline-block; min-width:150px;">{{ contractData?.car?.cylinders }}</span></p>
 
-              <p style="margin:0;">KM O MILLAS RECORRIDAS <span style="border-bottom:1px solid black; display:inline-block; min-width:100px;">{{ contractData?.car?.km }}</span></p>
+              <p style="margin:0;">KM RECORRIDOS <span style="border-bottom:1px solid black; display:inline-block; min-width:100px;">{{ contractData?.car?.km }}</span></p>
+              <p style="margin:0;">CLAVE <span style="border-bottom:1px solid black; display:inline-block; min-width:155px;">{{ contractData?.car?.key || '' }}</span></p>
               <p style="margin:0;">No. DE MOTOR <span style="border-bottom:1px solid black; display:inline-block; min-width:145px;">{{ contractData?.car?.engine_number }}</span></p>
             </div>
 
             <p style="margin:0 0 8px 0;">
               EL VEHÍCULO ANTES DESCRITO SE DESIGNARÁ AL SERVICIO
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:180px;"></span>,
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:180px;">
+                {{ contractData?.contract.car_sector.toUpperCase() }}
+              </span>,
               MISMO QUE CUENTA CON EL SIGUIENTE INVENTARIO:
             </p>
           </div>
@@ -834,13 +873,13 @@
             </p>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 24px;">
-              <p style="margin:0;">A) TIPO DE VENTA <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">{{ contractData?.sales_type }}</span></p>
-              <p style="margin:0;">B) PRECIO DE LA UNIDAD SIN IVA $ <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">{{ contractData?.amount_sale }}</span></p>
+              <p style="margin:0;">A) TIPO DE VENTA <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">{{ contractData?.sales_type | uppercase }}</span></p>
+              <p style="margin:0;">B) PRECIO DE LA UNIDAD SIN IVA <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">{{ contractData?.amount_sale | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}</span></p>
 
-              <p style="margin:0;">C) FORMA DE PAGO <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">{{ contractData?.contract?.payment_method }}</span></p>
-              <p style="margin:0;">D) ANTICIPO $ <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">{{ contractData?.car?.down_payment }}</span></p>
+              <p style="margin:0;">C) FORMA DE PAGO <span style="border-bottom:1px solid black; display:inline-block; min-width:170px;">{{ contractData?.contract?.payment_method | uppercase }}</span></p>
+              <p style="margin:0;">D) ANTICIPO <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">{{ contractData?.car?.down_payment | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}</span></p>
 
-              <p style="margin:0;">E) ADEUDO $ <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">{{ adeudo(contractData.installments_data) }}</span></p>
+              <p style="margin:0;">E) ADEUDO <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">{{ adeudo(contractData.installments_data) | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}</span></p>
               <p style="margin:0;">F) NUMERO DE PAGOS <span style="border-bottom:1px solid black; display:inline-block; min-width:80px;">{{ contractData?.installments_data?.length }}</span></p>
 
               <p style="margin:0;">G) FECHAS DE PAGO <span style="border-bottom:1px solid black; display:inline-block; min-width:200px;">DÍA {{ contractData?.contract?.payment_day }} DE CADA MES</span></p>
@@ -848,9 +887,9 @@
             </div>
 
             <p style="margin:10px 0 0 0;">
-              EL PRECIO DE CONTADO DEL PRESENTE VEHÍCULO ES DE $
+              EL PRECIO DE CONTADO DEL PRESENTE VEHÍCULO ES DE
               <span style="border-bottom:1px solid black; display:inline-block; min-width:130px;">
-                {{ contractData?.amount_sale }}
+                {{ contractData?.amount_sale | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}
               </span>
               (
               <span>
@@ -876,13 +915,13 @@
 
             <div *ngFor="let installment of contractData?.installments_data" style="margin:0 0 4px 0;">
               <p style="margin:0;">
-                ${{ installment.amount }} ({{ numeroALetras(installment.amount) }})
+                {{ installment.amount | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }} ({{ numeroALetras(installment.amount) }})
               </p>
             </div>
 
             <p style="margin:6px 0 0 0;">
               CADA UNO, QUE VENCERÁN CON UNA PERIODICIDAD DE
-              <span style="border-bottom:1px solid black; display:inline-block; min-width:140px;">MENSUAL</span>
+              <span style="border-bottom:1px solid black; display:inline-block; min-width:140px;"></span>
               Y EN FORMA SUCESIVA, LOS DÍAS
               <span style="border-bottom:1px solid black; display:inline-block; min-width:60px;">{{ contractData?.contract?.payment_day }}</span>
               A PARTIR DEL DIA
@@ -1067,7 +1106,7 @@
             <p style="margin:0;">QUEJAS Y RECLAMACIONES AL TELÉFONO (686) 565-72-72</p>
             <p style="margin:0;">CALZ. INDEPENDENCIA #1375 COL. BENITO JUÁREZ</p>
             <p style="margin:0;">MEXICALI, B.C.</p>
-            <p style="margin:0;">HORARIO DE LUNES A SÁBADO DE 9:00 A.M. A 6:00 P.M.</p>
+            <p style="margin:0;">HORARIO DE LUNES A SÁBADO DE 9:00 A.M. A 4:00 P.M.</p>
             <p style="margin:0;">
               CONTRATO REGISTRADO ANTE LA PROCURADURÍA FEDERAL DEL CONSUMIDOS BAJO EL No. DE REGISTRO 571-2007 DE FECHA 26 DE FEBRERO DEL 2007
             </p>
@@ -1079,6 +1118,134 @@
             </p>
           </div>
 
+        </div>
+      </div>
+
+      <div class="w-full flex justify-center bg-gray-200 p-4 overflow-auto" *ngIf="file === 5">
+        <div id="print-section"
+            style="
+              width: 794px;
+              min-height: 1123px;
+              background: white;
+              padding: 28px 22px 18px 22px;
+              box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+              font-family: Arial, Helvetica, sans-serif;
+              color: black;
+              font-size: 12px;
+              line-height: 1.15;
+            ">
+
+          <div style="text-align:center; margin-bottom:10px;">
+            <img src="./assets/imgs/machucas.png" style="height:58px; width:82px; margin:0 auto 8px auto; display:block;">
+            <p style="margin:0; font-size:20px; font-weight:700;">CONTRATO DE APARTADO</p>
+            <p style="margin:6px 0 0 0; font-size:16px; font-weight:700;">MACHUCA'S AUTOMOTRIZ</p>
+          </div>
+
+          <div style="margin-bottom:8px;">
+            <div style="background:black; color:white; text-align:center; font-weight:700; padding:3px 8px; font-size:14px;">
+              CARACTERISTICAS DEL VEHICULO
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; column-gap:18px; row-gap:6px; padding-top:8px;">
+              <p style="margin:0;">MARCA : <strong>{{ contractData?.car?.make || '-' }}</strong></p>
+              <p style="margin:0;">LINEA : <strong>{{ contractData?.car?.version || '-' }}</strong></p>
+              <p style="margin:0;">MODELO : <strong>{{ contractData?.car?.model || '-' }}</strong></p>
+
+              <p style="margin:0;">NO DE SERIE : <strong>{{ contractData?.car?.vin || '-' }}</strong></p>
+              <p style="margin:0;"></p>
+              <p style="margin:0;">KM : <strong>{{ contractData?.car?.km || '-' }}</strong></p>
+
+              <p style="margin:0;">COLOR : <strong>{{ contractData?.car?.color || '-' }}</strong></p>
+              <p style="margin:0;">CLAVE : <strong>{{ contractData?.car?.key || '-' }}</strong></p>
+              <p style="margin:0;"></p>
+              <p style="margin:0;">CILINDROS : <strong>{{ contractData?.car?.cylinders || '-' }}</strong></p>
+            </div>
+          </div>
+
+          <div style="margin-bottom:8px;">
+            <div style="background:black; color:white; text-align:center; font-weight:700; padding:3px 8px; font-size:14px;">
+              DATOS DEL COMPRADOR
+            </div>
+
+            <div style="padding-top:8px; display:flex; flex-direction:column; gap:4px; line-height:1.25;" [style.font-size]="layawayBuyerSectionFontSize">
+              <p style="margin:0; text-align:justify;">
+                <span>POR MEDIO DEL PRESENTE DOCUMENTO HAGO CONSTAR CON ESTA FECHA </span>
+                <strong>{{ layawayContractDate | date:'dd/MM/yyyy':'UTC' }}</strong>
+                <span> HE VENDIDO AL SR.(A) </span>
+                <strong>{{ contractData?.client?.full_name || '-' }}</strong>
+                <span> UN AUTOMOVIL CON DATOS YA DESCRITOS EN LA PARTE SUPERIOR EN LA CANTIDAD DE </span>
+                <strong>{{ contractData?.amount_sale | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}</strong>
+                <span>. CON UN DEPOSITO DE </span>
+                <strong>{{ layawayDepositAmount | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}</strong>
+                <span> QUE SERA TOMADO A CUENTA , QUEDANDO DE ACUERDO QUE MAS TARDAR EL DIA </span>
+                <strong>{{ layawayCommitmentDate | date:'dd/MM/yyyy':'UTC' }}</strong>
+                <span> SE PAGARA EL RESTO QUE ES DE </span>
+                <strong>{{ layawayPendingAmount | currency:'MXN':'symbol-narrow':'1.2-2':'en-US' }}</strong>
+                <span> ESTAMOS DE ACUERDO EN QUE EL VALOR EN QUE SE HA AJUSTADO LA VENTA ES LO JUSTO Y LEGITIMO, UNA VEZ FIRMADO EL PRESENTE CONTRATO, </span>
+                <strong>NO HAY DEVOLUCION EN EFECTIVO NI MOTIVO PARA DISOLVERLOS</strong>
+              </p>
+
+              <div style="height:8px;"></div>
+
+              <div style="display:grid; grid-template-columns: auto 1fr; column-gap:12px; row-gap:12px; align-items:end;">
+                <span>DIRECCION DEL CLIENTE :</span>
+                <strong>{{ layawayClientAddress }}</strong>
+
+                <span>TELEFONO :</span>
+                <div style="display:flex; justify-content:space-between; gap:20px;">
+                  <strong>{{ layawayClientPhone }}</strong>
+                  <span>CELULAR :</span>
+                  <strong>{{ layawayClientCellphone }}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <p style="margin:0 0 6px 0;">NOTAS:</p>
+            <div style="border-bottom:1px dashed #555; min-height:28px; padding-bottom:4px;">{{ contractData?.comments || '' }}</div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; gap:24px; margin-top:34px;">
+            <div style="width:45%; text-align:center;">
+              <div style="border-top:2px solid black; padding-top:6px; font-weight:700;">{{ contractData?.user?.full_name || '-' }}</div>
+              <div style="margin-top:4px; font-size:11px; font-weight:700;">MACHUCAS AUTOMOTRIZ S. DE R. L.</div>
+            </div>
+
+            <div style="width:45%; text-align:center;">
+              <div style="border-top:2px solid black; padding-top:6px; font-weight:700;">{{ contractData?.client?.full_name || '-' }}</div>
+              <div style="margin-top:4px; font-size:11px; font-weight:700;">EL COMPRADOR</div>
+            </div>
+          </div>
+
+          <div style="text-align:center; margin-top:10px; font-size:13px;">
+            FOLIO <span style="color:#d60000; font-weight:700;">#{{ contractData?.folio || '' }}</span>
+          </div>
+
+          <div style="margin-top:32px;">
+            <div style="height:5px; background:#0f32ff;"></div>
+            <div style="height:5px; background:#d60000; margin-top:2px;"></div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:11px; font-weight:700;">
+              <div style="width:32%; text-align:left;">
+                BLVD. LAZARO CARDENAS #1498<br>
+                COL. LAZARO CARDENAS, MEXICALI, B.C.<br>
+                <span style="font-size:10px;">(686)596-25-50</span>
+              </div>
+
+              <div style="width:32%;"></div>
+
+              <div style="width:32%; text-align:right;">
+                CALZ. INDEPENDENCIA #1375<br>
+                COL. BENITO JUAREZ, MEXICALI, B.C.<br>
+                <span style="font-size:10px;">(686)565-72-72</span>
+              </div>
+            </div>
+
+            <div style="text-align:center; margin-top:6px; font-size:11px; font-weight:700;">
+              www.machucasautomotriz.com
+            </div>
+          </div>
         </div>
       </div>
     </div>

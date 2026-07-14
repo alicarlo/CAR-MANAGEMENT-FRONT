@@ -359,6 +359,13 @@ select {
   max-height: 90vh !important;
 }
 
+.cdk-overlay-pane.dialog-45 {
+  width: 90vw !important;
+  max-width: 90vw !important;
+  height: 38vh !important;
+  max-height: 90vh !important;
+}
+
 .cdk-overlay-pane.dialog-50 {
   width: 90vw !important;
   max-width: 90vw !important;
@@ -427,3 +434,201 @@ button {
 }
 
 .error-message { @apply text-xs text-red-500 text-center;  }
+
+.table-density-root {
+  --td-wrapper-padding: 0.5rem;
+  --td-scroll-px: 1rem;
+  --td-checkbox-width: 46px;
+  --td-th-font-size: 13px;
+  --td-th-px: 12px;
+  --td-th-py: 8px;
+  --td-td-font-size: 0.875rem;
+  --td-td-px: 12px;
+  --td-td-py: 8px;
+  --td-action-gap: 0.5rem;
+  --td-action-size: 28px;
+  --td-footer-gap: 0.75rem;
+  --td-footer-primary-gap: 0.5rem;
+  --td-footer-secondary-gap: 0.75rem;
+  --td-footer-pagination-gap: 0.25rem;
+  --td-footer-px: 1rem;
+  --td-footer-py: 0.75rem;
+  --td-footer-button-size: 28px;
+  --td-footer-button-font-size: 0.875rem;
+  --td-footer-select-width: 4rem;
+  --td-footer-select-padding-y: 0.5rem;
+  --td-footer-select-padding-x: 0.5rem;
+}
+
+.table-density-normal {
+  --td-scroll-px: 1.25rem;
+  --td-checkbox-width: 50px;
+  --td-th-font-size: 13px;
+  --td-th-px: 16px;
+  --td-th-py: 10px;
+  --td-td-font-size: 0.875rem;
+  --td-td-px: 16px;
+  --td-td-py: 12px;
+  --td-action-gap: 0.5rem;
+  --td-action-size: 28px;
+  --td-footer-gap: 1rem;
+  --td-footer-secondary-gap: 1rem;
+  --td-footer-pagination-gap: 0.5rem;
+  --td-footer-px: 1.25rem;
+  --td-footer-py: 0.75rem;
+}
+
+.table-density-normal-compact {
+  --td-scroll-px: 1rem;
+  --td-checkbox-width: 46px;
+  --td-th-font-size: 13px;
+  --td-th-px: 12px;
+  --td-th-py: 8px;
+  --td-td-font-size: 0.875rem;
+  --td-td-px: 12px;
+  --td-td-py: 8px;
+  --td-action-gap: 0.5rem;
+  --td-action-size: 28px;
+  --td-footer-gap: 0.75rem;
+  --td-footer-secondary-gap: 0.75rem;
+  --td-footer-pagination-gap: 0.25rem;
+  --td-footer-px: 1rem;
+  --td-footer-py: 0.75rem;
+}
+
+.table-density-compact {
+  --td-scroll-px: 0.75rem;
+  --td-checkbox-width: 42px;
+  --td-th-font-size: 12px;
+  --td-th-px: 10px;
+  --td-th-py: 7px;
+  --td-td-font-size: 12px;
+  --td-td-px: 10px;
+  --td-td-py: 7px;
+  --td-action-gap: 0.25rem;
+  --td-action-size: 24px;
+  --td-footer-gap: 0.5rem;
+  --td-footer-secondary-gap: 0.5rem;
+  --td-footer-pagination-gap: 0.25rem;
+  --td-footer-px: 0.75rem;
+  --td-footer-py: 0.5rem;
+  --td-footer-button-size: 24px;
+  --td-footer-button-font-size: 0.75rem;
+  --td-footer-select-width: 3.5rem;
+  --td-footer-select-padding-y: 0.375rem;
+  --td-footer-select-padding-x: 0.375rem;
+}
+
+.table-density-super-compact {
+  --td-wrapper-padding: 0.375rem;
+  --td-scroll-px: 0.5rem;
+  --td-checkbox-width: 38px;
+  --td-th-font-size: 12px;
+  --td-th-px: 8px;
+  --td-th-py: 7px;
+  --td-td-font-size: 12px;
+  --td-td-px: 8px;
+  --td-td-py: 7px;
+  --td-action-gap: 2px;
+  --td-action-size: 24px;
+  --td-footer-gap: 2px;
+  --td-footer-primary-gap: 2px;
+  --td-footer-secondary-gap: 2px;
+  --td-footer-pagination-gap: 2px;
+  --td-footer-px: 0.5rem;
+  --td-footer-py: 0.5rem;
+  --td-footer-button-size: 24px;
+  --td-footer-button-font-size: 0.75rem;
+  --td-footer-select-width: 3.5rem;
+  --td-footer-select-padding-y: 0.25rem;
+  --td-footer-select-padding-x: 0.25rem;
+}
+
+.table-density-root {
+  padding: var(--td-wrapper-padding);
+}
+
+.table-density-scroll {
+  @apply grow overflow-x-auto;
+  padding-inline: var(--td-scroll-px);
+}
+
+.table-density-table {
+  @apply table table-auto w-max border-collapse text-left align-middle;
+}
+
+.table-density-thead {
+  @apply border;
+  font-size: var(--td-th-font-size);
+}
+
+.table-density-checkbox-head {
+  width: var(--td-checkbox-width);
+  padding: var(--td-th-py) var(--td-th-px);
+}
+
+.table-density-th {
+  white-space: nowrap;
+  font-size: var(--td-th-font-size);
+  padding: var(--td-th-py) var(--td-th-px);
+}
+
+.table-density-td {
+  @apply max-w-[250px] break-words whitespace-normal;
+  font-size: var(--td-td-font-size);
+  padding: var(--td-td-py) var(--td-td-px);
+}
+
+.table-density-row {
+  @apply hover:bg-card/50;
+}
+
+.table-density-action-cell {
+  @apply text-center;
+  padding: var(--td-td-py) var(--td-td-px);
+}
+
+.table-density-row-actions {
+  display: flex;
+  gap: var(--td-action-gap);
+}
+
+.table-density-action-button {
+  @apply flex items-center justify-center rounded-md;
+  width: var(--td-action-size);
+  height: var(--td-action-size);
+}
+
+.table-density-footer {
+  @apply flex flex-wrap items-center justify-between text-xs;
+  gap: var(--td-footer-gap);
+  padding: var(--td-footer-py) var(--td-footer-px);
+}
+
+.table-density-footer-primary {
+  @apply order-2 flex items-center md:order-1;
+  gap: var(--td-footer-primary-gap);
+}
+
+.table-density-footer-secondary {
+  @apply order-1 flex items-center md:order-2;
+  gap: var(--td-footer-secondary-gap);
+}
+
+.table-density-footer-pagination {
+  @apply inline-flex items-center;
+  gap: var(--td-footer-pagination-gap);
+}
+
+.table-density-footer-icon-button,
+.table-density-footer-page-button {
+  @apply inline-flex shrink-0 items-center justify-center rounded-md;
+  width: var(--td-footer-button-size);
+  height: var(--td-footer-button-size);
+  font-size: var(--td-footer-button-font-size);
+}
+
+.table-density-footer-select {
+  width: var(--td-footer-select-width);
+  padding: var(--td-footer-select-padding-y) var(--td-footer-select-padding-x);
+}

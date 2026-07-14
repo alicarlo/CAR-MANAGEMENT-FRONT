@@ -54,11 +54,27 @@ export class TypeExpenseService {
     );
   }
 
-  public getPurchase(pageSize?: number, currentPage?: number): Observable<TypeExpense> {
+  public getPurchase(pageSize?: number, currentPage?: number, filters: any = {}, date_from: string = '', date_to: string = ''): Observable<TypeExpense> {
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
-    return this.http.get<TypeExpense>(`${environment.apiUrl}/purchase/?column=status&value=active&page=${currentPage}&limit=${pageSize}&sort_by=updated_at` ,httpOptions).pipe(
+    const params: string[] = [];
+
+    if (Object.keys(filters).length > 0) {
+      params.push(`filters=${encodeURIComponent(JSON.stringify(filters))}`);
+    }
+    if (date_from) {
+      params.push(`date_from=${encodeURIComponent(date_from)}`);
+    }
+    if (date_to) {
+      params.push(`date_to=${encodeURIComponent(date_to)}`);
+    }
+
+    params.push(`page=${currentPage}`);
+    params.push(`limit=${pageSize}`);
+    params.push('sort_by=updated_at');
+
+    return this.http.get<TypeExpense>(`${environment.apiUrl}/purchase/all?${params.join('&')}` ,httpOptions).pipe(
       retry(0),
       catchError(this.error.handleError)
     );

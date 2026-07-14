@@ -1,0 +1,15 @@
+:host {
+  display: block;
+}
+
+.report-sales-date-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+  -webkit-appearance: none;
+}
+
+.report-sales-date-input::-webkit-inner-spin-button,
+.report-sales-date-input::-webkit-clear-button {
+  display: none;
+  -webkit-appearance: none;
+}

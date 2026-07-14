@@ -1,5 +1,8 @@
+import { CommonModule } from '@angular/common';
 import { Component, model } from '@angular/core';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 import { RowAction, RowActionEvent } from 'src/app/core/models/actions.model';
@@ -19,15 +22,35 @@ import { IncomeAdditionalComponent } from '../../modals/income-additional/income
 import { HistoryIncomeModalComponent } from '../../modals/history-income-modal/history-income-modal.component';
 import { AdditionalIncomeModalComponent } from '../../modals/additional-income-modal/additional-income-modal.component';
 import { TicketPrintModalComponent } from '../../modals/ticket-print-modal/ticket-print-modal.component';
+import { PermissionsService } from 'src/app/core/services/permissions/permissions.service';
+import { UsersService } from 'src/app/core/services/users/users.service';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-incomes',
-  imports: [TableComponent, MatDialogModule],
+  imports: [TableComponent, MatDialogModule, CommonModule, FormsModule, ReactiveFormsModule, MatIconModule],
   templateUrl: './incomes.component.html',
   styleUrl: './incomes.component.css'
 })
 export class IncomesComponent {
+  readonly statusOptions: Array<{ id: string | null; label: string }> = [
+    { id: null, label: 'Todos' },
+    { id: 'pendiente_aprobacion', label: 'Pendiente de aprobacion' },
+    { id: 'aprobado', label: 'Aprobados' },
+  ];
+
   inconmes: any[] = [];
+  users: any[] = [];
+  filteredUsers: any[] = [];
+  selectedStatus: string | null = null;
+  selectedUserId: string | null = null;
+  selectedUserLabel = '';
+  userDropdownOpen = false;
+  userFilterControl = new FormControl('');
+  date_from: string = '';
+  date_to: string = '';
+  filterSelects: any = {};
+  downloadingExcel = false;
   laywaySelected: TypeExpense | undefined;
   inconmesHeader: string[] = [
     'Fecha','Usuario', 
@@ -85,11 +108,11 @@ export class IncomesComponent {
 
 
   readonly actions: RowAction[] = [
-    { icon: 'delete',  id: 'delete',  label: 'Cancelar registro' },
-    { icon: 'check_circle',  id: 'approve',  label: 'Aprobar registro' },
-    { icon: 'add',  id: 'status',  label: 'Agregar documento' },
-    { icon: 'attach_file',  id: 'url',  label: 'Descargar el archivo' },
-    { icon: 'description',  id: 'ticket',  label: 'Descargar Ticket' },
+    { icon: 'delete',  id: 'delete',  label: 'Cancelar registro', scope: ['INCOME.DELETE'] },
+    { icon: 'check_circle',  id: 'approve',  label: 'Aprobar registro', scope: ['INCOME.APPROVE', 'INCOME.STATUS.APPROVE'] },
+    { icon: 'add',  id: 'status',  label: 'Agregar documento', scope: ['INCOME.STATUS'] },
+    { icon: 'attach_file',  id: 'url',  label: 'Descargar el archivo', scope: ['INCOME.GET'] },
+    { icon: 'description',  id: 'ticket',  label: 'Descargar Ticket', scope: ['INCOME.GET'] },
     // { icon: 'attach_money',  id: 'incomeAdditional',  label: 'Agregar cobro adicional' },
     
   ];
@@ -117,16 +140,32 @@ export class IncomesComponent {
     private _MatDialog: MatDialog,
     private _ToastrService: ToastrService,
     private _SalesService : SalesService,
-    private _IncomeService: IncomeService
+    private _IncomeService: IncomeService,
+    private _UsersService: UsersService,
+    public permissionsService: PermissionsService
   ) {}
 
+  get canCreateAdditionalIncome() {
+    return this.permissionsService.hasScopes(['INCOME.ADD'], 'any');
+  }
+
   ngOnInit() {
+    this.getUsers();
     this.getIncomes();
+
+    this.userFilterControl.valueChanges.subscribe(term => {
+      const value = (term || '').toString().toLowerCase().trim();
+
+      this.filteredUsers = this.users.filter((user: any) => {
+        const text = `${user.full_name}`.toLowerCase();
+        return text.includes(value);
+      });
+    });
   }
 
   getIncomes() {
     this.loading = false;
-    this._IncomeService.getIncomesWithOutFilter(this.pageSize, this.currentPage).subscribe({
+    this._IncomeService.getIncomesFiltered(this.pageSize, this.currentPage, this.filterSelects, this.date_from, this.date_to).subscribe({
       next: async (response: any) => {
         if(response) {
           /*
@@ -142,32 +181,7 @@ export class IncomesComponent {
           this.hasNext = response.pagination.has_next;
           this.hasPrev = response.pagination.has_prev;
 
-          this.inconmes = response.items.map((r: any) => (
-            { 
-            statusReview: r.status === 'pendiente_aprobacion' ? 1 : r.status === 'cancelado' || r.status === 'aprobado' ? 2 : 3,
-            userData: r.user.full_name,
-            // typeIncome: r.sale.sales_type,
-            typeIncome: r.income_type == null ? '-' : this.formatIncomeType(r.income_type),
-            paymenthMethod: r.payment_method.name,
-            description: r.description === null ? '-' : r.description,
-            // client: r.source === 'layaway' ? r.layaway.client.full_name  ? r.source === 'sale' ?  r.sale.client.full_name : r.client,
-            clientData: r.source === 'layaway'
-              ? r.layaway?.client?.full_name
-              : r.source === 'sale'
-                ? r.sale?.client?.full_name
-                : r.client.full_name,
-            // carData: r.source === 'layaway' ? `${r.layaway.car.key} ${r.layaway.car.make} ${r.layaway.car.version} ${r.layaway.car.model} ${r.layaway.car.color}` : `${r.sale.car.key} ${r.sale.car.make} ${r.sale.car.version} ${r.sale.car.model} ${r.sale.car.color}`,
-            carData:
-              r.source === 'layaway'
-                ? [r.layaway?.car?.key, r.layaway?.car?.make, r.layaway?.car?.version, r.layaway?.car?.model, r.layaway?.car?.color].filter(Boolean).join(' ')
-                : r.source === 'sale'
-                  ? [r.sale?.car?.key, r.sale?.car?.make, r.sale?.car?.version, r.sale?.car?.model, r.sale?.car?.color].filter(Boolean).join(' ')
-                  : [r.car?.key, r.car?.make, r.car?.version, r.car?.model, r.car?.color].filter(Boolean).join(' '),
-            amount: r.amount,
-            url: Object.keys(r.document).length ? 1 : 2,
-            statusTicket: r.status === 'aprobado'  ? 1 : 2,
-             ...r
-          }));
+          this.inconmes = response.items.map((r: any) => this.normalizeIncomeRow(r));
           
           this.total = response.pagination.total_items;
           setTimeout(() => {
@@ -183,6 +197,135 @@ export class IncomesComponent {
       },
     })
     
+  }
+
+  getUsers() {
+    this._UsersService.getUsers(500, 1).subscribe({
+      next: async (response: any) => {
+        if (response) {
+          this.users = response.items.map((r: any) => ({ ...r.authz?.[0], ...r.user }));
+          this.filteredUsers = [...this.users];
+        }
+      },
+      error: (err) => {
+        if (err.error === 'Token expired') return;
+        this._ToastrService.error(err.error, 'Error');
+      },
+    });
+  }
+
+  filterGo() {
+    this.filterSelects = Object.fromEntries(
+      Object.entries({
+        status: this.selectedStatus,
+        user_id: this.selectedUserId,
+      }).filter(([_, v]) => v != null && v !== '')
+    );
+
+    this.currentPage = 1;
+    this.getIncomes();
+  }
+
+  downloadFile() {
+    if (this.downloadingExcel) return;
+
+    this.downloadingExcel = true;
+
+    this._IncomeService.getIncomesFiltered(undefined, undefined, this.filterSelects, this.date_from, this.date_to).subscribe({
+      next: (response: any) => {
+        const items = Array.isArray(response?.items)
+          ? response.items
+          : Array.isArray(response)
+            ? response
+            : [];
+
+        const normalizedItems = items.map((item: any) => this.normalizeIncomeRow(item));
+
+        if (normalizedItems.length === 0) {
+          this._ToastrService.warning('No hay datos para descargar', 'Mensaje');
+          this.downloadingExcel = false;
+          return;
+        }
+
+        const dataPush = normalizedItems.map((item: any) => ({
+          'Fecha': item.date_income ? moment(item.date_income).format('DD/MM/YYYY') : '-',
+          'Usuario': item.userData ?? '-',
+          'Tipo de ingreso': item.typeIncome ?? '-',
+          'Tipo de pago': item.paymenthMethod ?? '-',
+          'Importe del ingreso': item.amount ?? '-',
+          'Origen del ingreso': item.source ?? '-',
+          'Cliente': item.clientData ?? '-',
+          'Auto': item.carData ?? '-',
+          'Concepto del ingreso': item.description ?? '-',
+          'Estatus': item.status ?? '-',
+        }));
+
+        const binaryWS = XLSX.utils.json_to_sheet(dataPush);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, binaryWS, 'Ingresos');
+        XLSX.writeFile(wb, `Ingresos-${moment().format('DD-MM-YYYY')}.xlsx`);
+        this._ToastrService.success('Descarga exitosa', 'Mensaje');
+        this.downloadingExcel = false;
+      },
+      error: (err) => {
+        if (err.error !== 'Token expired') {
+          this._ToastrService.error(err.error, 'Error');
+        }
+        this.downloadingExcel = false;
+      },
+    });
+  }
+
+  toggleUserDropdown() {
+    this.userDropdownOpen = !this.userDropdownOpen;
+    if (this.userDropdownOpen) {
+      this.userFilterControl.setValue('');
+      this.filteredUsers = [...this.users];
+    }
+  }
+
+  closeUserDropdown() {
+    this.userDropdownOpen = false;
+  }
+
+  selectUser(user: any) {
+    this.selectedUserLabel = user !== null ? `${user.full_name}` : 'Todos';
+    this.selectedUserId = user !== null ? user.id : null;
+    this.closeUserDropdown();
+  }
+
+  openPicker(input: HTMLInputElement) {
+    if (typeof input.showPicker === 'function') {
+      input.showPicker();
+      return;
+    }
+    input.focus();
+    input.click();
+  }
+
+  private normalizeIncomeRow(r: any) {
+    return {
+      statusReview: r.status === 'pendiente_aprobacion' ? 1 : r.status === 'cancelado' || r.status === 'aprobado' ? 2 : 3,
+      userData: r.user?.full_name ?? '-',
+      typeIncome: r.income_type == null ? '-' : this.formatIncomeType(r.income_type),
+      paymenthMethod: r.payment_method?.name ?? '-',
+      description: r.description === null ? '-' : r.description,
+      clientData: r.source === 'layaway'
+        ? r.layaway?.client?.full_name ?? '-'
+        : r.source === 'sale'
+          ? r.sale?.client?.full_name ?? '-'
+          : r.client?.full_name ?? '-',
+      carData:
+        r.source === 'layaway'
+          ? [r.layaway?.car?.key, r.layaway?.car?.make, r.layaway?.car?.version, r.layaway?.car?.model, r.layaway?.car?.color].filter(Boolean).join(' ') || '-'
+          : r.source === 'sale'
+            ? [r.sale?.car?.key, r.sale?.car?.make, r.sale?.car?.version, r.sale?.car?.model, r.sale?.car?.color].filter(Boolean).join(' ') || '-'
+            : [r.car?.key, r.car?.make, r.car?.version, r.car?.model, r.car?.color].filter(Boolean).join(' ') || '-',
+      amount: r.amount,
+      url: r.document && Object.keys(r.document).length ? 1 : 2,
+      statusTicket: r.status === 'aprobado'  ? 1 : 2,
+      ...r
+    };
   }
 
   formatIncomeType(value: string): string {

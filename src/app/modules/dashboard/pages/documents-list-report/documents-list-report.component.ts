@@ -26,7 +26,9 @@ import * as XLSX from "xlsx";
   styleUrl: './documents-list-report.component.css'
 })
 export class DocumentsListReportComponent {
+  downloadingExcel = false;
   loadingModal: boolean = false;
+  selectedRowKey: string | null = null;
   typeDocument: any = [];
   store: any = [];
   carType: any = [];
@@ -45,6 +47,7 @@ export class DocumentsListReportComponent {
   statusSelected: any = null;
 
   filter: any = {};
+  keyFilterControl = new FormControl('');
   filteredStore: any = [];
   storeFilterControl = new FormControl('');
   storeDropdownOpen = false;
@@ -69,6 +72,7 @@ export class DocumentsListReportComponent {
   documentColumns: any[] = [];
 
   isDown = false;
+  didDrag = false;
   startX = 0;
   scrollLeft = 0;
   constructor(
@@ -81,8 +85,9 @@ export class DocumentsListReportComponent {
   ) { }
 
 
-  onMouseDown(e: MouseEvent, container: HTMLElement) {
+onMouseDown(e: MouseEvent, container: HTMLElement) {
   this.isDown = true;
+  this.didDrag = false;
   this.startX = e.pageX - container.offsetLeft;
   this.scrollLeft = container.scrollLeft;
 }
@@ -102,9 +107,30 @@ onMouseMove(e: MouseEvent, container: HTMLElement) {
 
   const x = e.pageX - container.offsetLeft;
   const walk = (x - this.startX) * 1.5;
+  if (Math.abs(walk) > 4) {
+    this.didDrag = true;
+  }
 
   container.scrollLeft = this.scrollLeft - walk;
 }
+
+  handleRowClick(item: any, index: number) {
+    if (this.didDrag) {
+      this.didDrag = false;
+      return;
+    }
+
+    this.selectRow(item, index);
+  }
+
+  handleRowDoubleClick(item: any, index: number) {
+    if (this.didDrag) {
+      this.didDrag = false;
+      return;
+    }
+
+    this.clearSelectedRow(item, index);
+  }
 
   ngOnInit() { 
     this.getInvestor();
@@ -157,6 +183,7 @@ onMouseMove(e: MouseEvent, container: HTMLElement) {
 
   async getReports() {
     this.loadingModal = false;
+    this.selectedRowKey = null;
     return new Promise((resolve, reject) => {
       this._ReportsService.getReportsDocuments(this.filter).subscribe({
         next: (response: any) => {
@@ -246,6 +273,7 @@ onMouseMove(e: MouseEvent, container: HTMLElement) {
 
   filterGo() {
     const rawFilter = {
+      key: this.keyFilterControl.value,
       document_type_id: this.document_id,
       store_id: this.store_id,
       car_type_id: this.car_type_id,
@@ -257,6 +285,60 @@ onMouseMove(e: MouseEvent, container: HTMLElement) {
     );
 
     this.getReports();
+  }
+
+  getRowSelectionKey(item: any, index: number) {
+    return String(item?.id ?? item?.key ?? item?.carData ?? index);
+  }
+
+  selectRow(item: any, index: number) {
+    this.selectedRowKey = this.getRowSelectionKey(item, index);
+  }
+
+  clearSelectedRow(item: any, index: number) {
+    if (this.selectedRowKey === this.getRowSelectionKey(item, index)) {
+      this.selectedRowKey = null;
+    }
+  }
+
+  isSelectedRow(item: any, index: number) {
+    return this.selectedRowKey === this.getRowSelectionKey(item, index);
+  }
+
+  downloadFile() {
+    if (this.downloadingExcel) {
+      return;
+    }
+
+    if (this.list.length === 0) {
+      this._ToastrService.warning('No hay datos para descargar', 'Mensaje');
+      return;
+    }
+
+    this.downloadingExcel = true;
+    const dataPush = this.list.map((item: any) => {
+      const row: Record<string, string | number> = {
+        'Clave': item.key ?? '-',
+        'Auto': item.carData ?? '-',
+      };
+
+      for (const col of this.documentColumns) {
+        const doc = this.getDocument(item.documents, col);
+        row[col] = this.getDocumentExportValue(doc);
+      }
+
+      row['KM'] = item.km ?? '-';
+      row['A quien se le compró'] = item.salesperson_name ?? '-';
+
+      return row;
+    });
+
+    const binaryWS = XLSX.utils.json_to_sheet(dataPush);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, binaryWS, 'Listado de documentos');
+    XLSX.writeFile(wb, `Listado-documentos-${moment().format('DD-MM-YYYY')}.xlsx`);
+    this.downloadingExcel = false;
+    this._ToastrService.success('Descarga exitosa', 'Mensaje');
   }
 
   toggleStoreDropdown() {
@@ -335,5 +417,16 @@ onMouseMove(e: MouseEvent, container: HTMLElement) {
     this.document_id = data !== null ? data.id : '';
     
     this.closeTypeDocumentDropdown();
+  }
+
+  private getDocumentExportValue(doc: any): string {
+    if (!doc) {
+      return '-';
+    }
+
+    const status = doc.exist === 'true' ? 'OK' : 'NO';
+    const date = doc.require_date ? moment(doc.require_date).format('DD/MM/YYYY') : '';
+
+    return date ? `${status} - ${date}` : status;
   }
 }

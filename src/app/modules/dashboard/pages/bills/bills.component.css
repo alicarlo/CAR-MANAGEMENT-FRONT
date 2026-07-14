@@ -1,0 +1,11 @@
+.bills-date-input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+  -webkit-appearance: none;
+}
+
+.bills-date-input::-webkit-inner-spin-button,
+.bills-date-input::-webkit-clear-button {
+  display: none;
+  -webkit-appearance: none;
+}

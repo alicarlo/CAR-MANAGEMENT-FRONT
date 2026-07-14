@@ -1,7 +1,7 @@
 @reference "../../../../../../../styles.css";
 
 td {
-  padding: 0.75rem 1rem;
-  font-size: 0.85rem;
+  padding: var(--td-td-py) var(--td-td-px);
+  font-size: var(--td-td-font-size);
   @apply border-b border-muted/20;
 }
